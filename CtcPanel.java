@@ -254,18 +254,25 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     // draw grid
 
-    private void paintGrid (Graphics2D g2d, AffineTransform transform)
+    private void paintGrid (
+        Graphics2D  g2d,
+        AffineTransform transform,
+        int         screenWid,
+        int         screenHt )
     {
-        final int Col = 160;
-        final int Row =  55;
+        int       wid   = bmp [2].img.getWidth  (null);
+        int       ht    = bmp [2].img.getHeight (null);
+        int       cols  = screenWid / wid;
 
-        System.out.format ("paintGrid: wid %d, ht %d\n",
-            bmp [2].img.getWidth (null), bmp [2].img.getHeight (null) );
+        System.out.format ("paintGrid: wid %d, ht %d\n", wid, ht, cols);
 
-        for (int row = 1; row <= Row; row++)  {
-        }
-
-        for (int col = 1; col <= Col; col++)  {
+        int  y = screenHt - 2*ht;
+        for (int row = 0; row < 2; row++)  {
+            for (int col = 0; col <= cols; col++)  {
+                int x  = wid * col;
+                g2d.drawImage (bmp [2+row].img, x, y, this);
+            }
+            y -= ht;
         }
     }
 
@@ -293,7 +300,9 @@ public class CtcPanel extends JPanel
         int         x;
         int         y;
 
-        paintBmps     (g2d, transform);
-        paintGrid     (g2d, transform);
+        if (true)
+            paintBmps     (g2d, transform);
+        else
+            paintGrid     (g2d, transform, r.width, r.height);
     }
 }
