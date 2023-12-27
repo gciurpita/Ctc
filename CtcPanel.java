@@ -261,10 +261,10 @@ public class CtcPanel extends JPanel
         int         plateIdx,
         int         lvrIdx )
     {
-        System.out.format ("paintPlate:\n");
+     // System.out.format ("paintPlate:\n");
 
-        final int[] LvrXoff = {  9, 20,  8, 0};
-        final int[] LvrYoff = { 50, 43, 49, 20};
+        final int[] LvrXoff = {  9,  8, 20};
+        final int[] LvrYoff = { 50, 49, 43};
 
         g2d.drawImage (bmp [plateIdx].img, x0, y0, this);
 
@@ -293,27 +293,27 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     // draw grid
 
-    private void paintGrid (
+    private void paintCtcPlates (
         Graphics2D  g2d,
         AffineTransform transform,
-        int         nCols,
-        int         screenHt )
+        int         nCols )
     {
         System.out.format ("paintGrid: nCols %d\n", nCols);
 
         Rectangle   r   = frame.getBounds();
-        g2d.setColor (new Color(49, 107, 53));
-        g2d.fillRect (0, 0, r.width, r.height);
+        int         y0  = 150;
 
-        int       wid   = bmp [2].img.getWidth  (null);
-        int       ht    = bmp [2].img.getHeight (null);
+        g2d.setColor (Color.black);
+        g2d.fillRect (0, 0, r.width, y0);
 
-        int  y = screenHt - 2*ht;
+        g2d.setColor (new Color(49, 107, 53));  // CTC  green
+        g2d.fillRect (0, y0, r.width, r.height);
+
         for (int col = 0; col <= nCols; col++)  {
-            int x0 = col * 100;
+            int x0 = col * 100 + 25;
 
-            paintPlate (g2d, x0, 100, 4, col % 3);
-            paintPlate (g2d, x0, 200, 4, col % 2);
+            paintPlate (g2d, x0, y0,       4, col % 2); // turnout
+            paintPlate (g2d, x0, y0 + 100, 3, col % 3); // signal
         }
     }
 
@@ -342,6 +342,6 @@ public class CtcPanel extends JPanel
         if (false)
             paintPlates    (g2d, r.width, r.height);
         else
-            paintGrid     (g2d, transform, 5, r.height);
+            paintCtcPlates (g2d, transform, 7);
     }
 }
