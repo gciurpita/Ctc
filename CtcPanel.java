@@ -256,12 +256,22 @@ public class CtcPanel extends JPanel
 
     private void paintPlate (
         Graphics2D  g2d,
-        int         screenWid,
-        int         screenHt )
+        int         x0,
+        int         y0,
+        int         plateIdx,
+        int         lvrIdx )
     {
         System.out.format ("paintPlate:\n");
-    }
 
+        final int[] LvrXoff = {  9, 20,  8, 0};
+        final int[] LvrYoff = { 50, 43, 49, 20};
+
+        g2d.drawImage (bmp [plateIdx].img, x0, y0, this);
+
+        g2d.drawImage (  bmp [lvrIdx].img,
+                x0 + LvrXoff [lvrIdx],
+                y0 + LvrYoff [lvrIdx], this);
+    }
 
     // --------------------------------
     // draw CTC plate
@@ -271,46 +281,12 @@ public class CtcPanel extends JPanel
         int         screenWid,
         int         screenHt )
     {
-        System.out.format ("paintPlate:\n");
+        System.out.format ("paintPlates:\n");
 
-        g2d.setColor (Color.white);
-        g2d.drawLine (0, 100, CANVAS_WIDTH, 100);
-
-        final int[] LvrXoff = {  9, 20,  8, 0};
-        final int[] LvrYoff = { 50, 43, 49, 20};
-
-        int  wid   = bmp [3].img.getWidth  (null);
-        int  ht    = bmp [3].img.getHeight (null);
-        int  htLvr = bmp [0].img.getHeight (null);
-
-        int  y0    = 100;
-        int  y1    = y0 + ht;
-        int  y2    = y0 + 10;
-        int  dX    = 100;
-
-        for (int i = 0; i < 4; i++)
-            System.out.format (
-                "paintPlate: %d wid %3d, ht %3d\n", i,
-                    bmp [i].img.getWidth (null),
-                    bmp [i].img.getHeight (null) );
-
-        g2d.setColor (Color.black);
-        g2d.drawLine (0, y0, screenWid, y0);
-        g2d.drawLine (0, y2, screenWid, y2);
-        g2d.drawLine (0, y1, screenWid, y1);
-
+        int y0 = 100;
         for (int i = 0; i < 3; i++)  {
-            int x0  = (i+1) * dX;
-            g2d.drawImage (bmp [3].img, x0, y0, this);      // plate
-
-            int x1  = x0 + wid/2;
-            g2d.drawLine (x1, 0, x1, screenHt);             // center
-
-            int  lvrWid   = bmp [i].img.getWidth  (null);
-            int  lvrHt    = bmp [i].img.getHeight (null);
-
-            g2d.drawImage (bmp [i].img,
-                        x0 + LvrXoff [i], y0 + LvrYoff [i], this);    // lever
+            int x0  = (i+1) * 100;
+            paintPlate (g2d, x0, y0, 4, i);
         }
     }
 
@@ -320,27 +296,24 @@ public class CtcPanel extends JPanel
     private void paintGrid (
         Graphics2D  g2d,
         AffineTransform transform,
-        int         screenWid,
+        int         nCols,
         int         screenHt )
     {
+        System.out.format ("paintGrid: nCols %d\n", nCols);
+
+        Rectangle   r   = frame.getBounds();
+        g2d.setColor (new Color(49, 107, 53));
+        g2d.fillRect (0, 0, r.width, r.height);
+
         int       wid   = bmp [2].img.getWidth  (null);
         int       ht    = bmp [2].img.getHeight (null);
-        int       cols  = screenWid / wid;
-
-        g2d.setColor (new Color(49, 107, 53));
-        g2d.fillRect (0, 0, screenWid, screenHt);
-
-        System.out.format ("paintGrid: wid %d, ht %d\n", wid, ht, cols);
 
         int  y = screenHt - 2*ht;
-        for (int row = 0; row < 2; row++)  {
-            for (int col = 0; col <= cols; col++)  {
-                int x  = wid * col;
-                g2d.drawImage (
-                    makeColorTransparent (bmp [2+row].img, Color.white),
-                    x, y, this);
-            }
-            y -= ht;
+        for (int col = 0; col <= nCols; col++)  {
+            int x0 = col * 100;
+
+            paintPlate (g2d, x0, 100, 4, col % 3);
+            paintPlate (g2d, x0, 200, 4, col % 2);
         }
     }
 
@@ -366,9 +339,9 @@ public class CtcPanel extends JPanel
         int         x;
         int         y;
 
-        if (true)
+        if (false)
             paintPlates    (g2d, r.width, r.height);
         else
-            paintGrid     (g2d, transform, r.width, r.height);
+            paintGrid     (g2d, transform, 5, r.height);
     }
 }
