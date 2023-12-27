@@ -7,6 +7,11 @@ import javax.swing.*;
 import java.util.*;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
+import java.awt.image.RGBImageFilter;
+import java.awt.image.FilteredImageSource;
+
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import javax.imageio.ImageIO;
@@ -220,9 +225,39 @@ public class CtcPanel extends JPanel
     public void mouseReleased (MouseEvent e) { }
 
     // ------------------------------------------------------------------------
+    //Just copy-paste this method
+    public static Image makeColorTransparent (
+        Image       im,
+        final Color color)
+    {
+        ImageFilter filter = new RGBImageFilter() {
+
+            // the color we are looking for... Alpha bits are set to opaque
+            public int markerRGB = color.getRGB() | 0xFF000000;
+
+            public final int filterRGB(int x, int y, int rgb) {
+                if ((rgb | 0xFF000000) == markerRGB) {
+                    // Mark the alpha bits as zero - transparent
+                    return 0x00FFFFFF & rgb;
+                }
+                else {
+                    // nothing to do
+                    return rgb;
+                }
+            }
+        };
+
+        ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
+        return Toolkit.getDefaultToolkit().createImage(ip);
+    }
+
+    // ------------------------------------------------------------------------
     // draws bmps
 
-    private void paintBmps (Graphics2D g2d, AffineTransform transform)
+    private void paintBmps (
+        Graphics2D  g2d,
+        int         screenWid,
+        int         screenHt )
     {
         int     b;
         int     x0  = 0;
@@ -235,19 +270,20 @@ public class CtcPanel extends JPanel
         g2d.setColor (Color.white);
         g2d.drawLine (0, 100, CANVAS_WIDTH, 100);
 
-        for (b = 0; b < 5; b++)  {
-            System.out.format ("  paintBmps: %d  wid %d\n",
-                    b, bmp [b].img.getWidth(null));
+        int  wid   = bmp [3].img.getWidth  (null);
+        int  ht    = bmp [3].img.getHeight (null);
 
-            x  = b * 100;
-            y  = 100;
+        g2d.setColor (Color.black);
+        g2d.drawLine (0, ht, screenWid, ht);
 
-            transform.translate (x - x0, y - y0);
+        for (int i = 0; i < 3; i++)  {
+            x  = i * wid;
+            g2d.drawImage (bmp [3].img, x, 0, this);
 
-            x0 = x;
-            y0 = y;
+            int  lvrWid   = bmp [i].img.getWidth  (null);
+            int  lvrHt    = bmp [i].img.getHeight (null);
 
-            g2d.drawImage (bmp [b].img, transform, this);
+            g2d.drawImage (bmp [i].img, x, ht-lvrHt, this);
         }
     }
 
@@ -264,13 +300,18 @@ public class CtcPanel extends JPanel
         int       ht    = bmp [2].img.getHeight (null);
         int       cols  = screenWid / wid;
 
+        g2d.setColor (new Color(49, 107, 53));
+        g2d.fillRect (0, 0, screenWid, screenHt);
+
         System.out.format ("paintGrid: wid %d, ht %d\n", wid, ht, cols);
 
         int  y = screenHt - 2*ht;
         for (int row = 0; row < 2; row++)  {
             for (int col = 0; col <= cols; col++)  {
                 int x  = wid * col;
-                g2d.drawImage (bmp [2+row].img, x, y, this);
+                g2d.drawImage (
+                    makeColorTransparent (bmp [2+row].img, Color.white),
+                    x, y, this);
             }
             y -= ht;
         }
@@ -289,8 +330,6 @@ public class CtcPanel extends JPanel
         // set background to black
      // g2d.setColor (Color.black);
      // g2d.setColor (new Color.parseColor("#316b35"));
-        g2d.setColor (new Color(49, 107, 53));
-        g2d.fillRect (0, 0, r.width, r.height);
 
         // -----------------------------------------------
         AffineTransform transform = new AffineTransform ();
@@ -301,7 +340,7 @@ public class CtcPanel extends JPanel
         int         y;
 
         if (true)
-            paintBmps     (g2d, transform);
+            paintBmps     (g2d, r.width, r.height);
         else
             paintGrid     (g2d, transform, r.width, r.height);
     }
