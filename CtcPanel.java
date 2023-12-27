@@ -252,38 +252,65 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    // draws bmps
+    // draw CTC plate
 
-    private void paintBmps (
+    private void paintPlate (
         Graphics2D  g2d,
         int         screenWid,
         int         screenHt )
     {
-        int     b;
-        int     x0  = 0;
-        int     y0  = 0;
-        int     x;
-        int     y;
+        System.out.format ("paintPlate:\n");
+    }
 
-        System.out.format ("paintBmps:\n");
+
+    // --------------------------------
+    // draw CTC plate
+
+    private void paintPlates (
+        Graphics2D  g2d,
+        int         screenWid,
+        int         screenHt )
+    {
+        System.out.format ("paintPlate:\n");
 
         g2d.setColor (Color.white);
         g2d.drawLine (0, 100, CANVAS_WIDTH, 100);
 
+        final int[] LvrXoff = {  9, 20,  8, 0};
+        final int[] LvrYoff = { 50, 43, 49, 20};
+
         int  wid   = bmp [3].img.getWidth  (null);
         int  ht    = bmp [3].img.getHeight (null);
+        int  htLvr = bmp [0].img.getHeight (null);
+
+        int  y0    = 100;
+        int  y1    = y0 + ht;
+        int  y2    = y0 + 10;
+        int  dX    = 100;
+
+        for (int i = 0; i < 4; i++)
+            System.out.format (
+                "paintPlate: %d wid %3d, ht %3d\n", i,
+                    bmp [i].img.getWidth (null),
+                    bmp [i].img.getHeight (null) );
 
         g2d.setColor (Color.black);
-        g2d.drawLine (0, ht, screenWid, ht);
+        g2d.drawLine (0, y0, screenWid, y0);
+        g2d.drawLine (0, y2, screenWid, y2);
+        g2d.drawLine (0, y1, screenWid, y1);
 
         for (int i = 0; i < 3; i++)  {
-            x  = i * wid;
-            g2d.drawImage (bmp [3].img, x, 0, this);
+            int x0  = (i+1) * dX;
+            g2d.drawImage (bmp [3].img, x0, y0, this);      // plate
+
+            int x1  = x0 + wid/2;
+            g2d.drawLine (x1, 0, x1, screenHt);             // center
 
             int  lvrWid   = bmp [i].img.getWidth  (null);
             int  lvrHt    = bmp [i].img.getHeight (null);
 
-            g2d.drawImage (bmp [i].img, x, ht-lvrHt, this);
+            g2d.drawImage (bmp [i].img,
+                        x0 + LvrXoff [i], y0 + LvrYoff [i], this);    // lever
         }
     }
 
@@ -340,7 +367,7 @@ public class CtcPanel extends JPanel
         int         y;
 
         if (true)
-            paintBmps     (g2d, r.width, r.height);
+            paintPlates    (g2d, r.width, r.height);
         else
             paintGrid     (g2d, transform, r.width, r.height);
     }
