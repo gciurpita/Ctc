@@ -38,22 +38,35 @@ public class CtcPanel extends JPanel
 
     private static final String Title           = "Pacific Southern Railway";
 
-    public static final int     CANVAS_WIDTH    = 800;
-    public static final int     CANVAS_HEIGHT   = 400;
+    final int       CANVAS_WIDTH    = 800;
+    final int       CANVAS_HEIGHT   = 400;
 
-    private int                 dbg             = 0;
+    final int       ColMax          = 20;
+    final   int     ColOff          = 25;
+    final   int     ColWid          = 100;
+    final   int     Ncol            = CANVAS_WIDTH / ColWid;
 
-    private Bmp                 bg;
-    private int                 bgSize          = 0;
+    final   int     RowOff          = 150;
+    final   int     RowHt           = 100;
 
-    private static final int    MAX_BMP         = 200;
-    private static final int    MAX_ELEM        = 5000;
-    private static final int    MAX_RECT        = 50;
-    private static final int    MAX_TEXT        = 1000;
+    private int     dbg             = 0;
 
-    private String              cfgFile;
-    private Bmp                 bmp []          = new Bmp  [MAX_BMP];
-    private int                 bmpSize         = 0;
+    final int       MAX_BMP         = 10;
+    String          cfgFile;
+    Bmp             bmp []          = new Bmp  [MAX_BMP];
+    int             bmpSize         = 0;
+
+    final int       ImgIdxSig       = 3;
+    final int       ImgIdxSw        = 4;
+
+    final int       LvrLeft         = 0;
+    final int       LvrRight        = 1;
+    final int       LvrCenter       = 2;
+
+    int             plateWid;
+
+    int             sigPos []       = new int [ColMax];
+    int             swPos  []       = new int [ColMax];
 
     // ------------------------------------------------------------------------
     // constructor loads the configuration files and
@@ -81,9 +94,15 @@ public class CtcPanel extends JPanel
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
         frame.setBounds (900, 0, r.width, r.height);
+
+        // initialize CTC
+        plateWid = bmp [ImgIdxSig].img.getWidth(null); 
+        for (int col = 0; col < ColMax; col++)
+            sigPos [col] = LvrCenter;
     }
 
     // --------------------------------
+    public void keyReleased (KeyEvent e) { }
     public void keyPressed (KeyEvent e)
     {
         int     code    = e.getKeyCode();
@@ -97,12 +116,6 @@ public class CtcPanel extends JPanel
             default:
                 break;      // ignore char keypresses belwo
         }
-    }
-
-    // --------------------------------
-    public void keyReleased (KeyEvent e)
-    {
-        // ignore
     }
 
     // --------------------------------
@@ -145,7 +158,8 @@ public class CtcPanel extends JPanel
     private void loadImage (String imgFileName, Bmp bmp)
         throws IllegalArgumentException
     {
-        System.out.format ("      loadImage: %s\n", imgFileName);
+        if (0 != dbg)
+            System.out.format ("      loadImage: %s\n", imgFileName);
 
         URL url = getClass ().getClassLoader ().getResource (imgFileName);
 
@@ -174,7 +188,8 @@ public class CtcPanel extends JPanel
 
         while ((line = br.readLine()) != null)  {
             String[]    fields = line.split("  *");
-            System.out.format ("   loadCfg: %s - %s\n", line, fields [0]);
+            if (0 != dbg)
+                System.out.format ("   loadCfg: %s - %s\n", line, fields [0]);
 
             // -----------------------------------------------------------------
             // load icon
@@ -201,8 +216,6 @@ public class CtcPanel extends JPanel
             System.out.format ("main: %d %s\n", i, args[i]);
 
         CtcPanel disp = new CtcPanel (args[0]);
-     // CtcPanel disp = new CtcPanel ("Resources/ctcTiles");
-        System.out.format ("  main: done\n");
     }
 
     // ------------------------------------------------------------------------
@@ -210,11 +223,7 @@ public class CtcPanel extends JPanel
 
     public void mousePressed (MouseEvent ev)
     {
-        int  p       = ev.getX();
-        int  q       = ev.getY();
-
-
-        requestFocusInWindow ();
+        leverAdjust (ev.getX(), ev.getY());
     }
 
     // ------------------------------------------------------------------------
@@ -252,6 +261,41 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    private void leverAdjust (
+        int  x,
+        int  y )
+    {
+        int col = (x - ColOff) / ColWid;
+        int row = (y - RowOff) / RowHt;
+
+        int dX  = (x - ColOff) % ColWid;
+
+        if (plateWid < dX)
+            return;
+
+        if (0 == row) {
+            if ((dX < plateWid / 2))
+                swPos [col] = LvrLeft;
+            else
+                swPos [col] = LvrRight;
+        }
+        else {
+            if (dX < (plateWid / 3))
+                sigPos [col] = LvrLeft;
+            else if (dX < (plateWid * 2 / 3))
+                sigPos [col] = LvrCenter;
+            else
+                sigPos [col] = LvrRight;
+        }
+
+        System.out.format (
+            " leverAdjust: (%3d, %3d), [%2d, %d], dX %2d, | %d, sw %d, sig %d\n",
+                x, y, col, row, dX, ColWid/2, swPos [col], sigPos [col]);
+
+        repaint ();
+    }
+
+    // ------------------------------------------------------------------------
     // draw CTC plate
 
     private void paintPlate (
@@ -261,7 +305,8 @@ public class CtcPanel extends JPanel
         int         plateIdx,
         int         lvrIdx )
     {
-     // System.out.format ("paintPlate:\n");
+        if (0 != dbg)
+            System.out.format ("  paintPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
         final int[] LvrXoff = {  9,  8, 20};
         final int[] LvrYoff = { 50, 49, 43};
@@ -295,13 +340,13 @@ public class CtcPanel extends JPanel
 
     private void paintCtcPlates (
         Graphics2D  g2d,
-        AffineTransform transform,
-        int         nCols )
+        AffineTransform transform )
     {
-        System.out.format ("paintGrid: nCols %d\n", nCols);
+        if (0 != dbg)
+            System.out.format ("paintGrid:\n");
 
         Rectangle   r   = frame.getBounds();
-        int         y0  = 150;
+        int         y0  = RowOff;
 
         g2d.setColor (Color.black);
         g2d.fillRect (0, 0, r.width, y0);
@@ -309,11 +354,11 @@ public class CtcPanel extends JPanel
         g2d.setColor (new Color(49, 107, 53));  // CTC  green
         g2d.fillRect (0, y0, r.width, r.height);
 
-        for (int col = 0; col <= nCols; col++)  {
-            int x0 = col * 100 + 25;
+        for (int col = 0; col <= Ncol; col++)  {
+            int x0 = col * ColWid + ColOff;
 
-            paintPlate (g2d, x0, y0,       4, col % 2); // turnout
-            paintPlate (g2d, x0, y0 + 100, 3, col % 3); // signal
+            paintPlate (g2d, x0, y0,         ImgIdxSw,  swPos  [col]);
+            paintPlate (g2d, x0, y0 + RowHt, ImgIdxSig, sigPos [col]);
         }
     }
 
@@ -342,6 +387,6 @@ public class CtcPanel extends JPanel
         if (false)
             paintPlates    (g2d, r.width, r.height);
         else
-            paintCtcPlates (g2d, transform, 7);
+            paintCtcPlates (g2d, transform);
     }
 }
