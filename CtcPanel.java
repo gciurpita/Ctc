@@ -23,9 +23,60 @@ import javax.imageio.ImageIO;
 // bitmap description - id, label, ...
 
 class Bmp {
+ // public static final int  BG      = 0;
+ // public static final int  Tile    = 1;
+ // public static final int  Lamp    = 2;
+ // public static final int  Lever   = 3;
+ // public static final int  PlateSw = 4;
+ // public static final int  PlateTo = 5;
+
+    public enum ImgType { Lamp, Lever, PlateSw, PlateTo, None };
+
     Image   img;
+    String  name;
+    int     type;
+    int     id;
+
     public Bmp (String filename) {
     }
+
+    // ---------------------------------------------------------
+    // translate string to type value (if possible)
+
+    public static ImgType stringToType (String s)  {
+        ImgType type;
+
+        if (s.equals("Lamp"))
+            type = ImgType.Lamp;
+        else if (s.equals("Lever"))
+            type = ImgType.Lever;
+        else if (s.equals("PlateSw"))
+            type = ImgType.PlateSw;
+        else if (s.equals("PlateTo"))
+            type = ImgType.PlateTo;
+        else
+            type = ImgType.None;
+
+        return type;
+    }
+
+}
+
+// -------------------------------------
+class ImgLamp {
+    Image   img;
+}
+class ImgLvr {
+    Image   img;
+}
+
+
+class ImgSig {
+    Image   img;
+}
+
+class ImgSw {
+    Image   img;
 }
 
 // -----------------------------------------------------------------------------
@@ -51,10 +102,20 @@ public class CtcPanel extends JPanel
 
     private int     dbg             = 0;
 
-    final int       MAX_BMP         = 10;
     String          cfgFile;
-    Bmp             bmp []          = new Bmp  [MAX_BMP];
-    int             bmpSize         = 0;
+
+    final int       MaxImg          = 20;
+    ImgLvr          imgLvr []       = new ImgLvr  [MaxImg];
+    int             imgLvrSize      = 0;
+
+    ImgLamp         imgLamp []      = new ImgLamp [MaxImg];
+    int             imgLampSize     = 0;
+
+    ImgSig          imgSig []       = new ImgSig  [MaxImg];
+    int             imgSigSize      = 0;
+
+    ImgSw           imgSw []        = new ImgSw   [MaxImg];
+    int             imgSwSize       = 0;
 
     final int       ImgIdxSig       = 3;
     final int       ImgIdxSw        = 4;
@@ -67,6 +128,22 @@ public class CtcPanel extends JPanel
 
     int             sigPos []       = new int [ColMax];
     int             swPos  []       = new int [ColMax];
+
+    // ---------------------------------------------------------
+    public enum ImgType { Lamp, Lever, PlateSw, PlateTo, None };
+
+    public ImgType stringToType (String s)  {
+        if (s.equals("Lamp"))
+            return ImgType.Lamp;
+        else if (s.equals("Lever"))
+            return ImgType.Lever;
+        else if (s.equals("PlateSw"))
+            return ImgType.PlateSw;
+        else if (s.equals("PlateTo"))
+            return ImgType.PlateTo;
+
+        return ImgType.None;
+    }
 
     // ------------------------------------------------------------------------
     // constructor loads the configuration files and
@@ -97,7 +174,7 @@ public class CtcPanel extends JPanel
         frame.setBounds (900, 0, r.width, r.height);
 
         // initialize CTC
-        plateWid = bmp [ImgIdxSig].img.getWidth(null); 
+    //  plateWid = bmp [ImgIdxSig].img.getWidth(null); 
         for (int col = 0; col < ColMax; col++)
             sigPos [col] = LvrCenter;
     }
@@ -164,6 +241,8 @@ public class CtcPanel extends JPanel
 
         URL url = getClass ().getClassLoader ().getResource (imgFileName);
 
+                bmp[bmpSize] = new Bmp (fields[3]);
+
         if  (url == null) {
             throw new IllegalArgumentException ("cannot find " + imgFileName);
         } else {
@@ -201,8 +280,10 @@ public class CtcPanel extends JPanel
                         "Error - loadCfg: icon type id  <filename>\n");
                 }
 
-                bmp[bmpSize] = new Bmp (fields[3]);
-                loadImage (fields[3], bmp[bmpSize++]);
+                int     id   = Integer.parseInt(fields[2]);
+                ImgType type = Bmp.stringToType (fields[1]);
+
+                loadImage (fields[3], id, type);
             }
         }
     }
