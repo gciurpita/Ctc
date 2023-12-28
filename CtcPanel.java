@@ -90,6 +90,7 @@ public class CtcPanel extends JPanel
         frame.pack ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.setVisible (true);
+        frame.setTitle   ("CTC Panel");
 
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
