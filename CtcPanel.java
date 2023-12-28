@@ -384,7 +384,7 @@ public class CtcPanel extends JPanel
         Graphics2D  g2d,
         int         x0,
         int         y0,
-        int         plateIdx,
+        Image       img,
         int         lvrIdx )
     {
         if (0 != dbg)
@@ -393,7 +393,7 @@ public class CtcPanel extends JPanel
         final int[] LvrXoff = {  9,  8, 20};
         final int[] LvrYoff = { 50, 49, 43};
 
-        g2d.drawImage (imgTo [plateIdx].img, x0, y0, this);
+        g2d.drawImage (img, x0, y0, this);
 
         g2d.drawImage ( imgLvr [lvrIdx].img,
                 x0 + LvrXoff [lvrIdx],
@@ -413,7 +413,7 @@ public class CtcPanel extends JPanel
         int y0 = 100;
         for (int i = 0; i < 3; i++)  {
             int x0  = (i+1) * 100;
-            paintPlate (g2d, x0, y0, 4, i);
+         // paintPlate (g2d, x0, y0, 4, i);
         }
     }
 
@@ -429,7 +429,7 @@ public class CtcPanel extends JPanel
 
         Rectangle   r      = frame.getBounds();
         int         colWid = imgTo [0].img.getWidth (null);
-        int         rowHt  = imgTo [0].img.getHeight (null);
+        int         nCol   = r.width / colWid;
         int         y0     = RowOff;
         int         y1     = y0 + imgTo [0].img.getHeight (null);
 
@@ -439,16 +439,16 @@ public class CtcPanel extends JPanel
      // g2d.setColor (new Color(49, 107, 53));   // CTC  green
         g2d.setColor (new Color(115, 104, 50));  // #736832
 
-        for (int col = 0; col <= Ncol; col++)  {
+        for (int col = 0; col < nCol; col++)  {
             int x0 = col * colWid;
 
-            paintPlate (g2d, x0, y0, ImgIdxSw,  swPos  [col]);
-            paintPlate (g2d, x0, y1, ImgIdxSig, sigPos [col]);
+            paintPlate (g2d, x0, y0, imgTo  [col].img, swPos  [col]);
+            paintPlate (g2d, x0, y1, imgSig [col].img, sigPos [col]);
         }
 
-        y0 += rowHt + imgTo [0].img.getHeight (null);   // To or Sig
+        y1 += imgSig [0].img.getHeight (null);
 
-        g2d.fillRect (0, y0, r.width, 30);
+        g2d.fillRect (0, y1, r.width, 30);
     }
 
     // ------------------------------------------------------------------------
