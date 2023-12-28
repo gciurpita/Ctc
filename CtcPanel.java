@@ -162,16 +162,11 @@ public class CtcPanel extends JPanel
         if (0 != dbg)
             System.out.format ("      loadImage: %s\n", imgFileName);
 
-        URL url = getClass ().getClassLoader ().getResource (imgFileName);
-
-        if  (url == null) {
-            throw new IllegalArgumentException ("cannot find " + imgFileName);
-        } else {
-            try {
-                bmp.img  = ImageIO.read (url);
-            } catch  (IOException ex) {
-                ex.printStackTrace ();
-            }
+        try {
+            File   inFile  = new File (imgFileName);
+            bmp.img  = ImageIO.read (inFile);
+        } catch  (IOException ex) {
+            ex.printStackTrace ();
         }
     }
 
