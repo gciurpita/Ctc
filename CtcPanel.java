@@ -20,9 +20,14 @@ import javax.imageio.ImageIO;
 @SuppressWarnings ("serial")
 
 // -----------------------------------------------------------------------------
+class ImgCode {
+    Image   img;
+}
+
 class ImgLamp {
     Image   img;
 }
+
 class ImgLvr {
     Image   img;
 }
@@ -53,11 +58,14 @@ public class CtcPanel extends JPanel
     String          cfgFile;
 
     final int       MaxImg          = 20;
-    ImgLvr          imgLvr []       = new ImgLvr  [MaxImg];
-    int             imgLvrSize      = 0;
+    ImgCode         imgCode []      = new ImgCode [MaxImg];
+    int             imgCodeSize     = 0;
 
     ImgLamp         imgLamp []      = new ImgLamp [MaxImg];
     int             imgLampSize     = 0;
+
+    ImgLvr          imgLvr []       = new ImgLvr  [MaxImg];
+    int             imgLvrSize      = 0;
 
     ImgSig          imgSig []       = new ImgSig  [MaxImg];
     int             imgSigSize      = 0;
@@ -85,10 +93,12 @@ public class CtcPanel extends JPanel
     int             swPos  []       = new int [ColMax];
 
     // ---------------------------------------------------------
-    public enum ImgType { Lamp, Lever, PlateSig, PlateTo, None };
+    public enum ImgType { Code, Lamp, Lever, PlateSig, PlateTo, None };
 
     public ImgType stringToType (String s)  {
-        if (s.equals("Lamp"))
+        if (s.equals("Code"))
+            return ImgType.Code;
+        else if (s.equals("Lamp"))
             return ImgType.Lamp;
         else if (s.equals("Lever"))
             return ImgType.Lever;
@@ -101,7 +111,9 @@ public class CtcPanel extends JPanel
     }
 
     public String typeToString (ImgType type)  {
-        if (ImgType.Lamp == type)
+        if (ImgType.Code == type)
+            return "Code";
+        else if (ImgType.Lamp == type)
             return "Lamp";
         else if (ImgType.Lever == type)
             return "Lever";
@@ -150,7 +162,7 @@ public class CtcPanel extends JPanel
         frame.setBounds (900, 0, r.width, r.height);
 
         // initialize CTC
-    //  plateWid = bmp [ImgIdxSig].img.getWidth(null); 
+    //  plateWid = bmp [ImgIdxSig].img.getWidth(null);
         for (int col = 0; col < ColMax; col++)
             sigPos [col] = LvrCenter;
     }
@@ -219,6 +231,12 @@ public class CtcPanel extends JPanel
         try {
             File   inFile  = new File (imgFileName);
             switch (type) {
+            case Code:
+                imgCode [imgCodeSize]     = new ImgCode ();
+                imgCode [imgCodeSize].img = ImageIO.read (inFile);
+                imgCodeSize++;
+                break;
+
             case Lamp:
                 imgLamp [imgLampSize]     = new ImgLamp ();
                 imgLamp [imgLampSize].img = ImageIO.read (inFile);
@@ -242,7 +260,7 @@ public class CtcPanel extends JPanel
                 imgTo [imgToSize].img    = ImageIO.read (inFile);
 
                 if (0 != dbg)
-                    System.out.format ("     loadImage: wid %4d\n", 
+                    System.out.format ("     loadImage: wid %4d\n",
                             imgTo [imgToSize].img.getWidth (null));
 
                 imgToSize++;
@@ -374,7 +392,7 @@ public class CtcPanel extends JPanel
             else
                 sigPos [col] = LvrRight;
         }
-        else 
+        else
             return;
 
         if (0 != dbg)
@@ -463,24 +481,26 @@ public class CtcPanel extends JPanel
 
         Rectangle   r      = frame.getBounds();
         int         y0     = RowOff;
-        int         y1     = y0 + imgTo [0].img.getHeight (null);
+        int         y1     = y0 + imgTo  [0].img.getHeight (null);
+        int         y2     = y1 + imgSig [0].img.getHeight (null);
 
         g2d.setColor (Color.black);
         g2d.fillRect (0, 0, r.width, r.height);
 
      // g2d.setColor (new Color(49, 107, 53));   // CTC  green
         g2d.setColor (new Color(115, 104, 50));  // #736832
+     // y1 += imgSig [0].img.getHeight (null);
+        g2d.fillRect (0, y2, r.width, 50);
 
         for (int col = 0; col < nCol; col++)  {
             int x0 = col * colWid;
 
             paintPlate (g2d, x0, y0, false, col, swPos  [col]);
             paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
+
+            g2d.drawImage (imgCode [0].img, x0 + 15, y2 + 5, this);
         }
 
-        y1 += imgSig [0].img.getHeight (null);
-
-        g2d.fillRect (0, y1, r.width, 30);
     }
 
     // ------------------------------------------------------------------------
