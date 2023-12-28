@@ -50,7 +50,7 @@ public class CtcPanel extends JPanel
 
     final int       ColMax          = 20;
     final   int     ColOff          = 25;
-    final   int     ColWid          = 100;
+    final   int     ColWid          = 60;
     final   int     Ncol            = CANVAS_WIDTH / ColWid;
 
     final   int     RowOff          = 150;
@@ -101,6 +101,19 @@ public class CtcPanel extends JPanel
         return ImgType.None;
     }
 
+    public String typeToString (ImgType type)  {
+        if (ImgType.Lamp == type)
+            return "Lamp";
+        else if (ImgType.Lever == type)
+            return "Lever";
+        else if (ImgType.PlateSig == type)
+            return "Signal";
+        else if (ImgType.PlateTo == type)
+            return "Turnout";
+
+        return "Unknown";
+    }
+
     // ------------------------------------------------------------------------
     // constructor loads the configuration files and
     //   determines the initial display geometry
@@ -116,6 +129,9 @@ public class CtcPanel extends JPanel
 
         cfgFile  = configuration;
         loadCfg (configuration);
+
+        System.out.format (" CtcPanel: sig wid %3d, to wid %3d\n",
+            imgSig [1].img.getWidth (null), imgTo [1].img.getWidth (null) );
 
         this.setPreferredSize (new Dimension (CANVAS_WIDTH, CANVAS_HEIGHT));
 
@@ -193,32 +209,38 @@ public class CtcPanel extends JPanel
         throws IllegalArgumentException
     {
         if (0 != dbg)
-            System.out.format ("      loadImage: %s\n", imgFileName);
+            System.out.format ("      loadImage:  %s %8s %2d\n",
+                    imgFileName, typeToString (type), id);
 
         try {
             File   inFile  = new File (imgFileName);
             switch (type) {
             case Lamp:
-                ImgLamp  imgLamp = new ImgLamp ();
-                imgLamp.img      = ImageIO.read (inFile);
+                imgLamp [imgLampSize]     = new ImgLamp ();
+                imgLamp [imgLampSize].img = ImageIO.read (inFile);
                 imgLampSize++;
                 break;
 
             case Lever:
-                ImgLvr  imgLvr  = new ImgLvr ();
-                imgLvr.img      = ImageIO.read (inFile);
+                imgLvr [imgLvrSize]       = new ImgLvr ();
+                imgLvr [imgLvrSize].img   = ImageIO.read (inFile);
                 imgLvrSize++;
                 break;
 
             case PlateSig:
-                ImgSig  imgSig  = new ImgSig ();
-                imgSig.img      = ImageIO.read (inFile);
+                imgSig [imgSigSize]       = new ImgSig ();
+                imgSig [imgSigSize].img   = ImageIO.read (inFile);
                 imgSigSize++;
                 break;
 
             case PlateTo:
-                ImgTo  imgTo   = new ImgTo ();
-                imgTo.img      = ImageIO.read (inFile);
+                imgTo [imgToSize]        = new ImgTo ();
+                imgTo [imgToSize].img    = ImageIO.read (inFile);
+
+                if (0 != dbg)
+                    System.out.format ("     loadImage: wid %4d\n", 
+                            imgTo [imgToSize].img.getWidth (null));
+
                 imgToSize++;
                 break;
 
@@ -246,7 +268,7 @@ public class CtcPanel extends JPanel
 
         while ((line = br.readLine()) != null)  {
             String[]    fields = line.split("  *");
-       //   if (0 != dbg)
+            if (0 != dbg)
                 System.out.format ("   loadCfg: %s - %s\n", line, fields [0]);
 
             // -----------------------------------------------------------------
@@ -405,21 +427,28 @@ public class CtcPanel extends JPanel
         if (0 != dbg)
             System.out.format ("paintGrid:\n");
 
-        Rectangle   r   = frame.getBounds();
-        int         y0  = RowOff;
+        Rectangle   r      = frame.getBounds();
+        int         colWid = imgTo [0].img.getWidth (null);
+        int         rowHt  = imgTo [0].img.getHeight (null);
+        int         y0     = RowOff;
+        int         y1     = y0 + imgTo [0].img.getHeight (null);
 
         g2d.setColor (Color.black);
-        g2d.fillRect (0, 0, r.width, y0);
+        g2d.fillRect (0, 0, r.width, r.height);
 
-        g2d.setColor (new Color(49, 107, 53));  // CTC  green
-        g2d.fillRect (0, y0, r.width, r.height);
+     // g2d.setColor (new Color(49, 107, 53));   // CTC  green
+        g2d.setColor (new Color(115, 104, 50));  // #736832
 
         for (int col = 0; col <= Ncol; col++)  {
-            int x0 = col * ColWid + ColOff;
+            int x0 = col * colWid;
 
-        //  paintPlate (g2d, x0, y0,         ImgIdxSw,  swPos  [col]);
-        //  paintPlate (g2d, x0, y0 + RowHt, ImgIdxSig, sigPos [col]);
+            paintPlate (g2d, x0, y0, ImgIdxSw,  swPos  [col]);
+            paintPlate (g2d, x0, y1, ImgIdxSig, sigPos [col]);
         }
+
+        y0 += rowHt + imgTo [0].img.getHeight (null);   // To or Sig
+
+        g2d.fillRect (0, y0, r.width, 30);
     }
 
     // ------------------------------------------------------------------------
@@ -444,7 +473,7 @@ public class CtcPanel extends JPanel
         int         x;
         int         y;
 
-        if (true)
+        if (false)
             paintPlates    (g2d, r.width, r.height);
         else
             paintCtcPlates (g2d, transform);
