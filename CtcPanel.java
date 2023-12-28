@@ -48,14 +48,6 @@ public class CtcPanel extends JPanel
     final int       CANVAS_WIDTH    = 800;
     final int       CANVAS_HEIGHT   = 400;
 
-    final int       ColMax          = 20;
-    final   int     ColOff          = 25;
-    final   int     ColWid          = 60;
-    final   int     Ncol            = CANVAS_WIDTH / ColWid;
-
-    final   int     RowOff          = 150;
-    final   int     RowHt           = 100;
-
     private int     dbg             = 0;
 
     String          cfgFile;
@@ -80,7 +72,14 @@ public class CtcPanel extends JPanel
     final int       LvrRight        = 1;
     final int       LvrCenter       = 2;
 
-    int             plateWid;
+    final int       ColMax          = 20;
+    int             nCol;
+    int             colWid;
+
+    final int       RowOff          = 150;
+    int             sigHt;
+    int             toHt;
+
 
     int             sigPos []       = new int [ColMax];
     int             swPos  []       = new int [ColMax];
@@ -129,6 +128,11 @@ public class CtcPanel extends JPanel
 
         cfgFile  = configuration;
         loadCfg (configuration);
+
+        colWid  = imgTo [0].img.getWidth (null);
+        nCol    = CANVAS_WIDTH / colWid;
+        toHt    = imgTo  [0].img.getHeight (null);
+        sigHt   = imgSig [0].img.getHeight (null);
 
         System.out.format (" CtcPanel: sig wid %3d, to wid %3d\n",
             imgSig [1].img.getWidth (null), imgTo [1].img.getWidth (null) );
@@ -347,32 +351,36 @@ public class CtcPanel extends JPanel
         int  x,
         int  y )
     {
-        int col = (x - ColOff) / ColWid;
-        int row = (y - RowOff) / RowHt;
+     // System.out.format ("leverAdjust: %3d x %3d\n", x, y);
 
-        int dX  = (x - ColOff) % ColWid;
+        int col = x / colWid;
+        int dX  = x % colWid;
+        int row;
 
-        if (plateWid < dX)
+        if (y < RowOff)
             return;
 
-        if (0 == row) {
-            if ((dX < plateWid / 2))
+        if (y < (RowOff + toHt))  {
+            if ((dX < colWid / 2))
                 swPos [col] = LvrLeft;
             else
                 swPos [col] = LvrRight;
         }
-        else {
-            if (dX < (plateWid / 3))
+        else if (y < (RowOff + toHt + sigHt))  {
+            if (dX < (colWid / 3))
                 sigPos [col] = LvrLeft;
-            else if (dX < (plateWid * 2 / 3))
+            else if (dX < (colWid * 2 / 3))
                 sigPos [col] = LvrCenter;
             else
                 sigPos [col] = LvrRight;
         }
+        else 
+            return;
 
-        System.out.format (
-            " leverAdjust: (%3d, %3d), [%2d, %d], dX %2d, | %d, sw %d, sig %d\n",
-                x, y, col, row, dX, ColWid/2, swPos [col], sigPos [col]);
+        if (0 != dbg)
+            System.out.format (
+            " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d, sw %d, sig %d\n",
+                x, y, col, dX, colWid/2, swPos [col], sigPos [col]);
 
         repaint ();
     }
@@ -384,20 +392,46 @@ public class CtcPanel extends JPanel
         Graphics2D  g2d,
         int         x0,
         int         y0,
-        Image       img,
+        boolean     signal,
+        int         col,
         int         lvrIdx )
     {
         if (0 != dbg)
             System.out.format ("  paintPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
-        final int[] LvrXoff = {  9,  8, 20};
-        final int[] LvrYoff = { 50, 49, 43};
+        if ( ! signal) {
+            g2d.drawImage (imgTo  [col].img, x0, y0, this);
+            g2d.drawImage (imgLvr [lvrIdx].img, x0 + 6, y0 + 44, this);
 
-        g2d.drawImage (img, x0, y0, this);
+            if (0 == lvrIdx)  {
+                g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
+                g2d.drawImage (imgLamp [9].img,  x0 + 34, y0 + 4, this);
+            }
+            else  {
+                g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 3, this);
+                g2d.drawImage (imgLamp [10].img, x0 + 34, y0 + 4, this);
+            }
+        }
+        else {
+            g2d.drawImage (imgSig [col].img, x0, y0, this);
+            g2d.drawImage (imgLvr [lvrIdx].img, x0 + 5, y0 + 57, this);
 
-        g2d.drawImage ( imgLvr [lvrIdx].img,
-                x0 + LvrXoff [lvrIdx],
-                y0 + LvrYoff [lvrIdx], this);
+            if (0 == lvrIdx)  {
+                g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
+                g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
+                g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+            }
+            else if (1 == lvrIdx)  { // right
+                g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
+                g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
+                g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, this);
+            }
+            else  { // center/vertical
+                g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
+                g2d.drawImage (imgLamp [10].img, x0 + 18, y0 +  6, this);
+                g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+            }
+        }
     }
 
     // --------------------------------
@@ -428,8 +462,6 @@ public class CtcPanel extends JPanel
             System.out.format ("paintGrid:\n");
 
         Rectangle   r      = frame.getBounds();
-        int         colWid = imgTo [0].img.getWidth (null);
-        int         nCol   = r.width / colWid;
         int         y0     = RowOff;
         int         y1     = y0 + imgTo [0].img.getHeight (null);
 
@@ -442,8 +474,8 @@ public class CtcPanel extends JPanel
         for (int col = 0; col < nCol; col++)  {
             int x0 = col * colWid;
 
-            paintPlate (g2d, x0, y0, imgTo  [col].img, swPos  [col]);
-            paintPlate (g2d, x0, y1, imgSig [col].img, sigPos [col]);
+            paintPlate (g2d, x0, y0, false, col, swPos  [col]);
+            paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
         }
 
         y1 += imgSig [0].img.getHeight (null);
