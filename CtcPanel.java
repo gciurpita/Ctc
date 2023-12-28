@@ -20,49 +20,6 @@ import javax.imageio.ImageIO;
 @SuppressWarnings ("serial")
 
 // -----------------------------------------------------------------------------
-// bitmap description - id, label, ...
-
-class Bmp {
- // public static final int  BG      = 0;
- // public static final int  Tile    = 1;
- // public static final int  Lamp    = 2;
- // public static final int  Lever   = 3;
- // public static final int  PlateSw = 4;
- // public static final int  PlateTo = 5;
-
-    public enum ImgType { Lamp, Lever, PlateSw, PlateTo, None };
-
-    Image   img;
-    String  name;
-    int     type;
-    int     id;
-
-    public Bmp (String filename) {
-    }
-
-    // ---------------------------------------------------------
-    // translate string to type value (if possible)
-
-    public static ImgType stringToType (String s)  {
-        ImgType type;
-
-        if (s.equals("Lamp"))
-            type = ImgType.Lamp;
-        else if (s.equals("Lever"))
-            type = ImgType.Lever;
-        else if (s.equals("PlateSw"))
-            type = ImgType.PlateSw;
-        else if (s.equals("PlateTo"))
-            type = ImgType.PlateTo;
-        else
-            type = ImgType.None;
-
-        return type;
-    }
-
-}
-
-// -------------------------------------
 class ImgLamp {
     Image   img;
 }
@@ -70,12 +27,11 @@ class ImgLvr {
     Image   img;
 }
 
-
 class ImgSig {
     Image   img;
 }
 
-class ImgSw {
+class ImgTo {
     Image   img;
 }
 
@@ -114,8 +70,8 @@ public class CtcPanel extends JPanel
     ImgSig          imgSig []       = new ImgSig  [MaxImg];
     int             imgSigSize      = 0;
 
-    ImgSw           imgSw []        = new ImgSw   [MaxImg];
-    int             imgSwSize       = 0;
+    ImgTo           imgTo []        = new ImgTo   [MaxImg];
+    int             imgToSize       = 0;
 
     final int       ImgIdxSig       = 3;
     final int       ImgIdxSw        = 4;
@@ -130,16 +86,16 @@ public class CtcPanel extends JPanel
     int             swPos  []       = new int [ColMax];
 
     // ---------------------------------------------------------
-    public enum ImgType { Lamp, Lever, PlateSw, PlateTo, None };
+    public enum ImgType { Lamp, Lever, PlateSig, PlateTo, None };
 
     public ImgType stringToType (String s)  {
         if (s.equals("Lamp"))
             return ImgType.Lamp;
         else if (s.equals("Lever"))
             return ImgType.Lever;
-        else if (s.equals("PlateSw"))
-            return ImgType.PlateSw;
-        else if (s.equals("PlateTo"))
+        else if (s.equals("Signal"))
+            return ImgType.PlateSig;
+        else if (s.equals("Turnout"))
             return ImgType.PlateTo;
 
         return ImgType.None;
@@ -233,24 +189,46 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     // open and loads a bitmap file
 
-    private void loadImage (String imgFileName, Bmp bmp)
+    private void loadImage (String imgFileName, ImgType type, int id)
         throws IllegalArgumentException
     {
         if (0 != dbg)
             System.out.format ("      loadImage: %s\n", imgFileName);
 
-        URL url = getClass ().getClassLoader ().getResource (imgFileName);
+        try {
+            File   inFile  = new File (imgFileName);
+            switch (type) {
+            case Lamp:
+                ImgLamp  imgLamp = new ImgLamp ();
+                imgLamp.img      = ImageIO.read (inFile);
+                imgLampSize++;
+                break;
 
-                bmp[bmpSize] = new Bmp (fields[3]);
+            case Lever:
+                ImgLvr  imgLvr  = new ImgLvr ();
+                imgLvr.img      = ImageIO.read (inFile);
+                imgLvrSize++;
+                break;
 
-        if  (url == null) {
-            throw new IllegalArgumentException ("cannot find " + imgFileName);
-        } else {
-            try {
-                bmp.img  = ImageIO.read (url);
-            } catch  (IOException ex) {
-                ex.printStackTrace ();
+            case PlateSig:
+                ImgSig  imgSig  = new ImgSig ();
+                imgSig.img      = ImageIO.read (inFile);
+                imgSigSize++;
+                break;
+
+            case PlateTo:
+                ImgTo  imgTo   = new ImgTo ();
+                imgTo.img      = ImageIO.read (inFile);
+                imgToSize++;
+                break;
+
+            default:
+                System.out.format ("loadImage: Error unknown type\n");
+                System.exit (1);
+                break;
             }
+        } catch  (IOException ex) {
+            ex.printStackTrace ();
         }
     }
 
@@ -268,7 +246,7 @@ public class CtcPanel extends JPanel
 
         while ((line = br.readLine()) != null)  {
             String[]    fields = line.split("  *");
-            if (0 != dbg)
+       //   if (0 != dbg)
                 System.out.format ("   loadCfg: %s - %s\n", line, fields [0]);
 
             // -----------------------------------------------------------------
@@ -281,9 +259,9 @@ public class CtcPanel extends JPanel
                 }
 
                 int     id   = Integer.parseInt(fields[2]);
-                ImgType type = Bmp.stringToType (fields[1]);
+                ImgType type = stringToType (fields[1]);
 
-                loadImage (fields[3], id, type);
+                loadImage (fields[3], type, id);
             }
         }
     }
@@ -393,9 +371,9 @@ public class CtcPanel extends JPanel
         final int[] LvrXoff = {  9,  8, 20};
         final int[] LvrYoff = { 50, 49, 43};
 
-        g2d.drawImage (bmp [plateIdx].img, x0, y0, this);
+        g2d.drawImage (imgTo [plateIdx].img, x0, y0, this);
 
-        g2d.drawImage (  bmp [lvrIdx].img,
+        g2d.drawImage ( imgLvr [lvrIdx].img,
                 x0 + LvrXoff [lvrIdx],
                 y0 + LvrYoff [lvrIdx], this);
     }
@@ -439,8 +417,8 @@ public class CtcPanel extends JPanel
         for (int col = 0; col <= Ncol; col++)  {
             int x0 = col * ColWid + ColOff;
 
-            paintPlate (g2d, x0, y0,         ImgIdxSw,  swPos  [col]);
-            paintPlate (g2d, x0, y0 + RowHt, ImgIdxSig, sigPos [col]);
+        //  paintPlate (g2d, x0, y0,         ImgIdxSw,  swPos  [col]);
+        //  paintPlate (g2d, x0, y0 + RowHt, ImgIdxSig, sigPos [col]);
         }
     }
 
@@ -466,7 +444,7 @@ public class CtcPanel extends JPanel
         int         x;
         int         y;
 
-        if (false)
+        if (true)
             paintPlates    (g2d, r.width, r.height);
         else
             paintCtcPlates (g2d, transform);
