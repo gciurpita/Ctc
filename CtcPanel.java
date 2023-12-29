@@ -20,23 +20,7 @@ import javax.imageio.ImageIO;
 @SuppressWarnings ("serial")
 
 // -----------------------------------------------------------------------------
-class ImgCode {
-    Image   img;
-}
-
-class ImgLamp {
-    Image   img;
-}
-
-class ImgLvr {
-    Image   img;
-}
-
-class ImgSig {
-    Image   img;
-}
-
-class ImgTo {
+class Img   {
     Image   img;
 }
 
@@ -58,19 +42,19 @@ public class CtcPanel extends JPanel
     String          cfgFile;
 
     final int       MaxImg          = 20;
-    ImgCode         imgCode []      = new ImgCode [MaxImg];
+    Img             imgCode []      = new Img     [MaxImg];
     int             imgCodeSize     = 0;
 
-    ImgLamp         imgLamp []      = new ImgLamp [MaxImg];
+    Img             imgLamp []      = new Img     [MaxImg];
     int             imgLampSize     = 0;
 
-    ImgLvr          imgLvr []       = new ImgLvr  [MaxImg];
+    Img             imgLvr []       = new Img     [MaxImg];
     int             imgLvrSize      = 0;
 
-    ImgSig          imgSig []       = new ImgSig  [MaxImg];
+    Img             imgSig []       = new Img     [MaxImg];
     int             imgSigSize      = 0;
 
-    ImgTo           imgTo []        = new ImgTo   [MaxImg];
+    Img             imgTo []        = new Img     [MaxImg];
     int             imgToSize       = 0;
 
     final int       ImgIdxSig       = 3;
@@ -237,31 +221,31 @@ public class CtcPanel extends JPanel
             File   inFile  = new File (imgFileName);
             switch (type) {
             case Code:
-                imgCode [imgCodeSize]     = new ImgCode ();
+                imgCode [imgCodeSize]     = new Img     ();
                 imgCode [imgCodeSize].img = ImageIO.read (inFile);
                 imgCodeSize++;
                 break;
 
             case Lamp:
-                imgLamp [imgLampSize]     = new ImgLamp ();
+                imgLamp [imgLampSize]     = new Img     ();
                 imgLamp [imgLampSize].img = ImageIO.read (inFile);
                 imgLampSize++;
                 break;
 
             case Lever:
-                imgLvr [imgLvrSize]       = new ImgLvr ();
+                imgLvr [imgLvrSize]       = new Img    ();
                 imgLvr [imgLvrSize].img   = ImageIO.read (inFile);
                 imgLvrSize++;
                 break;
 
             case PlateSig:
-                imgSig [imgSigSize]       = new ImgSig ();
+                imgSig [imgSigSize]       = new Img    ();
                 imgSig [imgSigSize].img   = ImageIO.read (inFile);
                 imgSigSize++;
                 break;
 
             case PlateTo:
-                imgTo [imgToSize]        = new ImgTo ();
+                imgTo [imgToSize]        = new Img   ();
                 imgTo [imgToSize].img    = ImageIO.read (inFile);
 
                 if (0 != dbg)
