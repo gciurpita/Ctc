@@ -369,7 +369,9 @@ public class CtcPanel extends JPanel
 
         int col = x / colWid;
         int dX  = x % colWid;
-        int row;
+
+        int pktType = 0;
+        int pos     = 0;
 
         if (y < RowOff)
             return;
@@ -379,7 +381,11 @@ public class CtcPanel extends JPanel
                 swPos [col] = LvrLeft;
             else
                 swPos [col] = LvrRight;
+
+            pktType = Sckt.PKT_LVR_TO;
+            pos     = swPos [col];
         }
+
         else if (y < (rowHt2))  {
             if (dX < (colWid / 3))
                 sigPos [col] = LvrLeft;
@@ -387,7 +393,11 @@ public class CtcPanel extends JPanel
                 sigPos [col] = LvrCenter;
             else
                 sigPos [col] = LvrRight;
+
+            pktType = Sckt.PKT_LVR_SIG;
+            pos     = sigPos [col];
         }
+
         else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
             codeBut [col] = ! codeBut [col];
         else
@@ -399,6 +409,13 @@ public class CtcPanel extends JPanel
                 x, y, col, dX, colWid/2, swPos [col], sigPos [col]);
 
         repaint ();
+
+        buf [0] = (byte) col;
+        buf [1] = (byte) pos;
+
+        System.out.format ("leverAdjust: type %d %02x %02x\n",
+                                        pktType, buf [0], buf [1]);
+        sckt.sendPkt ((byte) pktType, buf, 2);
     }
 
     // ------------------------------------------------------------------------
