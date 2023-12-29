@@ -20,12 +20,24 @@ import javax.imageio.ImageIO;
 @SuppressWarnings ("serial")
 
 // -----------------------------------------------------------------------------
-// bitmap description - id, label, ...
-
-class Bmp {
+class ImgCode {
     Image   img;
-    public Bmp (String filename) {
-    }
+}
+
+class ImgLamp {
+    Image   img;
+}
+
+class ImgLvr {
+    Image   img;
+}
+
+class ImgSig {
+    Image   img;
+}
+
+class ImgTo {
+    Image   img;
 }
 
 // -----------------------------------------------------------------------------
@@ -41,20 +53,25 @@ public class CtcPanel extends JPanel
     final int       CANVAS_WIDTH    = 800;
     final int       CANVAS_HEIGHT   = 400;
 
-    final int       ColMax          = 20;
-    final   int     ColOff          = 25;
-    final   int     ColWid          = 100;
-    final   int     Ncol            = CANVAS_WIDTH / ColWid;
-
-    final   int     RowOff          = 150;
-    final   int     RowHt           = 100;
-
     private int     dbg             = 0;
 
-    final int       MAX_BMP         = 10;
     String          cfgFile;
-    Bmp             bmp []          = new Bmp  [MAX_BMP];
-    int             bmpSize         = 0;
+
+    final int       MaxImg          = 20;
+    ImgCode         imgCode []      = new ImgCode [MaxImg];
+    int             imgCodeSize     = 0;
+
+    ImgLamp         imgLamp []      = new ImgLamp [MaxImg];
+    int             imgLampSize     = 0;
+
+    ImgLvr          imgLvr []       = new ImgLvr  [MaxImg];
+    int             imgLvrSize      = 0;
+
+    ImgSig          imgSig []       = new ImgSig  [MaxImg];
+    int             imgSigSize      = 0;
+
+    ImgTo           imgTo []        = new ImgTo   [MaxImg];
+    int             imgToSize       = 0;
 
     final int       ImgIdxSig       = 3;
     final int       ImgIdxSw        = 4;
@@ -63,10 +80,54 @@ public class CtcPanel extends JPanel
     final int       LvrRight        = 1;
     final int       LvrCenter       = 2;
 
-    int             plateWid;
+    final int       ColMax          = 20;
+    int             nCol;
+    int             colWid;
 
-    int             sigPos []       = new int [ColMax];
-    int             swPos  []       = new int [ColMax];
+    final int       RowOff          = 150;
+    int             rowHt1;
+    int             rowHt2;
+
+    final int       CodeXoff        = 15;
+    final int       CodeYoff        =  5;
+    int             codeDia;
+
+    boolean         codeBut []       = new boolean [ColMax];
+    int             sigPos  []       = new int [ColMax];
+    int             swPos   []       = new int [ColMax];
+
+    // ---------------------------------------------------------
+    public enum ImgType { Code, Lamp, Lever, PlateSig, PlateTo, None };
+
+    public ImgType stringToType (String s)  {
+        if (s.equals("Code"))
+            return ImgType.Code;
+        else if (s.equals("Lamp"))
+            return ImgType.Lamp;
+        else if (s.equals("Lever"))
+            return ImgType.Lever;
+        else if (s.equals("Signal"))
+            return ImgType.PlateSig;
+        else if (s.equals("Turnout"))
+            return ImgType.PlateTo;
+
+        return ImgType.None;
+    }
+
+    public String typeToString (ImgType type)  {
+        if (ImgType.Code == type)
+            return "Code";
+        else if (ImgType.Lamp == type)
+            return "Lamp";
+        else if (ImgType.Lever == type)
+            return "Lever";
+        else if (ImgType.PlateSig == type)
+            return "Signal";
+        else if (ImgType.PlateTo == type)
+            return "Turnout";
+
+        return "Unknown";
+    }
 
     // ------------------------------------------------------------------------
     // constructor loads the configuration files and
@@ -84,6 +145,15 @@ public class CtcPanel extends JPanel
         cfgFile  = configuration;
         loadCfg (configuration);
 
+        colWid  = imgTo [0].img.getWidth (null);
+        nCol    = CANVAS_WIDTH / colWid;
+        rowHt1  = RowOff + imgTo  [0].img.getHeight (null);
+        rowHt2  = rowHt1 + imgSig [0].img.getHeight (null);
+        codeDia = imgCode [0].img.getWidth (null);
+
+        System.out.format (" CtcPanel: sig wid %3d, to wid %3d\n",
+            imgSig [1].img.getWidth (null), imgTo [1].img.getWidth (null) );
+
         this.setPreferredSize (new Dimension (CANVAS_WIDTH, CANVAS_HEIGHT));
 
         frame.setContentPane (this);
@@ -97,7 +167,7 @@ public class CtcPanel extends JPanel
         frame.setBounds (900, 0, r.width, r.height);
 
         // initialize CTC
-        plateWid = bmp [ImgIdxSig].img.getWidth(null); 
+    //  plateWid = bmp [ImgIdxSig].img.getWidth(null);
         for (int col = 0; col < ColMax; col++)
             sigPos [col] = LvrCenter;
     }
@@ -156,15 +226,56 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     // open and loads a bitmap file
 
-    private void loadImage (String imgFileName, Bmp bmp)
+    private void loadImage (String imgFileName, ImgType type, int id)
         throws IllegalArgumentException
     {
         if (0 != dbg)
-            System.out.format ("      loadImage: %s\n", imgFileName);
+            System.out.format ("      loadImage:  %s %8s %2d\n",
+                    imgFileName, typeToString (type), id);
 
         try {
             File   inFile  = new File (imgFileName);
-            bmp.img  = ImageIO.read (inFile);
+            switch (type) {
+            case Code:
+                imgCode [imgCodeSize]     = new ImgCode ();
+                imgCode [imgCodeSize].img = ImageIO.read (inFile);
+                imgCodeSize++;
+                break;
+
+            case Lamp:
+                imgLamp [imgLampSize]     = new ImgLamp ();
+                imgLamp [imgLampSize].img = ImageIO.read (inFile);
+                imgLampSize++;
+                break;
+
+            case Lever:
+                imgLvr [imgLvrSize]       = new ImgLvr ();
+                imgLvr [imgLvrSize].img   = ImageIO.read (inFile);
+                imgLvrSize++;
+                break;
+
+            case PlateSig:
+                imgSig [imgSigSize]       = new ImgSig ();
+                imgSig [imgSigSize].img   = ImageIO.read (inFile);
+                imgSigSize++;
+                break;
+
+            case PlateTo:
+                imgTo [imgToSize]        = new ImgTo ();
+                imgTo [imgToSize].img    = ImageIO.read (inFile);
+
+                if (0 != dbg)
+                    System.out.format ("     loadImage: wid %4d\n",
+                            imgTo [imgToSize].img.getWidth (null));
+
+                imgToSize++;
+                break;
+
+            default:
+                System.out.format ("loadImage: Error unknown type\n");
+                System.exit (1);
+                break;
+            }
         } catch  (IOException ex) {
             ex.printStackTrace ();
         }
@@ -196,8 +307,10 @@ public class CtcPanel extends JPanel
                         "Error - loadCfg: icon type id  <filename>\n");
                 }
 
-                bmp[bmpSize] = new Bmp (fields[3]);
-                loadImage (fields[3], bmp[bmpSize++]);
+                int     id   = Integer.parseInt(fields[2]);
+                ImgType type = stringToType (fields[1]);
+
+                loadImage (fields[3], type, id);
             }
         }
     }
@@ -261,32 +374,38 @@ public class CtcPanel extends JPanel
         int  x,
         int  y )
     {
-        int col = (x - ColOff) / ColWid;
-        int row = (y - RowOff) / RowHt;
+     // System.out.format ("leverAdjust: %3d x %3d\n", x, y);
 
-        int dX  = (x - ColOff) % ColWid;
+        int col = x / colWid;
+        int dX  = x % colWid;
+        int row;
 
-        if (plateWid < dX)
+        if (y < RowOff)
             return;
 
-        if (0 == row) {
-            if ((dX < plateWid / 2))
+        if (y < (rowHt1))  {
+            if ((dX < colWid / 2))
                 swPos [col] = LvrLeft;
             else
                 swPos [col] = LvrRight;
         }
-        else {
-            if (dX < (plateWid / 3))
+        else if (y < (rowHt2))  {
+            if (dX < (colWid / 3))
                 sigPos [col] = LvrLeft;
-            else if (dX < (plateWid * 2 / 3))
+            else if (dX < (colWid * 2 / 3))
                 sigPos [col] = LvrCenter;
             else
                 sigPos [col] = LvrRight;
         }
+        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
+            codeBut [col] = ! codeBut [col];
+        else
+            return;
 
-        System.out.format (
-            " leverAdjust: (%3d, %3d), [%2d, %d], dX %2d, | %d, sw %d, sig %d\n",
-                x, y, col, row, dX, ColWid/2, swPos [col], sigPos [col]);
+        if (0 != dbg)
+            System.out.format (
+            " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d, sw %d, sig %d\n",
+                x, y, col, dX, colWid/2, swPos [col], sigPos [col]);
 
         repaint ();
     }
@@ -298,20 +417,46 @@ public class CtcPanel extends JPanel
         Graphics2D  g2d,
         int         x0,
         int         y0,
-        int         plateIdx,
+        boolean     signal,
+        int         col,
         int         lvrIdx )
     {
         if (0 != dbg)
             System.out.format ("  paintPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
-        final int[] LvrXoff = {  9,  8, 20};
-        final int[] LvrYoff = { 50, 49, 43};
+        if ( ! signal) {
+            g2d.drawImage (imgTo  [col].img, x0, y0, this);
+            g2d.drawImage (imgLvr [lvrIdx].img, x0 + 6, y0 + 44, this);
 
-        g2d.drawImage (bmp [plateIdx].img, x0, y0, this);
+            if (0 == lvrIdx)  {
+                g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
+                g2d.drawImage (imgLamp [9].img,  x0 + 34, y0 + 4, this);
+            }
+            else  {
+                g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 3, this);
+                g2d.drawImage (imgLamp [10].img, x0 + 34, y0 + 4, this);
+            }
+        }
+        else {
+            g2d.drawImage (imgSig [col].img, x0, y0, this);
+            g2d.drawImage (imgLvr [lvrIdx].img, x0 + 5, y0 + 57, this);
 
-        g2d.drawImage (  bmp [lvrIdx].img,
-                x0 + LvrXoff [lvrIdx],
-                y0 + LvrYoff [lvrIdx], this);
+            if (0 == lvrIdx)  {
+                g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
+                g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
+                g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+            }
+            else if (1 == lvrIdx)  { // right
+                g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
+                g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
+                g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, this);
+            }
+            else  { // center/vertical
+                g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
+                g2d.drawImage (imgLamp [10].img, x0 + 18, y0 +  6, this);
+                g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+            }
+        }
     }
 
     // --------------------------------
@@ -327,7 +472,7 @@ public class CtcPanel extends JPanel
         int y0 = 100;
         for (int i = 0; i < 3; i++)  {
             int x0  = (i+1) * 100;
-            paintPlate (g2d, x0, y0, 4, i);
+         // paintPlate (g2d, x0, y0, 4, i);
         }
     }
 
@@ -341,20 +486,30 @@ public class CtcPanel extends JPanel
         if (0 != dbg)
             System.out.format ("paintGrid:\n");
 
-        Rectangle   r   = frame.getBounds();
-        int         y0  = RowOff;
+        Rectangle   r      = frame.getBounds();
+        int         y0     = RowOff;
+        int         y1     = y0 + imgTo  [0].img.getHeight (null);
+        int         y2     = y1 + imgSig [0].img.getHeight (null);
 
         g2d.setColor (Color.black);
-        g2d.fillRect (0, 0, r.width, y0);
+        g2d.fillRect (0, 0, r.width, r.height);
 
-        g2d.setColor (new Color(49, 107, 53));  // CTC  green
-        g2d.fillRect (0, y0, r.width, r.height);
+     // g2d.setColor (new Color(49, 107, 53));   // CTC  green
+        g2d.setColor (new Color(115, 104, 50));  // #736832
+     // y1 += imgSig [0].img.getHeight (null);
+        g2d.fillRect (0, y2, r.width, 50);
 
-        for (int col = 0; col <= Ncol; col++)  {
-            int x0 = col * ColWid + ColOff;
+        for (int col = 0; col < nCol; col++)  {
+            int x0 = col * colWid;
 
-            paintPlate (g2d, x0, y0,         ImgIdxSw,  swPos  [col]);
-            paintPlate (g2d, x0, y0 + RowHt, ImgIdxSig, sigPos [col]);
+            paintPlate (g2d, x0, y0, false, col, swPos  [col]);
+            paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
+
+            // code button
+            Image img = imgCode [0].img;
+            if (codeBut [col])
+                img  = imgLamp [1].img;
+            g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
         }
     }
 

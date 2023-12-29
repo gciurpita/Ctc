@@ -21,7 +21,7 @@
 
 # --------------------------------------------------------------------
 run : $(Classes)
-		java $(Targ)  Resources/ctcTiles | tee $(Targ).out
+		java $(Targ)  Resources/ctcNumbered | tee $(Targ).out
 
 all : $(Classes)
 
