@@ -11,8 +11,8 @@ import java.util.*;
 class Sckt {
     public static final byte   PKT_STRING      = 2;
     public static final byte   PKT_START       = 3;
-    public static final byte   PKT_MOUSE       = 4;
-    public static final byte   PKT_TOWER       = 5;
+    public static final byte   PKT_LVR_TO      = 4;
+    public static final byte   PKT_LVR_SIG     = 5;
     public static final byte   PKT_HELP        = 6;
 
     Socket          socket;
