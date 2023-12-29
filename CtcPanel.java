@@ -85,12 +85,16 @@ public class CtcPanel extends JPanel
     int             colWid;
 
     final int       RowOff          = 150;
-    int             sigHt;
-    int             toHt;
+    int             rowHt1;
+    int             rowHt2;
 
+    final int       CodeXoff        = 15;
+    final int       CodeYoff        =  5;
+    int             codeDia;
 
-    int             sigPos []       = new int [ColMax];
-    int             swPos  []       = new int [ColMax];
+    boolean         codeBut []       = new boolean [ColMax];
+    int             sigPos  []       = new int [ColMax];
+    int             swPos   []       = new int [ColMax];
 
     // ---------------------------------------------------------
     public enum ImgType { Code, Lamp, Lever, PlateSig, PlateTo, None };
@@ -143,8 +147,9 @@ public class CtcPanel extends JPanel
 
         colWid  = imgTo [0].img.getWidth (null);
         nCol    = CANVAS_WIDTH / colWid;
-        toHt    = imgTo  [0].img.getHeight (null);
-        sigHt   = imgSig [0].img.getHeight (null);
+        rowHt1  = RowOff + imgTo  [0].img.getHeight (null);
+        rowHt2  = rowHt1 + imgSig [0].img.getHeight (null);
+        codeDia = imgCode [0].img.getWidth (null);
 
         System.out.format (" CtcPanel: sig wid %3d, to wid %3d\n",
             imgSig [1].img.getWidth (null), imgTo [1].img.getWidth (null) );
@@ -378,13 +383,13 @@ public class CtcPanel extends JPanel
         if (y < RowOff)
             return;
 
-        if (y < (RowOff + toHt))  {
+        if (y < (rowHt1))  {
             if ((dX < colWid / 2))
                 swPos [col] = LvrLeft;
             else
                 swPos [col] = LvrRight;
         }
-        else if (y < (RowOff + toHt + sigHt))  {
+        else if (y < (rowHt2))  {
             if (dX < (colWid / 3))
                 sigPos [col] = LvrLeft;
             else if (dX < (colWid * 2 / 3))
@@ -392,6 +397,8 @@ public class CtcPanel extends JPanel
             else
                 sigPos [col] = LvrRight;
         }
+        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
+            codeBut [col] = ! codeBut [col];
         else
             return;
 
@@ -498,9 +505,12 @@ public class CtcPanel extends JPanel
             paintPlate (g2d, x0, y0, false, col, swPos  [col]);
             paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
 
-            g2d.drawImage (imgCode [0].img, x0 + 15, y2 + 5, this);
+            // code button
+            Image img = imgCode [0].img;
+            if (codeBut [col])
+                img  = imgLamp [1].img;
+            g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
         }
-
     }
 
     // ------------------------------------------------------------------------
