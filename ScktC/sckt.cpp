@@ -12,6 +12,8 @@
 // #include "debug.h"
 #include "sckt.h"
 
+int dbg = 0;
+
 // --------------------------------------------------------------------
 //
 void dispSin (
@@ -132,7 +134,7 @@ int Sckt :: receive (
     // check event
     int activity = select (maxSd +1, & readfds, NULL, NULL, & timeout);
 
-    if (activity)
+    if (activity && dbg)
         printf ("%s: select event, %d\n", __func__, activity);
 
     // -----------------------------------------------
@@ -168,11 +170,12 @@ int Sckt :: receive (
 
         if (FD_ISSET (sd, &readfds)) {
             nRd = read (sd, buf, size);
-            printf (" %s: idx %d, sd %d, nRd %d\n", __func__, i, sd, nRd);
+            if (dbg)
+                printf (" %s: idx %d, sd %d, nRd %d\n", __func__, i, sd, nRd);
 
             // disconnect
             if (0 >= nRd)  {
-                if (0 > nRd)
+                if (0 > nRd && dbg)
                     perror ("  receive: read");
 
                 printf ("  %s: disconnection - sock %d\n", __func__, sd);
@@ -181,7 +184,7 @@ int Sckt :: receive (
                 sockCli [i] = 0;
             }
 
-            else  {
+            else if (dbg) {
                 printf ("  %s: nRd %d, ", __func__, nRd);
                 for (int i = 0; i < nRd; i++)
                     printf (" %02x", buf [i]);
