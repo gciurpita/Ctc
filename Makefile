@@ -50,3 +50,4 @@ neat :
 
 clean : neat
 		rm -f *.jar
+		cd ScktC; make clean
