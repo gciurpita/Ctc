@@ -80,6 +80,9 @@ public class CtcPanel extends JPanel
     int             sigPos  []       = new int [ColMax];
     int             swPos   []       = new int [ColMax];
 
+    Sckt            sckt;
+    byte[]          buf              = new byte [100];
+
     // ---------------------------------------------------------
     public enum ImgType { Code, Lamp, Lever, PlateSig, PlateTo, None };
 
@@ -154,6 +157,10 @@ public class CtcPanel extends JPanel
     //  plateWid = bmp [ImgIdxSig].img.getWidth(null);
         for (int col = 0; col < ColMax; col++)
             sigPos [col] = LvrCenter;
+
+        sckt   = new Sckt ("127.0.0.1");
+        buf[0] = 0;
+        sckt.sendPkt (Sckt.PKT_START, buf, 1);
     }
 
     // --------------------------------
