@@ -438,11 +438,11 @@ public class CtcPanel extends JPanel
 
             if (0 == lvrIdx)  {
                 g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
-                g2d.drawImage (imgLamp [9].img,  x0 + 34, y0 + 4, this);
+                g2d.drawImage (imgLamp [0].img,  x0 + 34, y0 + 4, this);
             }
             else  {
                 g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 3, this);
-                g2d.drawImage (imgLamp [10].img, x0 + 34, y0 + 4, this);
+                g2d.drawImage (imgLamp [1].img,  x0 + 34, y0 + 4, this);
             }
         }
         else {
