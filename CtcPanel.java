@@ -57,6 +57,9 @@ public class CtcPanel extends JPanel
     Img             imgTo []        = new Img     [MaxImg];
     int             imgToSize       = 0;
 
+    Img             imgTile []      = new Img     [100];
+    int             imgTileSize     = 0;
+
     final int       ImgIdxSig       = 3;
     final int       ImgIdxSw        = 4;
 
@@ -84,7 +87,7 @@ public class CtcPanel extends JPanel
     byte[]          buf              = new byte [100];
 
     // ---------------------------------------------------------
-    public enum ImgType { Code, Lamp, Lever, PlateSig, PlateTo, None };
+    public enum ImgType { Code, Lamp, Lever, PlateSig, PlateTo, Tile, None };
 
     public ImgType stringToType (String s)  {
         if (s.equals("Code"))
@@ -97,6 +100,8 @@ public class CtcPanel extends JPanel
             return ImgType.PlateSig;
         else if (s.equals("Turnout"))
             return ImgType.PlateTo;
+        else if (s.equals("Tile"))
+            return ImgType.Tile;
 
         return ImgType.None;
     }
@@ -112,6 +117,8 @@ public class CtcPanel extends JPanel
             return "Signal";
         else if (ImgType.PlateTo == type)
             return "Turnout";
+        else if (ImgType.Tile == type)
+            return "Tile";
 
         return "Unknown";
     }
@@ -262,6 +269,17 @@ public class CtcPanel extends JPanel
                 imgToSize++;
                 break;
 
+            case Tile:
+                imgTile [imgTileSize]        = new Img   ();
+                imgTile [imgTileSize].img    = ImageIO.read (inFile);
+
+                if (0 != dbg)
+                    System.out.format ("     loadImage: wid %4d\n",
+                            imgTile [imgTileSize].img.getWidth (null));
+
+                imgTileSize++;
+                break;
+
             default:
                 System.out.format ("loadImage: Error unknown type\n");
                 System.exit (1);
@@ -302,6 +320,17 @@ public class CtcPanel extends JPanel
                 ImgType type = stringToType (fields[1]);
 
                 loadImage (fields[3], type, id);
+            }
+            // -----------------------------------------------------------------
+            // recursively process additional files
+
+            else if (fields[0].equals("include"))  {
+                if (fields.length < 2)  {
+                    throw new IllegalArgumentException (
+                            "Error - loadCfg: include <filename>\n");
+                }
+
+                loadCfg (fields[1]);
             }
         }
     }
