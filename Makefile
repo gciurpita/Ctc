@@ -19,6 +19,9 @@
 % : %.class
 		java $@ $(Args)
 
+%.exe : %.cpp
+		$(CXX) -o $@  $^
+
 # --------------------------------------------------------------------
 run : $(Classes)
 		java $(Targ)  Resources/ctcNumbered
@@ -44,10 +47,13 @@ xgr :
 xgr2 :
 		plot.k  S=TE,mph,lbs1:10 $(Targ).out | tee $(Targ).xgr
 
+ids : tileIds.exe
+		$^ Resources/blackScreenTiles.cfg
+
 # --------------------------------------------------------------------
 neat :
 		rm -f *~ *.class *.out
 
 clean : neat
-		rm -f *.jar
+		rm -f *.jar *.exe
 		cd ScktC; make clean
