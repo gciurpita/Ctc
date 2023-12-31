@@ -75,6 +75,8 @@ public class CtcPanel extends JPanel
     int             rowHt1;
     int             rowHt2;
 
+    int             tileWid;
+
     final int       CodeXoff        = 15;
     final int       CodeYoff        =  5;
     int             codeDia;
@@ -127,7 +129,9 @@ public class CtcPanel extends JPanel
     // constructor loads the configuration files and
     //   determines the initial display geometry
 
-    public CtcPanel (String configuration)
+    public CtcPanel (
+        String configuration,
+        String ip )
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
         byte[]  buf     = new byte [10];
@@ -165,9 +169,15 @@ public class CtcPanel extends JPanel
         for (int col = 0; col < ColMax; col++)
             sigPos [col] = LvrCenter;
 
-        sckt   = new Sckt ("127.0.0.1");
-        buf[0] = 0;
-        sckt.sendPkt (Sckt.PKT_START, buf, 1);
+        tileWid = imgTile [0].img.getWidth (null);
+        System.out.format ("CtcPanel: tile width %d x %d\n",
+                tileWid, imgTile [0].img.getHeight (null));
+
+        if (null != ip)  {
+            sckt   = new Sckt ("127.0.0.1");
+            buf[0] = 0;
+            sckt.sendPkt (Sckt.PKT_START, buf, 1);
+        }
     }
 
     // --------------------------------
@@ -341,10 +351,25 @@ public class CtcPanel extends JPanel
     public static void main (String[] args)
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
-        for (int i = 0; i < args.length; i++)
+        String ip = null;
+        int    i;
+
+        for (i = 0; i < args.length; i++) {
             System.out.format ("main: %d %s\n", i, args[i]);
 
-        CtcPanel disp = new CtcPanel (args[0]);
+            if (args[i].startsWith("-ip"))  {
+                ip = args[i].substring(3);
+                System.out.format ("main: ip %s\n", ip);
+            }
+            else if (args[i].startsWith("-"))  {
+                throw new IllegalArgumentException (
+                            "unknown option - " + args[i]);
+            }
+            else
+                break;
+        }
+
+        CtcPanel disp = new CtcPanel (args [i], ip);
     }
 
     // ------------------------------------------------------------------------
