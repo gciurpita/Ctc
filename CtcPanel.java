@@ -539,8 +539,6 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    // draw grid
-
     private void paintCtcPlates (
         Graphics2D  g2d,
         AffineTransform transform )
@@ -576,6 +574,71 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    private void paintTiles (
+        Graphics2D  g2d,
+        int         screenWid,
+        int         screenHt )
+    {
+     // if (0 != dbg)
+            System.out.format ("paintTiles:\n");
+
+        int  nCol   = screenWid / tileWid;
+        int  y0     = tileWid;
+        int  idx;
+
+        int TrkH     = 2;
+        int TrkDL    = 8;
+        int TrkDR    = 9;
+        int TrkUL    = 10;
+        int TrkUR    = 11;
+        int TrkDiagU = 6;
+        int TrkDiagD = 7;
+
+        int SigGL = 47;     // left green
+        int SigGR = 46;     // left red
+        int SigRL = 17;     // right red
+        int SigRR = 16;     // left  red
+
+        for (int row = 1; row <= 6; row++)  {
+            y0 = row * tileWid;
+            for (int col = 0; col < nCol; col++)  {
+                int x0 = col * tileWid;
+
+                idx = 0;
+                if (1 == row)  {
+                    if (8 == col)
+                        idx = SigRL;
+                }
+                else if (2 == row)  {
+                    if (7 == col)
+                        idx = TrkDL;
+                    else if (7 < col)
+                        idx = TrkH;
+                }
+
+                else if (3 == row)  {
+                    if (6 == col)
+                        idx = TrkDiagU;
+                    if (8 == col)
+                        idx = SigRL;
+                }
+
+                else if (4 == row)  {
+                    idx = TrkH;
+                    if (5 == col)
+                        ;  // idx = TrkUR;
+                }
+                else if (5 == row)  {
+                    if (4 == col)
+                        idx = SigRR;
+                }
+
+                g2d.drawImage (imgTile [idx].img, x0, y0, this);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     // redraw the screen -- recalculate the scale factors, redraw the
     //   background bitmaps and call paintElems() to redraw features
 
@@ -601,5 +664,7 @@ public class CtcPanel extends JPanel
             paintPlates    (g2d, r.width, r.height);
         else
             paintCtcPlates (g2d, transform);
+
+        paintTiles   (g2d, r.width, r.height);
     }
 }
