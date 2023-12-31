@@ -584,56 +584,47 @@ public class CtcPanel extends JPanel
 
         int  nCol   = screenWid / tileWid;
         int  y0     = tileWid;
+        int  x0;
         int  idx;
 
-        int TrkH     = 2;
-        int TrkDL    = 8;
-        int TrkDR    = 9;
-        int TrkUL    = 10;
-        int TrkUR    = 11;
-        int TrkDiagU = 6;
-        int TrkDiagD = 7;
+        int TrkH     = 2;   // 2
 
-        int SigGL = 47;     // left green
-        int SigGR = 46;     // left red
-        int SigRL = 17;     // right red
-        int SigRR = 16;     // left  red
+        int TrkDL    = 8;   // 8
+        int TrkDR    = 9;   // 9
+        int TrkUL    = 10;  // :
+        int TrkUR    = 11;  // ;
 
-        for (int row = 1; row <= 6; row++)  {
-            y0 = row * tileWid;
-            for (int col = 0; col < nCol; col++)  {
-                int x0 = col * tileWid;
+        int TrkDiagU = 6;   // 6
+        int TrkDiagD = 7;   // 7
 
-                idx = 0;
-                if (1 == row)  {
-                    if (8 == col)
-                        idx = SigRL;
-                }
-                else if (2 == row)  {
-                    if (7 == col)
-                        idx = TrkDL;
-                    else if (7 < col)
-                        idx = TrkH;
-                }
+        int SigGL = 47;     // _   // left green
+        int SigGR = 46;     // ^   // left red
+        int SigRL = 17;     // A   // right red
+        int SigRR = 16;     // @   // left  red
 
-                else if (3 == row)  {
-                    if (6 == col)
-                        idx = TrkDiagU;
-                    if (8 == col)
-                        idx = SigRL;
-                }
+        String[]   s = new String[]   { "       A",
+                                        "      8222222",
+                                        "     6       A",
+                                        "  2222222292222222222222222",
+                                        "   @       7 _   ",
+                                        "  2222222222:22222222222222",
+                                        "   @    7 A   ",
+                                        "         :22222229" };
 
-                else if (4 == row)  {
-                    idx = TrkH;
-                    if (5 == col)
-                        ;  // idx = TrkUR;
-                }
-                else if (5 == row)  {
-                    if (4 == col)
-                        idx = SigRR;
-                }
+        for (int row = 0; row < 8; row++)  {
+            for (int i = 0; i < s [row].length(); i++)  {
+                x0 = i * tileWid;
+                y0 = row * tileWid;
 
-                g2d.drawImage (imgTile [idx].img, x0, y0, this);
+                char c = s [row].charAt(i);
+                if (' ' == c)
+                    idx = 0;
+                else
+                    idx    = (int) c - '0';
+                System.out.format ("  %2d, %c  %d\n", i, c, idx);
+
+                if (76 > idx)
+                    g2d.drawImage (imgTile [idx].img, x0, y0, this);
             }
         }
     }
