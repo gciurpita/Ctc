@@ -49,7 +49,7 @@ xgr2 :
 		plot.k  S=TE,mph,lbs1:10 $(Targ).out | tee $(Targ).xgr
 
 ids : tileIds.exe
-		$^ Resources/blackScreenTiles.cfg
+		$^ Resources/blackScreenTiles.cfg | tee $@
 
 # --------------------------------------------------------------------
 neat :
