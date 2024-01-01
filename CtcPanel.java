@@ -20,16 +20,40 @@ import javax.imageio.ImageIO;
 @SuppressWarnings ("serial")
 
 // -----------------------------------------------------------------------------
-class Img   {
-    Image   img;
-}
-
 // -----------------------------------------------------------------------------
 // display railroad schematic and USS switch & signal levers
 
 public class CtcPanel extends JPanel
         implements MouseListener, KeyListener
 {
+    class Img   {
+        Image   img;
+    }
+    // ---------------------------------------------------------
+
+    class PnlSym  {
+        int     ctcCol;
+        int     row;
+        int     col;
+        String  lbl;
+
+        public PnlSym (
+            String  ctcCol_,
+            String  row_,
+            String  col_,
+            String  lbl_ )
+        {
+            ctcCol  = Integer.parseInt (ctcCol_);
+            row     = Integer.parseInt (row_);
+            col     = Integer.parseInt (col_);
+            lbl     = lbl_;
+
+         // System.out.format (" PnlSym: lbl %s\n", lbl);
+        }
+
+    };
+
+    // ---------------------------------------------------------
     JFrame frame = new JFrame ();
 
     private static final String Title           = "Pacific Southern Railway";
@@ -44,6 +68,13 @@ public class CtcPanel extends JPanel
 
     boolean         ctcSw  []       = new boolean [20];
     boolean         ctcSig []       = new boolean [20];
+
+    final int       MaxPnlSym       = 20;
+    PnlSym          symTo  []       = new PnlSym  [MaxPnlSym];
+    int             symToSize       = 0;
+
+    PnlSym          symSig []       = new PnlSym  [MaxPnlSym];
+    int             symSigSize      = 0;
 
     final int       MaxImg          = 20;
     Img             imgCode []      = new Img     [MaxImg];
@@ -390,6 +421,22 @@ public class CtcPanel extends JPanel
                     ctcSw [Integer.parseInt(sField[i])] = true;
                 }
             }
+
+            // -----------------------------------
+            else if (fields[0].equals("signal"))  {
+                symSig [symSigSize++]     = new PnlSym (
+                        fields [1], fields [2], fields [3], fields [4]);
+            }
+
+            // -----------------------------------
+            else if (fields[0].equals("turnout"))  {
+                symTo [symToSize++]     = new PnlSym (
+                        fields [1], fields [2], fields [3], fields [4]);
+            }
+
+            // -----------------------------------
+            else if (fields[0].equals("#"))
+                ;           // ignore
 
             // -----------------------------------
             else if (0 < line.length()) {
