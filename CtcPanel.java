@@ -39,7 +39,10 @@ public class CtcPanel extends JPanel
 
     private int     dbg             = 0;
 
-    String          cfgFile;
+    String[]        pnlRow          = new String[10];
+    int             nPnlRow         = 0;
+
+    boolean         ctcCol []       = new boolean [20];
 
     final int       MaxImg          = 20;
     Img             imgCode []      = new Img     [MaxImg];
@@ -86,6 +89,7 @@ public class CtcPanel extends JPanel
     int             swPos   []       = new int [ColMax];
 
     Sckt            sckt;
+    boolean         scktEn           = false;
     byte[]          buf              = new byte [100];
 
     // ---------------------------------------------------------
@@ -130,7 +134,7 @@ public class CtcPanel extends JPanel
     //   determines the initial display geometry
 
     public CtcPanel (
-        String configuration,
+        String pnlFile,
         String ip )
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
@@ -139,9 +143,8 @@ public class CtcPanel extends JPanel
         addKeyListener   (this);
         addMouseListener (this);
 
-
-        cfgFile  = configuration;
-        loadCfg (configuration);
+        loadCfg ("Resources/ctcNumbered");
+        loadPnl (pnlFile);
 
         colWid  = imgTo [0].img.getWidth (null);
         nCol    = CANVAS_WIDTH / colWid;
@@ -177,6 +180,7 @@ public class CtcPanel extends JPanel
             sckt   = new Sckt ("127.0.0.1");
             buf[0] = 0;
             sckt.sendPkt (Sckt.PKT_START, buf, 1);
+            scktEn = true;
         }
     }
 
@@ -346,6 +350,44 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    //   load panel decription
+
+    private void loadPnl (String pnlFile)
+            throws FileNotFoundException, IOException
+    {
+        System.out.format (" loadPnl: %s\n", pnlFile);
+
+        BufferedReader br = new BufferedReader(new FileReader(pnlFile));
+        String         line;
+
+        while ((line = br.readLine()) != null)  {
+            String[]    fields = line.split("  *");
+            if (0 != dbg)
+                System.out.format ("   loadPnl: %s - %s\n", line, fields [0]);
+
+            // -----------------------------------
+            if (fields[0].equals("row"))  {
+                pnlRow [nPnlRow++] = line.substring (4);
+            }
+
+            // -----------------------------------
+            else if (fields[0].equals("col"))  {
+                String[]    sField = fields[1].split(",");
+
+                for (int i = 0; i < sField.length; i++)  {
+                 // System.out.format (" loadPnls: %d %s\n", i, sField [i]);
+                    ctcCol [Integer.parseInt(sField[i])] = true;
+                }
+            }
+
+            // -----------------------------------
+            else if (0 < line.length()) {
+                System.out.format ("loadPnl: ERROR - %s\n", line);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     // main processes command line arguments settign the debug level and
 
     public static void main (String[] args)
@@ -469,7 +511,8 @@ public class CtcPanel extends JPanel
 
         System.out.format ("leverAdjust: type %d %02x %02x\n",
                                         pktType, buf [0], buf [1]);
-        sckt.sendPkt ((byte) pktType, buf, 2);
+        if (scktEn)
+            sckt.sendPkt ((byte) pktType, buf, 2);
     }
 
     // ------------------------------------------------------------------------
@@ -560,6 +603,9 @@ public class CtcPanel extends JPanel
         g2d.fillRect (0, y2, r.width, 50);
 
         for (int col = 0; col < nCol; col++)  {
+            if (! ctcCol [col])
+                continue;
+
             int x0 = col * colWid;
 
             paintPlate (g2d, x0, y0, false, col, swPos  [col]);
@@ -574,56 +620,29 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    private void paintTiles (
+    private void paintTrack (
         Graphics2D  g2d,
         int         screenWid,
         int         screenHt )
     {
-     // if (0 != dbg)
-            System.out.format ("paintTiles:\n");
-
-        int  nCol   = screenWid / tileWid;
-        int  y0     = tileWid;
-        int  x0;
-        int  idx;
-
-        int TrkH     = 2;   // 2
-
-        int TrkDL    = 8;   // 8
-        int TrkDR    = 9;   // 9
-        int TrkUL    = 10;  // :
-        int TrkUR    = 11;  // ;
-
-        int TrkDiagU = 6;   // 6
-        int TrkDiagD = 7;   // 7
-
-        int SigGL = 47;     // _   // left green
-        int SigGR = 46;     // ^   // left red
-        int SigRL = 17;     // A   // right red
-        int SigRR = 16;     // @   // left  red
-
-        String[]   s = new String[]   { "       A",
-                                        "      8222222",
-                                        "     6       A",
-                                        "  2222222292222222222222222",
-                                        "   @       7 _   ",
-                                        "  2222222222:22222222222222",
-                                        "   @    7 A   ",
-                                        "         :22222229" };
+        if (0 != dbg)
+            System.out.format ("paintTrack:\n");
 
         for (int row = 0; row < 8; row++)  {
-            for (int i = 0; i < s [row].length(); i++)  {
-                x0 = i * tileWid;
-                y0 = row * tileWid;
+         // System.out.format ("  paintTrack: %d %s\n", row, pnlRow [row]);
 
-                char c = s [row].charAt(i);
-                if (' ' == c)
-                    idx = 0;
-                else
+            for (int i = 0; i < pnlRow [row].length(); i++)  {
+                int  x0   = tileWid * i;
+                int  y0   = tileWid * row;
+                char c   = pnlRow [row].charAt(i);
+                int  idx = 0;
+                if (' ' != c)
                     idx    = (int) c - '0';
-                System.out.format ("  %2d, %c  %d\n", i, c, idx);
+           //   System.out.format ("  %2d, %c  %d\n", i, c, idx);
 
-                if (76 > idx)
+                if (76 < idx)
+                    System.out.format ("paintTrack: ERROR idx %d > 76\n", idx);
+                else
                     g2d.drawImage (imgTile [idx].img, x0, y0, this);
             }
         }
@@ -656,6 +675,6 @@ public class CtcPanel extends JPanel
         else
             paintCtcPlates (g2d, transform);
 
-        paintTiles   (g2d, r.width, r.height);
+        paintTrack   (g2d, r.width, r.height);
     }
 }
