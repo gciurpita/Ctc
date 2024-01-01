@@ -37,6 +37,6 @@ turnout   2     5    7  2
 turnout   3     3   10  3A
 turnout   3     5   12  3B
 
-ctcSw  1,2,3
+ctcTo  1,2,3
 ctcSig 1,2
 
