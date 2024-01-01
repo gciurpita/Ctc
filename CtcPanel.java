@@ -56,8 +56,9 @@ public class CtcPanel extends JPanel
 
     // ---------------------------------------------------------
     class CtcCol {
-        int  to;
-        int  sig;
+        int     to;
+        int     sig;
+        boolean code;
     };
 
     // ---------------------------------------------------------
@@ -127,8 +128,6 @@ public class CtcPanel extends JPanel
     int             codeDia;
 
     boolean         codeBut []       = new boolean [ColMax];
-    int             sigPos  []       = new int [ColMax];
-    int             swPos   []       = new int [ColMax];
 
     Sckt            sckt;
     boolean         scktEn           = false;
@@ -216,10 +215,6 @@ public class CtcPanel extends JPanel
         frame.setBounds (900, 0, r.width, r.height);
 
         // initialize CTC
-    //  plateWid = bmp [ImgIdxSig].img.getWidth(null);
-        for (int col = 0; col < ColMax; col++)
-            sigPos [col] = LvrCenter;
-
         tileWid = imgTile [0].img.getWidth (null);
         System.out.format ("CtcPanel: tile width %d x %d\n",
                 tileWid, imgTile [0].img.getHeight (null));
@@ -423,8 +418,6 @@ public class CtcPanel extends JPanel
                 String[]    sField = fields[1].split(",");
 
                 for (int i = 0; i < sField.length; i++)  {
-                 // System.out.format (" loadPnls: %d %s\n", i, sField [i]);
-                 // ctcSig [Integer.parseInt(sField[i])] = true;
                     int idx = Integer.parseInt(sField[i]);
                     if (ctcCol [idx] == null)
                         ctcCol [idx] = new CtcCol ();
@@ -437,13 +430,9 @@ public class CtcPanel extends JPanel
                 String[]    sField = fields[1].split(",");
 
                 for (int i = 0; i < sField.length; i++)  {
-                 // System.out.format (" loadPnls: %d %s\n", i, sField [i]);
-                 // ctcSw [Integer.parseInt(sField[i])] = true;
                     int idx = Integer.parseInt(sField[i]);
-                    if (ctcCol [idx] == null)  {
+                    if (ctcCol [idx] == null)
                         ctcCol [idx] = new CtcCol ();
-                        System.out.format (" loadPnls: %d alloc\n", i);
-                    }
                     ctcCol [idx].to = 0;
                 }
             }
@@ -563,35 +552,35 @@ public class CtcPanel extends JPanel
 
         if (y < (rowHt1))  {
             if ((dX < colWid / 2))
-                swPos [col] = LvrLeft;
+                ctcCol [col].to = LvrLeft;
             else
-                swPos [col] = LvrRight;
+                ctcCol [col].to = LvrRight;
 
             pktType = Sckt.PKT_LVR_TO;
-            pos     = swPos [col];
+            pos     = ctcCol [col].to;
         }
 
         else if (y < (rowHt2))  {
             if (dX < (colWid / 3))
-                sigPos [col] = LvrLeft;
+                ctcCol [col].sig = LvrLeft;
             else if (dX < (colWid * 2 / 3))
-                sigPos [col] = LvrCenter;
+                ctcCol [col].sig = LvrCenter;
             else
-                sigPos [col] = LvrRight;
+                ctcCol [col].sig = LvrRight;
 
             pktType = Sckt.PKT_LVR_SIG;
-            pos     = sigPos [col];
+            pos     = ctcCol [col].sig;
         }
 
         else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
-            codeBut [col] = ! codeBut [col];
+            ctcCol [col].code = ! ctcCol [col].code;
         else
             return;
 
         if (0 != dbg)
             System.out.format (
             " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d, sw %d, sig %d\n",
-                x, y, col, dX, colWid/2, swPos [col], sigPos [col]);
+                x, y, col, dX, colWid/2, ctcCol [col].to, ctcCol [col].sig);
 
         repaint ();
 
@@ -698,10 +687,11 @@ public class CtcPanel extends JPanel
             int x0 = col * colWid;
 
             if (0 <= ctcCol [col].to)
-                paintPlate (g2d, x0, y0, false, col, swPos  [col]);
+                paintPlate (g2d, x0, y0, false, col, ctcCol  [col].to);
 
             if (0 <= ctcCol [col].sig)
-                paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
+             // paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
+                paintPlate (g2d, x0, y1, true,  col, ctcCol [col].sig);
 
             // code button
             Image img = imgCode [0].img;
