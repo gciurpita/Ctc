@@ -42,7 +42,8 @@ public class CtcPanel extends JPanel
     String[]        pnlRow          = new String[10];
     int             nPnlRow         = 0;
 
-    boolean         ctcCol []       = new boolean [20];
+    boolean         ctcSw  []       = new boolean [20];
+    boolean         ctcSig []       = new boolean [20];
 
     final int       MaxImg          = 20;
     Img             imgCode []      = new Img     [MaxImg];
@@ -371,12 +372,22 @@ public class CtcPanel extends JPanel
             }
 
             // -----------------------------------
-            else if (fields[0].equals("col"))  {
+            else if (fields[0].equals("ctcSig"))  {
                 String[]    sField = fields[1].split(",");
 
                 for (int i = 0; i < sField.length; i++)  {
                  // System.out.format (" loadPnls: %d %s\n", i, sField [i]);
-                    ctcCol [Integer.parseInt(sField[i])] = true;
+                    ctcSig [Integer.parseInt(sField[i])] = true;
+                }
+            }
+
+            // -----------------------------------
+            else if (fields[0].equals("ctcSw"))  {
+                String[]    sField = fields[1].split(",");
+
+                for (int i = 0; i < sField.length; i++)  {
+                 // System.out.format (" loadPnls: %d %s\n", i, sField [i]);
+                    ctcSw [Integer.parseInt(sField[i])] = true;
                 }
             }
 
@@ -600,15 +611,18 @@ public class CtcPanel extends JPanel
      // g2d.setColor (new Color(49, 107, 53));   // CTC  green
         g2d.setColor (new Color(115, 104, 50));  // #736832
      // y1 += imgSig [0].img.getHeight (null);
-        g2d.fillRect (0, y2, r.width, 50);
+        g2d.fillRect (0, y0, r.width, 50 + y2 - y0);
 
         for (int col = 0; col < nCol; col++)  {
-            if (! ctcCol [col])
+            if (! ctcSw [col] && ! ctcSig [col])
                 continue;
 
             int x0 = col * colWid;
 
-            paintPlate (g2d, x0, y0, false, col, swPos  [col]);
+            if (ctcSw [col])
+                paintPlate (g2d, x0, y0, false, col, swPos  [col]);
+
+            if (ctcSig [col])
             paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
 
             // code button
