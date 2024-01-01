@@ -38,6 +38,10 @@ public class CtcPanel extends JPanel
         int     col;
         String  lbl;
 
+        int     x;
+        int     y;
+        int     tile;
+
         // -------------------------------------
         public PnlSym (
             String  ctcCol_,
@@ -50,6 +54,9 @@ public class CtcPanel extends JPanel
             col     = Integer.parseInt (col_);
             lbl     = lbl_;
 
+            x       = tileWid * col;
+            y       = tileWid * row;
+
          // System.out.format (" PnlSym: lbl %s\n", lbl);
         }
     }
@@ -59,6 +66,9 @@ public class CtcPanel extends JPanel
         int     to;
         int     sig;
         boolean code;
+
+        int     idxTo;
+        int     idxSig;
     };
 
     // ---------------------------------------------------------
@@ -185,22 +195,17 @@ public class CtcPanel extends JPanel
         addMouseListener (this);
 
         loadCfg ("Resources/ctcNumbered");
+        tileWid = imgTile [0].img.getWidth (null);
 
-        if (false)
-        for (int i = 0; i < CtcColMax; i++)  {
-            ctcCol [i]     = new CtcCol ();
-            ctcCol [i].to  = ctcCol [i].sig = -1;
-        }
         loadPnl (pnlFile);
+        linkLevers ();
 
+        // set up screen graphics
         colWid  = imgTo [0].img.getWidth (null);
         nCol    = CANVAS_WIDTH / colWid;
         rowHt1  = RowOff + imgTo  [0].img.getHeight (null);
         rowHt2  = rowHt1 + imgSig [0].img.getHeight (null);
         codeDia = imgCode [0].img.getWidth (null);
-
-        System.out.format (" CtcPanel: sig wid %3d, to wid %3d\n",
-            imgSig [1].img.getWidth (null), imgTo [1].img.getWidth (null) );
 
         this.setPreferredSize (new Dimension (CANVAS_WIDTH, CANVAS_HEIGHT));
 
@@ -214,11 +219,7 @@ public class CtcPanel extends JPanel
         Rectangle r = frame.getBounds();        // window size
         frame.setBounds (900, 0, r.width, r.height);
 
-        // initialize CTC
-        tileWid = imgTile [0].img.getWidth (null);
-        System.out.format ("CtcPanel: tile width %d x %d\n",
-                tileWid, imgTile [0].img.getHeight (null));
-
+        // open socket
         if (null != ip)  {
             sckt   = new Sckt ("127.0.0.1");
             buf[0] = 0;
@@ -388,6 +389,33 @@ public class CtcPanel extends JPanel
                 }
 
                 loadCfg (fields[1]);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
+    private void linkLevers ()
+    {
+        for (int col = 0; col < CtcColMax; col++)  {
+            if (ctcCol [col] == null)
+                continue;
+            System.out.format (" linkLevers: col %d\n", col);
+
+            for (int i = 0; i < symToSize; i++)
+                if (symTo [i].ctcCol == col)  {
+                    System.out.format ("   linkLevers: to  %d\n", i);
+                    ctcCol [col].idxTo = i;
+
+                    PnlSym sym = symTo [i];
+                    sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0'; 
+                }
+
+            if (false)
+            for (int i = 0; i < symSigSize; i++)  {
+                if (symSig [i].ctcCol == col)  {
+                    System.out.format ("   linkLevers: sig %d\n", i);
+                }
             }
         }
     }
@@ -607,19 +635,32 @@ public class CtcPanel extends JPanel
         if (0 != dbg)
             System.out.format ("  paintPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
+        final int  TrackH  = 2;
+        int        toTile;
+
         if ( ! signal) {
+            PnlSym  to = symTo [ctcCol [col].idxTo];
+
             g2d.drawImage (imgTo  [col].img, x0, y0, this);
             g2d.drawImage (imgLvr [lvrIdx].img, x0 + 6, y0 + 44, this);
 
-            if (0 == lvrIdx)  {
+            if (LvrLeft == lvrIdx)  {
                 g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
                 g2d.drawImage (imgLamp [0].img,  x0 + 34, y0 + 4, this);
+                toTile = TrackH;
             }
             else  {
                 g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 3, this);
                 g2d.drawImage (imgLamp [1].img,  x0 + 34, y0 + 4, this);
+                toTile = to.tile;
             }
+
+            System.out.format (
+                " paintPlate: col %d, to %d, tile %2d (%3d, %3d)\n",
+                col, ctcCol [col].idxTo, toTile, to.x, to.y);
+            g2d.drawImage (imgTile [toTile].img,  to.x, to.y, this);
         }
+
         else {
             g2d.drawImage (imgSig [col].img, x0, y0, this);
             g2d.drawImage (imgLvr [lvrIdx].img, x0 + 5, y0 + 57, this);
@@ -671,9 +712,6 @@ public class CtcPanel extends JPanel
         int         y0     = RowOff;
         int         y1     = y0 + imgTo  [0].img.getHeight (null);
         int         y2     = y1 + imgSig [0].img.getHeight (null);
-
-        g2d.setColor (Color.black);
-        g2d.fillRect (0, 0, r.width, r.height);
 
      // g2d.setColor (new Color(49, 107, 53));   // CTC  green
         g2d.setColor (new Color(115, 104, 50));  // #736832
@@ -752,11 +790,14 @@ public class CtcPanel extends JPanel
         int         x;
         int         y;
 
+        g2d.setColor (Color.black);
+        g2d.fillRect (0, 0, r.width, r.height);
+
+        paintTrack   (g2d, r.width, r.height);
+
         if (false)
             paintPlates    (g2d, r.width, r.height);
         else
             paintCtcPlates (g2d, transform);
-
-        paintTrack   (g2d, r.width, r.height);
     }
 }
