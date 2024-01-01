@@ -26,17 +26,19 @@ import javax.imageio.ImageIO;
 public class CtcPanel extends JPanel
         implements MouseListener, KeyListener
 {
+    // ---------------------------------------------------------
     class Img   {
         Image   img;
     }
-    // ---------------------------------------------------------
 
+    // ---------------------------------------------------------
     class PnlSym  {
         int     ctcCol;
         int     row;
         int     col;
         String  lbl;
 
+        // -------------------------------------
         public PnlSym (
             String  ctcCol_,
             String  row_,
@@ -50,7 +52,12 @@ public class CtcPanel extends JPanel
 
          // System.out.format (" PnlSym: lbl %s\n", lbl);
         }
+    }
 
+    // ---------------------------------------------------------
+    class CtcCol {
+        int  to;
+        int  sig;
     };
 
     // ---------------------------------------------------------
@@ -65,6 +72,9 @@ public class CtcPanel extends JPanel
 
     String[]        pnlRow          = new String[10];
     int             nPnlRow         = 0;
+
+    final int       CtcColMax       = 20;
+    CtcCol          ctcCol []       = new CtcCol [CtcColMax];
 
     boolean         ctcSw  []       = new boolean [20];
     boolean         ctcSig []       = new boolean [20];
@@ -176,6 +186,12 @@ public class CtcPanel extends JPanel
         addMouseListener (this);
 
         loadCfg ("Resources/ctcNumbered");
+
+        if (false)
+        for (int i = 0; i < CtcColMax; i++)  {
+            ctcCol [i]     = new CtcCol ();
+            ctcCol [i].to  = ctcCol [i].sig = -1;
+        }
         loadPnl (pnlFile);
 
         colWid  = imgTo [0].img.getWidth (null);
@@ -408,7 +424,11 @@ public class CtcPanel extends JPanel
 
                 for (int i = 0; i < sField.length; i++)  {
                  // System.out.format (" loadPnls: %d %s\n", i, sField [i]);
-                    ctcSig [Integer.parseInt(sField[i])] = true;
+                 // ctcSig [Integer.parseInt(sField[i])] = true;
+                    int idx = Integer.parseInt(sField[i]);
+                    if (ctcCol [idx] == null)
+                        ctcCol [idx] = new CtcCol ();
+                    ctcCol [idx].sig = 2;
                 }
             }
 
@@ -418,7 +438,13 @@ public class CtcPanel extends JPanel
 
                 for (int i = 0; i < sField.length; i++)  {
                  // System.out.format (" loadPnls: %d %s\n", i, sField [i]);
-                    ctcSw [Integer.parseInt(sField[i])] = true;
+                 // ctcSw [Integer.parseInt(sField[i])] = true;
+                    int idx = Integer.parseInt(sField[i]);
+                    if (ctcCol [idx] == null)  {
+                        ctcCol [idx] = new CtcCol ();
+                        System.out.format (" loadPnls: %d alloc\n", i);
+                    }
+                    ctcCol [idx].to = 0;
                 }
             }
 
@@ -526,6 +552,11 @@ public class CtcPanel extends JPanel
 
         int pktType = 0;
         int pos     = 0;
+
+        if (ctcCol [col] == null)  {
+            System.out.format (" leverAdjust: col %d null\n", col);
+            return;
+        }
 
         if (y < RowOff)
             return;
@@ -661,16 +692,16 @@ public class CtcPanel extends JPanel
         g2d.fillRect (0, y0, r.width, 50 + y2 - y0);
 
         for (int col = 0; col < nCol; col++)  {
-            if (! ctcSw [col] && ! ctcSig [col])
+            if (ctcCol [col] == null)
                 continue;
 
             int x0 = col * colWid;
 
-            if (ctcSw [col])
+            if (0 <= ctcCol [col].to)
                 paintPlate (g2d, x0, y0, false, col, swPos  [col]);
 
-            if (ctcSig [col])
-            paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
+            if (0 <= ctcCol [col].sig)
+                paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
 
             // code button
             Image img = imgCode [0].img;
