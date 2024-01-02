@@ -42,7 +42,7 @@ public class CtcPanel extends JPanel
         int     y;
         int     tile;
 
-        PnlSym  toSym;
+        PnlSym  nxtSym;
 
         // -------------------------------------
         public PnlSym (
@@ -59,7 +59,7 @@ public class CtcPanel extends JPanel
             x       = tileWid * col;
             y       = tileWid * row;
 
-         // System.out.format (" PnlSym: lbl %s\n", lbl);
+         // System.out.format (" PnlSym: %3dx%3d  %s\n", x, y, lbl);
         }
     }
 
@@ -402,36 +402,6 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-
-    private void linkLevers ()
-    {
-        for (int col = 0; col < CtcColMax; col++)  {
-            if (ctcCol [col] == null)
-                continue;
-            System.out.format (" linkLevers: col %d\n", col);
-
-            for (int i = 0; i < symToSize; i++)
-                if (symTo [i].ctcCol == col)  {
-                    System.out.format ("   linkLevers: to  %d\n", i);
-                    if (ctcCol [col].toSym == null)
-                        ctcCol [col].toSym = symTo [i];
-                    else
-                        ctcCol [col].toSym.toSym = symTo [i];
-
-                    PnlSym sym = symTo [i];
-                    sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0'; 
-                }
-
-            if (false)
-            for (int i = 0; i < symSigSize; i++)  {
-                if (symSig [i].ctcCol == col)  {
-                    System.out.format ("   linkLevers: sig %d\n", i);
-                }
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------------
     //   load panel decription
 
     private void loadPnl (String pnlFile)
@@ -495,6 +465,58 @@ public class CtcPanel extends JPanel
             // -----------------------------------
             else if (0 < line.length()) {
                 System.out.format ("loadPnl: ERROR - %s\n", line);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    private void linkLevers ()
+    {
+        for (int col = 0; col < CtcColMax; col++)  {
+            if (ctcCol [col] == null)
+                continue;
+            System.out.format (" linkLevers: col %d\n", col);
+
+            // turnouts
+            for (int i = 0; i < symToSize; i++)
+                if (symTo [i].ctcCol == col)  {
+                    System.out.format ("   linkLevers: to  %d\n", i);
+                    if (ctcCol [col].toSym == null)
+                        ctcCol [col].toSym = symTo [i];
+                    else
+                        ctcCol [col].toSym.nxtSym = symTo [i];
+
+                    PnlSym sym = symTo [i];
+                    sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0'; 
+                }
+
+            // signals
+            for (int i = 0; i < symSigSize; i++)  {
+                PnlSym sym = symSig [i];
+                if (sym.ctcCol == col)  {
+                    // left
+                    if (sym.lbl.contains ("L"))  {
+                        if (ctcCol [col].sigLsym == null)
+                            ctcCol [col].sigLsym = sym;
+                        else  {
+                            sym.nxtSym          = ctcCol [col].sigLsym;
+                            ctcCol [col].sigLsym = sym;
+                        }
+                        System.out.format ("  linkLevers: col %d, sig %d  %s\n",
+                                                    col, i, sym.lbl);
+                    }
+                    // right
+                    else if (sym.lbl.contains ("R"))  {
+                        if (ctcCol [col].sigRsym == null)
+                            ctcCol [col].sigRsym = sym;
+                        else  {
+                            sym.nxtSym          = ctcCol [col].sigRsym;
+                            ctcCol [col].sigRsym = sym;
+                        }
+                        System.out.format ("  linkLevers: col %d, sig %d  %s\n",
+                                                    col, i, sym.lbl);
+                    }
+                }
             }
         }
     }
@@ -647,21 +669,27 @@ public class CtcPanel extends JPanel
             System.out.format ("  paintPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
         final int  TrackH  = 2;
-        int        toTile;
+
+        final int  SigRred = 16;
+        final int  SigLred = 17;
+        final int  SigRgr  = 46;
+        final int  SigLgr  = 47;
 
         if ( ! signal) {
             PnlSym to = ctcCol [col].toSym;
 
+            // lever
             g2d.drawImage (imgTo  [col].img, x0, y0, this);
             g2d.drawImage (imgLvr [lvrIdx].img, x0 + 6, y0 + 44, this);
 
+            // lamps
             if (LvrLeft == lvrIdx)  {
                 g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
                 g2d.drawImage (imgLamp [0].img,  x0 + 34, y0 + 4, this);
 
                 while (to != null)  {
                     g2d.drawImage (imgTile [TrackH].img,  to.x, to.y, this);
-                    to = to.toSym;
+                    to = to.nxtSym;
                 }
             }
             else  {
@@ -670,21 +698,43 @@ public class CtcPanel extends JPanel
 
                 while (to != null)  {
                     g2d.drawImage (imgTile [to.tile].img,  to.x, to.y, this);
-                    to = to.toSym;
+                    to = to.nxtSym;
                 }
             }
         }
 
         else {
+            PnlSym symL = ctcCol [col].sigLsym;
+            PnlSym symR = ctcCol [col].sigRsym;
+
+            // set all signals to stop
+            while (symL != null)  {
+                g2d.drawImage (imgTile [SigLred].img,  symL.x, symL.y, this);
+                symL = symL.nxtSym;
+            }
+
+            while (symR != null)  {
+                g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
+                symR = symR.nxtSym;
+            }
+
+            // lever
             g2d.drawImage (imgSig [col].img, x0, y0, this);
             g2d.drawImage (imgLvr [lvrIdx].img, x0 + 5, y0 + 57, this);
 
+            // lamps
             if (0 == lvrIdx)  {
+                symL = ctcCol [col].sigLsym;
+                g2d.drawImage (imgTile [SigLgr].img, symL.x, symL.y, this);
+
                 g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
                 g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
                 g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
             }
             else if (1 == lvrIdx)  { // right
+                symR = ctcCol [col].sigRsym;
+                g2d.drawImage (imgTile [SigRgr].img, symR.x, symR.y, this);
+
                 g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
                 g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
                 g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, this);
