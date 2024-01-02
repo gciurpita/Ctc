@@ -675,6 +675,8 @@ public class CtcPanel extends JPanel
         final int  SigRgr  = 46;
         final int  SigLgr  = 47;
 
+        g2d.setColor (Color.white);
+
         if ( ! signal) {
             PnlSym to = ctcCol [col].toSym;
 
@@ -706,15 +708,22 @@ public class CtcPanel extends JPanel
         else {
             PnlSym symL = ctcCol [col].sigLsym;
             PnlSym symR = ctcCol [col].sigRsym;
+            int    xOff = tileWid * 5/4;
+            int    yOff = tileWid * 3/4;
 
             // set all signals to stop
             while (symL != null)  {
-                g2d.drawImage (imgTile [SigLred].img,  symL.x, symL.y, this);
+                System.out.format (" paintPlate: wid %d,  %d\n", tileWid,
+                        imgTile [SigLred].img.getWidth (null));
+
+                g2d.drawImage  (imgTile [SigLred].img,  symL.x, symL.y, this);
+                g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
                 symL = symL.nxtSym;
             }
 
             while (symR != null)  {
                 g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
+                g2d.drawString (symR.lbl, symR.x - xOff, symR.y + yOff);
                 symR = symR.nxtSym;
             }
 
