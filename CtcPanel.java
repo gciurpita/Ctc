@@ -32,6 +32,13 @@ public class CtcPanel extends JPanel
     }
 
     // ---------------------------------------------------------
+    class Rule   {
+        PnlSym  sym;
+        int     lvrIdx;
+        Rule    nxt;
+    }
+
+    // ---------------------------------------------------------
     class PnlSym  {
         int     ctcCol;
         int     row;
@@ -405,6 +412,17 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    PnlSym findSig (
+        String lbl )
+    {
+        for (int i = 0; i < symSigSize; i++)  {
+            if (symSig [i].lbl.equals(lbl))
+                return symSig [i];
+        }
+        return null;
+    }
+
+    // ------------------------------------------------------------------------
     //   load panel decription
 
     private void loadPnl (String pnlFile)
@@ -416,18 +434,18 @@ public class CtcPanel extends JPanel
         String         line;
 
         while ((line = br.readLine()) != null)  {
-            String[]    fields = line.split("  *");
+            String[]    fld = line.split("  *");
             if (0 != dbg)
-                System.out.format ("   loadPnl: %s - %s\n", line, fields [0]);
+                System.out.format ("   loadPnl: %s - %s\n", line, fld [0]);
 
             // -----------------------------------
-            if (fields[0].equals("row"))  {
+            if (fld[0].equals("row"))  {
                 pnlRow [nPnlRow++] = line.substring (4);
             }
 
             // -----------------------------------
-            else if (fields[0].equals("ctcSig"))  {
-                String[]    sField = fields[1].split(",");
+            else if (fld[0].equals("ctcSig"))  {
+                String[]    sField = fld[1].split(",");
 
                 for (int i = 0; i < sField.length; i++)  {
                     int idx = Integer.parseInt(sField[i]);
@@ -438,8 +456,8 @@ public class CtcPanel extends JPanel
             }
 
             // -----------------------------------
-            else if (fields[0].equals("ctcTo"))  {
-                String[]    sField = fields[1].split(",");
+            else if (fld[0].equals("ctcTo"))  {
+                String[]    sField = fld[1].split(",");
 
                 for (int i = 0; i < sField.length; i++)  {
                     int idx = Integer.parseInt(sField[i]);
@@ -450,19 +468,37 @@ public class CtcPanel extends JPanel
             }
 
             // -----------------------------------
-            else if (fields[0].equals("signal"))  {
+            else if (fld[0].equals("signal"))  {
                 symSig [symSigSize++]     = new PnlSym (
-                        fields [1], fields [2], fields [3], fields [4]);
+                        fld [1], fld [2], fld [3], fld [4]);
             }
 
             // -----------------------------------
-            else if (fields[0].equals("turnout"))  {
+            else if (fld[0].equals("turnout"))  {
                 symTo [symToSize++]     = new PnlSym (
-                        fields [1], fields [2], fields [3], fields [4]);
+                        fld [1], fld [2], fld [3], fld [4]);
             }
 
             // -----------------------------------
-            else if (fields[0].equals("#"))
+            else if (fld[0].equals("rule"))  {
+                System.out.format ("  loadPnl: %s - %d\n", line, symSigSize);
+
+                PnlSym sigSym = findSig (fld [1]);
+                System.out.format (
+                        "   loadPnl: ,%s, ,%s,\n", fld [1], sigSym.lbl);
+
+                for (int i = 2; i < fld.length; i++)  {
+                    System.out.format ("   loadPnl: %d %6s", i, fld [i]);
+
+                    System.out.format (", col %d",
+                                Integer.parseInt (fld [i].substring(2)));
+                    System.out.format (", pos %s", fld [i].charAt(1));
+                    System.out.format (", %s\n", fld [i].charAt(0));
+                }
+            }
+
+            // -----------------------------------
+            else if (fld[0].equals("#"))
                 ;           // ignore
 
             // -----------------------------------
@@ -478,7 +514,9 @@ public class CtcPanel extends JPanel
         for (int col = 0; col < CtcColMax; col++)  {
             if (ctcCol [col] == null)
                 continue;
-            System.out.format (" linkLevers: col %d\n", col);
+
+            if (false)
+                System.out.format (" linkLevers: col %d\n", col);
 
             // turnouts
             for (int i = 0; i < symToSize; i++)
@@ -510,7 +548,8 @@ public class CtcPanel extends JPanel
                         break;
                     };
 
-                    System.out.format (
+                    if (false)
+                        System.out.format (
                         "   linkLevers: TO %d, tile %2d, %3d x %3d\n",
                             i, sym.tile, sym.xLbl, sym.yLbl);
                 }
@@ -527,7 +566,9 @@ public class CtcPanel extends JPanel
                             sym.nxtSym          = ctcCol [col].sigLsym;
                             ctcCol [col].sigLsym = sym;
                         }
-                        System.out.format ("  linkLevers: col %d, sig %d  %s\n",
+                        if (false)
+                            System.out.format (
+                                "  linkLevers: col %d, sig %d  %s\n",
                                                     col, i, sym.lbl);
                     }
                     // right
@@ -538,7 +579,9 @@ public class CtcPanel extends JPanel
                             sym.nxtSym          = ctcCol [col].sigRsym;
                             ctcCol [col].sigRsym = sym;
                         }
-                        System.out.format ("  linkLevers: col %d, sig %d  %s\n",
+                        if (false)
+                            System.out.format (
+                                "  linkLevers: col %d, sig %d  %s\n",
                                                     col, i, sym.lbl);
                     }
                 }
@@ -688,7 +731,7 @@ public class CtcPanel extends JPanel
             g2d.drawImage (imgLamp [0].img,  x0 + 34, y0 + 4, this);
 
             while (to != null)  {
-                System.out.format (" pntTo: %s\n", to.lbl);
+             // System.out.format (" pntTo: %s\n", to.lbl);
                 g2d.drawImage (imgTile [TrackH].img,  to.x, to.y, this);
                 to = to.nxtSym;
             }
