@@ -17,11 +17,11 @@ row        A
 row       8222222
 row      6       A           A
 row   22;2222292222222222222825252525
+#   0123456789012345678901234567890123456789
+#             1         2         3
 row    @       7 _       @ 6
 row   2222292222:222222222;
 row    @    7 A          @
-#   0123456789012345678901234567890123456789
-#             1         2         3
 row          :22222229
 
 #       ctc   row  col  lbl
@@ -32,10 +32,11 @@ signal    2     4   13  6L
 signal    2     6    3  6R
 signal    2     6   10  6LB
 
-turnout   1     3    4  1
-turnout   2     5    7  2
-turnout   3     3   10  3A
-turnout   3     5   12  3B
+turnout   1     3    4  3
+turnout   2     5    7  5
+turnout   3     3   10  7A
+turnout   3     5   12  7B
+turnout   4     3   24  20B
 
 ctcTo  1,2,3
 ctcSig 1,2
