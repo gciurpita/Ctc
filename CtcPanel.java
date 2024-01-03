@@ -531,8 +531,8 @@ public class CtcPanel extends JPanel
 
                     switch (sym.tile)  {
                     case 8:     // DL
-                        sym.xLbl = -tileWid;
-                        sym.yLbl =  tileWid * 5/4;
+                        sym.xLbl =  tileWid * 2/4;
+                        sym.yLbl =  tileWid * 7/4;
                         break;
                     case 9:     // DR
                         sym.xLbl =  tileWid * 6/4;
@@ -545,6 +545,10 @@ public class CtcPanel extends JPanel
                     case 11:    // UR
                         sym.xLbl =  tileWid * 6/4;
                         sym.yLbl =  tileWid * 1/4;
+                        break;
+                    default:    // flat
+                        sym.xLbl =  tileWid * 8/4;
+                        sym.yLbl =  0;
                         break;
                     };
 
@@ -779,7 +783,9 @@ public class CtcPanel extends JPanel
 
         while (symR != null)  {
             g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
-            g2d.drawString (symR.lbl, symR.x - xOff, symR.y + yOff);
+
+            int xOff2 = 5 + g2d.getFontMetrics().stringWidth (symR.lbl);
+            g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
             symR = symR.nxtSym;
         }
 
