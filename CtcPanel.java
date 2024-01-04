@@ -780,6 +780,7 @@ public class CtcPanel extends JPanel
             g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
             symL = symL.nxtSym;
         }
+        symL = ctcCol [col].sigLsym;
 
         while (symR != null)  {
             g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
@@ -788,22 +789,21 @@ public class CtcPanel extends JPanel
             g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
             symR = symR.nxtSym;
         }
+        symR = ctcCol [col].sigRsym;
 
         // lever
         g2d.drawImage (imgSig [col].img, x0, y0, this);
         g2d.drawImage (imgLvr [lvrIdx].img, x0 + 5, y0 + 57, this);
 
         // lamps
-        if (0 == lvrIdx)  {
-            symL = ctcCol [col].sigLsym;
+        if (0 == lvrIdx && symL != null)  {
             g2d.drawImage (imgTile [SigLgr].img, symL.x, symL.y, this);
 
             g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
             g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
             g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
         }
-        else if (1 == lvrIdx)  { // right
-            symR = ctcCol [col].sigRsym;
+        else if (1 == lvrIdx && symR != null)  { // right
             g2d.drawImage (imgTile [SigRgr].img, symR.x, symR.y, this);
 
             g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);

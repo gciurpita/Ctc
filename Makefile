@@ -24,7 +24,7 @@
 
 # --------------------------------------------------------------------
 run : $(Classes)
-		java $(Targ)  1.pnl
+		java $(Targ)  2.pnl
 #		java $(Targ)  Resources/ctcNumbered
 
 all : $(Classes)
