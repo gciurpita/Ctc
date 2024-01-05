@@ -34,7 +34,7 @@ public class CtcPanel extends JPanel
     // ---------------------------------------------------------
     class Rule   {
         PnlSym  sym;
-        int     lvrIdx;
+        int     state;
         Rule    nxt;
     }
 
@@ -53,6 +53,7 @@ public class CtcPanel extends JPanel
         int     tile;
 
         PnlSym  nxtSym;
+        Rule    rule;
 
         // -------------------------------------
         public PnlSym (
@@ -217,6 +218,8 @@ public class CtcPanel extends JPanel
 
         loadPnl (pnlFile);
         linkLevers ();
+
+        inventory();
 
         // set up screen graphics
         colWid  = imgTo [0].img.getWidth (null);
@@ -423,6 +426,42 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    private void dispSymList (
+        int    ctcCol,
+        String type,
+        PnlSym sym )
+    {
+        for ( ; null != sym; sym = sym.nxtSym)
+            System.out.format ("  dispSymList: %2d %-4s %4s\n",
+                                        ctcCol, type, sym.lbl);
+    }
+
+    private void inventory ()
+    {
+        System.out.format ("inventory:\n");
+
+        for (int i = 0; i < CtcColMax; i++) {
+            CtcCol ctc = ctcCol [i];
+            if (null == ctc)
+                continue;
+
+            dispSymList (i, "to",   ctc.toSym);
+            dispSymList (i, "sigL", ctc.sigLsym);
+            dispSymList (i, "sigR", ctc.sigRsym);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleAdd (
+        char   type,
+        int    num,
+        char   cond )
+    {
+        System.out.format ("    ruleAdd: type %s %2d, cond %s\n",
+                                                        type, num, cond);
+    }
+
+    // ------------------------------------------------------------------------
     //   load panel decription
 
     private void loadPnl (String pnlFile)
@@ -484,16 +523,20 @@ public class CtcPanel extends JPanel
                 System.out.format ("  loadPnl: %s - %d\n", line, symSigSize);
 
                 PnlSym sigSym = findSig (fld [1]);
-                System.out.format (
-                        "   loadPnl: ,%s, ,%s,\n", fld [1], sigSym.lbl);
 
                 for (int i = 2; i < fld.length; i++)  {
-                    System.out.format ("   loadPnl: %d %6s", i, fld [i]);
+                    System.out.format ("   loadPnl: %d %6s\n", i, fld [i]);
 
+                    if (false) {
                     System.out.format (", col %d",
                                 Integer.parseInt (fld [i].substring(2)));
                     System.out.format (", pos %s", fld [i].charAt(1));
                     System.out.format (", %s\n", fld [i].charAt(0));
+                    }
+
+                    ruleAdd (fld [i].charAt(0),
+                             Integer.parseInt (fld [i].substring(2)),
+                             fld [i].charAt(1));
                 }
             }
 
