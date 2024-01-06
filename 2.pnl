@@ -58,5 +58,5 @@ ctcTo  1,2,3,5,8,11
 ctcSig 1,2,3,5,8,11
 
 rule    4R  Sr4  Tr3
-rule    4R  Sr4  Tn3  Tn7
-rule    4R  Sr4  Tn3  Tr7
+rule    4R  Sr4  Tn3  Tn7A
+rule    4R  Sr4  Tn3  Tr7A

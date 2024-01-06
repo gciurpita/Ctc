@@ -34,7 +34,7 @@ public class CtcPanel extends JPanel
     // ---------------------------------------------------------
     class Rule   {
         PnlSym  sym;
-        int     state;
+        char    cond;
         Rule    nxt;
     }
 
@@ -53,7 +53,9 @@ public class CtcPanel extends JPanel
         int     tile;
 
         PnlSym  nxtSym;
-        Rule    rule;
+
+        Rule    rule []    = new Rule [10];
+        int     ruleSize   = 0;
 
         // -------------------------------------
         public PnlSym (
@@ -115,6 +117,9 @@ public class CtcPanel extends JPanel
 
     PnlSym          symSig []       = new PnlSym  [MaxPnlSym];
     int             symSigSize      = 0;
+
+    Rule            rules []        = new Rule [50];
+    int             rulesSize       = 0;
 
     final int       MaxImg          = 20;
     Img             imgCode []      = new Img     [MaxImg];
@@ -218,8 +223,8 @@ public class CtcPanel extends JPanel
 
         loadPnl (pnlFile);
         linkLevers ();
-
         inventory();
+
 
         // set up screen graphics
         colWid  = imgTo [0].img.getWidth (null);
@@ -415,27 +420,25 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    PnlSym findSig (
-        String lbl )
-    {
-        for (int i = 0; i < symSigSize; i++)  {
-            if (symSig [i].lbl.equals(lbl))
-                return symSig [i];
-        }
-        return null;
-    }
-
-    // ------------------------------------------------------------------------
     private void dispSymList (
         int    ctcCol,
         String type,
         PnlSym sym )
     {
-        for ( ; null != sym; sym = sym.nxtSym)
+        for ( ; null != sym; sym = sym.nxtSym)  {
             System.out.format ("  dispSymList: %2d %-4s %4s\n",
                                         ctcCol, type, sym.lbl);
+            for (int i = 0; i < sym.ruleSize; i++)  {
+                System.out.format ("    dispSymList: rules %d -", i);
+                Rule rule = sym.rule [i];
+                for ( ; null != rule; rule = rule.nxt)
+                    System.out.format (", %c %-5s", rule.cond, rule.sym.lbl);
+                System.out.format ("\n");
+            }
+        }
     }
 
+    // --------------------------------
     private void inventory ()
     {
         System.out.format ("inventory:\n");
@@ -452,13 +455,68 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    private void ruleAdd (
-        char   type,
-        int    num,
-        char   cond )
+    PnlSym symFind (
+        String lbl )
     {
-        System.out.format ("    ruleAdd: type %s %2d, cond %s\n",
-                                                        type, num, cond);
+        for (int i = 0; i < symSigSize; i++)
+            if (symSig [i].lbl.equals(lbl))
+                return symSig [i];
+
+        for (int i = 0; i < symToSize; i++)
+            if (symTo [i].lbl.equals(lbl))
+                return symTo [i];
+
+        System.out.format ("ERROR symFind: %s not found\n", lbl);
+        System.exit (4);
+
+        return null;
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleNew (
+        String fld [] )
+    {
+        PnlSym sym              = symFind (fld [1]);
+        System.out.format ("   ruleNew: sym %s\n", sym.lbl);
+
+     // sym.rule [sym.ruleSize] = new Rule ();
+     // Rule rule0              = sym.rule [sym.ruleSize++];
+
+        if (null == sym.rule [sym.ruleSize])  {
+            System.out.format ("Error ruleNew - symRule null\n");
+        }
+
+        for (int i = 2; i < fld.length; i++)  {
+         // rules [rulesSize] = new Rule ();
+         // Rule rule         = rules [rulesSize++];
+         // rule.nxt          = rule0;
+         // rule0             = rule;
+
+            Rule rule               = new Rule ();
+            rule.sym                = symFind (fld [i].substring(1));
+            rule.cond               = fld [i].charAt(0);
+            rule.nxt                = sym.rule [sym.ruleSize];
+            sym.rule [sym.ruleSize] = rule;
+
+            System.out.format ("    ruleNew: %c %s\n", rule.cond, rule.sym.lbl);
+        }
+
+        System.out.format ("    ruleNew: ");
+        System.out.format (" sym %s ", sym.lbl);
+        if (null != sym.rule [0])  {
+            if (null != sym.rule [0].sym)
+                System.out.format (", rule [0].sym %s", sym.rule [0].sym.lbl);
+            else
+                System.out.format (", rule [0].sym null");
+
+            if (null == sym.rule [0].nxt)
+                System.out.format (", rule [0].nxt null");
+        }
+        else
+            System.out.format (", rule [0] null");
+        System.out.format ("\n");
+
+        sym.ruleSize++;
     }
 
     // ------------------------------------------------------------------------
@@ -521,23 +579,7 @@ public class CtcPanel extends JPanel
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
                 System.out.format ("  loadPnl: %s - %d\n", line, symSigSize);
-
-                PnlSym sigSym = findSig (fld [1]);
-
-                for (int i = 2; i < fld.length; i++)  {
-                    System.out.format ("   loadPnl: %d %6s\n", i, fld [i]);
-
-                    if (false) {
-                    System.out.format (", col %d",
-                                Integer.parseInt (fld [i].substring(2)));
-                    System.out.format (", pos %s", fld [i].charAt(1));
-                    System.out.format (", %s\n", fld [i].charAt(0));
-                    }
-
-                    ruleAdd (fld [i].charAt(0),
-                             Integer.parseInt (fld [i].substring(2)),
-                             fld [i].charAt(1));
-                }
+                ruleNew (fld);
             }
 
             // -----------------------------------
@@ -570,7 +612,7 @@ public class CtcPanel extends JPanel
                         ctcCol [col].toSym.nxtSym = symTo [i];
 
                     PnlSym sym = symTo [i];
-                    sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0'; 
+                    sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0';
 
                     switch (sym.tile)  {
                     case 8:     // DL
