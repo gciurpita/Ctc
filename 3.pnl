@@ -1,0 +1,62 @@
+#    2     2  2  trackH.bmp
+
+#    8     8  8  angleDL.bmp
+#    9     9  9  angleDR.bmp
+#   10    10  :  angleUL.bmp
+#   11    11  ;  angleUR.bmp
+
+#   16    16  @  hsignalR.bmp
+#   17    17  A  hsignalL.bmp
+#   46    46  ^  hsignalRG.bmp
+#   47    47  _  hsignalLG.bmp
+#   76    66  |  hsignalRC.bmp
+#   77    67  }  hsignalLC.bmp
+
+
+row        A
+row       8522222
+row      6       A
+#   01234567890123456789012345678901234567890123456789
+#             1         2         3         4
+row   24;222229225
+row    @       7 _
+row   2422292222:5
+row    @    7 A
+row          :529
+
+#       ctc   row  col  lbl
+signal    1     0    7  4LB
+signal    1     2   13  4L
+signal    1     4    3  4R
+signal    3     4   13  8L
+signal    2     6    3  6R
+signal    2     6   10  6LB
+
+signal    5     2   23  12L
+signal    5     4   19  12R
+signal    5     6   19  12RB
+
+signal    8     2   32  18L
+signal    8     4   28  18R
+signal    8     4   32  18LB
+
+signal    11    2   44  22L
+signal    11    4   40  22R
+signal    11    6   40  22RB
+
+turnout   1     3    4  3
+turnout   2     5    7  5
+turnout   3     3   10  7A
+turnout   3     5   12  7B
+turnout   4     3   24  20B
+
+turnout   5     3   22  12
+turnout   8     3   29  17
+turnout   11    3   43  21
+
+ctcTo  1,2,3
+ctcSig 1,2,3
+
+rule    4R  r3
+rule    4R  n3   n7A
+rule    4R  n3   r7A  c8L
