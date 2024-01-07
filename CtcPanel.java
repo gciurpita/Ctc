@@ -161,8 +161,6 @@ public class CtcPanel extends JPanel
     final int       CodeYoff        =  5;
     int             codeDia;
 
-    boolean         codeBut []       = new boolean [ColMax];
-
     Sckt            sckt;
     boolean         scktEn           = false;
     byte[]          buf              = new byte [100];
@@ -763,8 +761,10 @@ public class CtcPanel extends JPanel
             pos     = ctcCol [col].sig;
         }
 
-        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
+        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))  {
             ctcCol [col].code = ! ctcCol [col].code;
+            System.out.format ("leverAdjust: code\n");
+        }
         else
             return;
 
@@ -935,7 +935,7 @@ public class CtcPanel extends JPanel
 
             // code button
             Image img = imgCode [0].img;
-            if (codeBut [col])
+            if (ctcCol [col].code)
                 img  = imgLamp [1].img;
             g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
         }
