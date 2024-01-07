@@ -487,50 +487,59 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    private void ruleChainCheck (
+        PnlSym sym )
+    {
+        for (int j = 0; j < symSig [j].ruleSize; j++)  {
+            Rule rule = sym.rule [j];
+            if (null == rule)
+                break;
+            for ( ; null != rule; rule = rule.nxt)  {
+                System.out.format (" ruleChainCheck: %-5s %d %c %s\n",
+                    sym.lbl, j, rule.cond, rule.sym.lbl);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleCheck ()
+    {
+        for (int i = 0; i < symSigSize; i++)
+            ruleChainCheck (symSig [i]);
+
+        for (int i = 0; i < symToSize; i++)
+            if (null != symTo [i].rule)  {
+                System.out.format (" ruleCheck: %s\n", symTo [i].lbl);
+                return;
+            }
+    }
+
+    // ------------------------------------------------------------------------
     private void ruleNew (
         String fld [] )
     {
-        PnlSym sym              = symFind (fld [1]);
+        PnlSym sym      = symFind (fld [1]);
         System.out.format ("   ruleNew: sym %s\n", sym.lbl);
 
-     // sym.rule [sym.ruleSize] = new Rule ();
-     // Rule rule0              = sym.rule [sym.ruleSize++];
-
-        if (null == sym.rule [sym.ruleSize])  {
-            System.out.format ("Error ruleNew - symRule null\n");
-        }
+        Rule rule0   = null;
 
         for (int i = 2; i < fld.length; i++)  {
-         // rules [rulesSize] = new Rule ();
-         // Rule rule         = rules [rulesSize++];
-         // rule.nxt          = rule0;
-         // rule0             = rule;
-
-            Rule rule               = new Rule ();
-            rule.sym                = symFind (fld [i].substring(1));
-            rule.cond               = fld [i].charAt(0);
-            rule.nxt                = sym.rule [sym.ruleSize];
-            sym.rule [sym.ruleSize] = rule;
+            Rule rule   = new Rule ();
+            rule.sym    = symFind (fld [i].substring(1));
+            rule.cond   = fld [i].charAt(0);
+            rule.nxt    = rule0;
+            rule0       = rule;
 
             System.out.format ("    ruleNew: %c %s\n", rule.cond, rule.sym.lbl);
         }
 
-        System.out.format ("    ruleNew: ");
-        System.out.format (" sym %s ", sym.lbl);
-        if (null != sym.rule [0])  {
-            if (null != sym.rule [0].sym)
-                System.out.format (", rule [0].sym %s", sym.rule [0].sym.lbl);
-            else
-                System.out.format (", rule [0].sym null");
+        sym.rule [sym.ruleSize++] = rule0;
 
-            if (null == sym.rule [0].nxt)
-                System.out.format (", rule [0].nxt null");
-        }
-        else
-            System.out.format (", rule [0] null");
+
+        System.out.format ("     ruleNew: %s - ", sym.lbl);
+        for  ( ; null != rule0; rule0 = rule0.nxt)
+            System.out.format ("   %c %s", rule0.cond, rule0.sym.lbl);
         System.out.format ("\n");
-
-        sym.ruleSize++;
     }
 
     // ------------------------------------------------------------------------
@@ -592,7 +601,7 @@ public class CtcPanel extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
-                System.out.format ("  loadPnl: %s - %d\n", line, symSigSize);
+                System.out.format ("  loadPnl: %s\n", line);
                 ruleNew (fld);
             }
 
@@ -813,6 +822,8 @@ public class CtcPanel extends JPanel
                 if (0 == ctcCol [col].code--)
                     ctcCol [col].code = 0;
         }
+
+        ruleCheck ();
 
         repaint ();
     }
