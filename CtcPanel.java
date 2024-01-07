@@ -60,12 +60,15 @@ public class CtcPanel extends JPanel
         Rule    rule []    = new Rule [10];
         int     ruleSize   = 0;
 
+        char    cond;
+
         // -------------------------------------
         public PnlSym (
             String  ctcCol_,
             String  row_,
             String  col_,
-            String  lbl_ )
+            String  lbl_,
+            char    cond_ )
         {
             ctcCol  = Integer.parseInt (ctcCol_);
             row     = Integer.parseInt (row_);
@@ -74,6 +77,7 @@ public class CtcPanel extends JPanel
 
             x       = tileWid * col;
             y       = tileWid * row;
+            cond    = cond_;
 
          // System.out.format (" PnlSym: %3dx%3d  %s\n", x, y, lbl);
         }
@@ -440,8 +444,8 @@ public class CtcPanel extends JPanel
         PnlSym sym )
     {
         for ( ; null != sym; sym = sym.nxtSym)  {
-            System.out.format ("  dispSymList: %2d %-4s %4s\n",
-                                        ctcCol, type, sym.lbl);
+            System.out.format ("  dispSymList: %2d %-4s %4s %c\n",
+                                        ctcCol, type, sym.lbl, sym.cond);
             for (int i = 0; i < sym.ruleSize; i++)  {
                 System.out.format ("    dispSymList: rules %d -", i);
                 Rule rule = sym.rule [i];
@@ -488,15 +492,27 @@ public class CtcPanel extends JPanel
 
     // ------------------------------------------------------------------------
     private void ruleChainCheck (
-        PnlSym sym )
+        PnlSym[]  sym,
+        int       symSize )
     {
-        for (int j = 0; j < symSig [j].ruleSize; j++)  {
-            Rule rule = sym.rule [j];
-            if (null == rule)
-                break;
-            for ( ; null != rule; rule = rule.nxt)  {
-                System.out.format (" ruleChainCheck: %-5s %d %c %s\n",
-                    sym.lbl, j, rule.cond, rule.sym.lbl);
+        for (int i = 0; i < symSize; i++)  {
+            if (0 == sym [i].ruleSize)
+                continue;
+
+            System.out.format ("  ruleChainCheck: %s\n", sym [i].lbl);
+
+            for (int j = 0 ; j < sym [i].ruleSize; j++)  {
+                Rule rule = sym [i].rule [j];
+
+                System.out.format ("    %d ", j);
+                for ( ; null != rule; rule = rule.nxt)  {
+                    char c = '!';
+                    if (rule.sym.cond == rule.cond)
+                        c = '_';
+                    System.out.format ("   %c %c %-4s",
+                        c, rule.cond, rule.sym.lbl);
+                }
+                System.out.println ();
             }
         }
     }
@@ -504,14 +520,8 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     private void ruleCheck ()
     {
-        for (int i = 0; i < symSigSize; i++)
-            ruleChainCheck (symSig [i]);
-
-        for (int i = 0; i < symToSize; i++)
-            if (null != symTo [i].rule)  {
-                System.out.format (" ruleCheck: %s\n", symTo [i].lbl);
-                return;
-            }
+        ruleChainCheck (symSig, symSigSize);
+        ruleChainCheck (symTo,  symToSize);
     }
 
     // ------------------------------------------------------------------------
@@ -590,13 +600,13 @@ public class CtcPanel extends JPanel
             // -----------------------------------
             else if (fld[0].equals("signal"))  {
                 symSig [symSigSize++]     = new PnlSym (
-                        fld [1], fld [2], fld [3], fld [4]);
+                        fld [1], fld [2], fld [3], fld [4], 's');
             }
 
             // -----------------------------------
             else if (fld[0].equals("turnout"))  {
                 symTo [symToSize++]     = new PnlSym (
-                        fld [1], fld [2], fld [3], fld [4]);
+                        fld [1], fld [2], fld [3], fld [4], 'n');
             }
 
             // -----------------------------------
@@ -812,8 +822,9 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     private void update ()
     {
-        System.out.format (" update\n");
+        System.out.format ("update\n");
 
+        // toggle code button
         for (int col = 0; col < nCol; col++)  {
             if (ctcCol [col] == null)
                 continue;

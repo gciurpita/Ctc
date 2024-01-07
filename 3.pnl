@@ -57,6 +57,10 @@ turnout   11    3   43  21
 ctcTo  1,2,3
 ctcSig 1,2,3
 
+rule    3   n3   n7A s4R s4L
+rule    3   r3   s4R s4LB
+rule    3   s4R  n7A s4L
+
 rule    4R  r3
 rule    4R  n3   n7A
 rule    4R  n3   r7A  c8L
