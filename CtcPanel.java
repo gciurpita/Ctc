@@ -16,6 +16,9 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import javax.imageio.ImageIO;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 @SuppressWarnings ("serial")
 
@@ -80,7 +83,7 @@ public class CtcPanel extends JPanel
     class CtcCol {
         int     to;
         int     sig;
-        boolean code;
+        int     code;
 
         PnlSym  toSym;
         PnlSym  sigLsym;
@@ -250,6 +253,19 @@ public class CtcPanel extends JPanel
             sckt.sendPkt (Sckt.PKT_START, buf, 1);
             scktEn = true;
         }
+    }
+
+    // ----------------------------------------------------
+    private void timer ()
+    {
+        TimerTask task = new TimerTask() {
+            public void run() {
+                update ();
+            }
+        };
+
+        Timer timer = new Timer("Timer");
+        timer.scheduleAtFixedRate (task, 0, 1000);
     }
 
     // --------------------------------
@@ -701,6 +717,7 @@ public class CtcPanel extends JPanel
         }
 
         CtcPanel disp = new CtcPanel (args [i], ip);
+        disp.timer ();
     }
 
     // ------------------------------------------------------------------------
@@ -761,10 +778,9 @@ public class CtcPanel extends JPanel
             pos     = ctcCol [col].sig;
         }
 
-        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))  {
-            ctcCol [col].code = ! ctcCol [col].code;
-            System.out.format ("leverAdjust: code\n");
-        }
+        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
+            ctcCol [col].code = 2;
+
         else
             return;
 
@@ -782,6 +798,23 @@ public class CtcPanel extends JPanel
                                         pktType, buf [0], buf [1]);
         if (scktEn)
             sckt.sendPkt ((byte) pktType, buf, 2);
+    }
+
+    // ------------------------------------------------------------------------
+    private void update ()
+    {
+        System.out.format (" update\n");
+
+        for (int col = 0; col < nCol; col++)  {
+            if (ctcCol [col] == null)
+                continue;
+
+            if (0 < ctcCol [col].code)
+                if (0 == ctcCol [col].code--)
+                    ctcCol [col].code = 0;
+        }
+
+        repaint ();
     }
 
     // ------------------------------------------------------------------------
@@ -935,7 +968,7 @@ public class CtcPanel extends JPanel
 
             // code button
             Image img = imgCode [0].img;
-            if (ctcCol [col].code)
+            if (0 < ctcCol [col].code)
                 img  = imgLamp [1].img;
             g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
         }
