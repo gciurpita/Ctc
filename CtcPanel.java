@@ -89,9 +89,10 @@ public class CtcPanel extends JPanel
         int     sig;
         int     code;
 
-        PnlSym  toSym;
-        PnlSym  sigLsym;
-        PnlSym  sigRsym;
+        PnlSym  symLvr;
+        PnlSym  symTo;
+        PnlSym  symSigL;
+        PnlSym  symSigR;
 
         // -------------------------------------
         CtcCol () {
@@ -124,6 +125,9 @@ public class CtcPanel extends JPanel
 
     PnlSym          symSig []       = new PnlSym  [MaxPnlSym];
     int             symSigSize      = 0;
+
+    PnlSym          symLvr []       = new PnlSym  [MaxPnlSym];
+    int             symLvrSize      = 0;
 
     Rule            rules []        = new Rule [50];
     int             rulesSize       = 0;
@@ -227,7 +231,6 @@ public class CtcPanel extends JPanel
         tileWid = imgTile [0].img.getWidth (null);
 
         loadPnl (pnlFile);
-        linkLevers ();
         inventory();
 
 
@@ -567,6 +570,8 @@ public class CtcPanel extends JPanel
                 System.out.format ("loadPnl: ERROR - %s\n", line);
             }
         }
+
+        linkLevers ();
     }
 
     // ------------------------------------------------------------------------
@@ -582,10 +587,10 @@ public class CtcPanel extends JPanel
             // turnouts
             for (int i = 0; i < symToSize; i++)
                 if (symTo [i].ctcCol == col)  {
-                    if (ctcCol [col].toSym == null)
-                        ctcCol [col].toSym = symTo [i];
+                    if (ctcCol [col].symTo == null)
+                        ctcCol [col].symTo = symTo [i];
                     else
-                        ctcCol [col].toSym.nxtSym = symTo [i];
+                        ctcCol [col].symTo.nxtSym = symTo [i];
 
                     PnlSym sym = symTo [i];
                     sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0';
@@ -625,11 +630,11 @@ public class CtcPanel extends JPanel
                 if (sym.ctcCol == col)  {
                     // left
                     if (sym.lbl.contains ("L"))  {
-                        if (ctcCol [col].sigLsym == null)
-                            ctcCol [col].sigLsym = sym;
+                        if (ctcCol [col].symSigL == null)
+                            ctcCol [col].symSigL = sym;
                         else  {
-                            sym.nxtSym          = ctcCol [col].sigLsym;
-                            ctcCol [col].sigLsym = sym;
+                            sym.nxtSym          = ctcCol [col].symSigL;
+                            ctcCol [col].symSigL = sym;
                         }
                         if (false)
                             System.out.format (
@@ -638,11 +643,11 @@ public class CtcPanel extends JPanel
                     }
                     // right
                     else if (sym.lbl.contains ("R"))  {
-                        if (ctcCol [col].sigRsym == null)
-                            ctcCol [col].sigRsym = sym;
+                        if (ctcCol [col].symSigR == null)
+                            ctcCol [col].symSigR = sym;
                         else  {
-                            sym.nxtSym          = ctcCol [col].sigRsym;
-                            ctcCol [col].sigRsym = sym;
+                            sym.nxtSym          = ctcCol [col].symSigR;
+                            ctcCol [col].symSigR = sym;
                         }
                         if (false)
                             System.out.format (
@@ -749,9 +754,9 @@ public class CtcPanel extends JPanel
             if (null == ctc)
                 continue;
 
-            dispSymList (i, "to",   ctc.toSym);
-            dispSymList (i, "sigL", ctc.sigLsym);
-            dispSymList (i, "sigR", ctc.sigRsym);
+            dispSymList (i, "to",   ctc.symTo);
+            dispSymList (i, "sigL", ctc.symSigL);
+            dispSymList (i, "sigR", ctc.symSigR);
         }
     }
 
@@ -851,7 +856,7 @@ public class CtcPanel extends JPanel
 
         g2d.setColor (Color.white);
 
-        PnlSym to   = ctcCol [col].toSym;
+        PnlSym to   = ctcCol [col].symTo;
 
         // label turnouts
         while (to != null)  {
@@ -863,7 +868,7 @@ public class CtcPanel extends JPanel
         g2d.drawImage (imgTo  [col].img, x0, y0, this);
         g2d.drawImage (imgLvr [lvrIdx].img, x0 + 6, y0 + 44, this);
 
-        to   = ctcCol [col].toSym;
+        to   = ctcCol [col].symTo;
 
         // lamps
         if (LvrLeft == lvrIdx)  {
@@ -905,8 +910,8 @@ public class CtcPanel extends JPanel
 
         g2d.setColor (Color.white);
 
-        PnlSym symL = ctcCol [col].sigLsym;
-        PnlSym symR = ctcCol [col].sigRsym;
+        PnlSym symL = ctcCol [col].symSigL;
+        PnlSym symR = ctcCol [col].symSigR;
         int    xOff = tileWid * 5/4;
         int    yOff = tileWid * 3/4;
 
@@ -916,7 +921,7 @@ public class CtcPanel extends JPanel
             g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
             symL = symL.nxtSym;
         }
-        symL = ctcCol [col].sigLsym;
+        symL = ctcCol [col].symSigL;
 
         while (symR != null)  {
             g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
@@ -925,7 +930,7 @@ public class CtcPanel extends JPanel
             g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
             symR = symR.nxtSym;
         }
-        symR = ctcCol [col].sigRsym;
+        symR = ctcCol [col].symSigR;
 
         // lever
         g2d.drawImage (imgSig [col].img, x0, y0, this);
