@@ -257,11 +257,8 @@ public class CtcPanel extends JPanel
             sckt.sendPkt (Sckt.PKT_START, buf, 1);
             scktEn = true;
         }
-    }
 
-    // ----------------------------------------------------
-    private void timer ()
-    {
+        // create timer
         TimerTask task = new TimerTask() {
             public void run() {
                 update ();
@@ -272,9 +269,70 @@ public class CtcPanel extends JPanel
         timer.scheduleAtFixedRate (task, 0, 1000);
     }
 
+    // ------------------------------------------------------------------------
+    private void update ()
+    {
+        System.out.format ("update\n");
+
+        // toggle code button
+        for (int col = 0; col < nCol; col++)  {
+            if (ctcCol [col] == null)
+                continue;
+
+            if (0 < ctcCol [col].code)
+                if (0 == ctcCol [col].code--)
+                    ctcCol [col].code = 0;
+        }
+
+        ruleCheck ();
+        repaint ();
+    }
+
+    // ------------------------------------------------------------------------
+    // main processes command line arguments settign the debug level and
+
+    public static void main (String[] args)
+            throws FileNotFoundException, IOException, IllegalArgumentException
+    {
+        String ip = null;
+        int    i;
+
+        for (i = 0; i < args.length; i++) {
+            System.out.format ("main: %d %s\n", i, args[i]);
+
+            if (args[i].startsWith("-ip"))  {
+                ip = args[i].substring(3);
+                System.out.format ("main: ip %s\n", ip);
+            }
+            else if (args[i].startsWith("-"))  {
+                throw new IllegalArgumentException (
+                            "unknown option - " + args[i]);
+            }
+            else
+                break;
+        }
+
+        CtcPanel disp = new CtcPanel (args [i], ip);
+    }
+
+    // ------------------------------------------------------------------------
+    // process mouse press, search for element closest to mouse location
+
+    public void mousePressed  (MouseEvent ev)
+    {
+        leverAdjust (ev.getX(), ev.getY());
+    }
+
+    // ------------------------------------------------------------------------
+    // ignore these mouse events
+    public void mouseClicked  (MouseEvent e) { }
+    public void mouseEntered  (MouseEvent e) { }
+    public void mouseExited   (MouseEvent e) { }
+    public void mouseReleased (MouseEvent e) { }
+
     // --------------------------------
     public void keyReleased (KeyEvent e) { }
-    public void keyPressed (KeyEvent e)
+    public void keyPressed  (KeyEvent e)
     {
         int     code    = e.getKeyCode();
         switch (code)  {
@@ -290,7 +348,7 @@ public class CtcPanel extends JPanel
     }
 
     // --------------------------------
-    public void keyTyped (KeyEvent e)
+    public void keyTyped    (KeyEvent e)
     {
         byte[]  buf     = new byte [10];
 
@@ -435,121 +493,6 @@ public class CtcPanel extends JPanel
                 loadCfg (fields[1]);
             }
         }
-    }
-
-    // ------------------------------------------------------------------------
-    private void dispSymList (
-        int    ctcCol,
-        String type,
-        PnlSym sym )
-    {
-        for ( ; null != sym; sym = sym.nxtSym)  {
-            System.out.format ("  dispSymList: %2d %-4s %4s %c\n",
-                                        ctcCol, type, sym.lbl, sym.cond);
-            for (int i = 0; i < sym.ruleSize; i++)  {
-                System.out.format ("    dispSymList: rules %d -", i);
-                Rule rule = sym.rule [i];
-                for ( ; null != rule; rule = rule.nxt)
-                    System.out.format (", %c %-5s", rule.cond, rule.sym.lbl);
-                System.out.format ("\n");
-            }
-        }
-    }
-
-    // --------------------------------
-    private void inventory ()
-    {
-        System.out.format ("inventory:\n");
-
-        for (int i = 0; i < CtcColMax; i++) {
-            CtcCol ctc = ctcCol [i];
-            if (null == ctc)
-                continue;
-
-            dispSymList (i, "to",   ctc.toSym);
-            dispSymList (i, "sigL", ctc.sigLsym);
-            dispSymList (i, "sigR", ctc.sigRsym);
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    PnlSym symFind (
-        String lbl )
-    {
-        for (int i = 0; i < symSigSize; i++)
-            if (symSig [i].lbl.equals(lbl))
-                return symSig [i];
-
-        for (int i = 0; i < symToSize; i++)
-            if (symTo [i].lbl.equals(lbl))
-                return symTo [i];
-
-        System.out.format ("ERROR symFind: %s not found\n", lbl);
-        System.exit (4);
-
-        return null;
-    }
-
-    // ------------------------------------------------------------------------
-    private void ruleChainCheck (
-        PnlSym[]  sym,
-        int       symSize )
-    {
-        for (int i = 0; i < symSize; i++)  {
-            if (0 == sym [i].ruleSize)
-                continue;
-
-            System.out.format ("  ruleChainCheck: %s\n", sym [i].lbl);
-
-            for (int j = 0 ; j < sym [i].ruleSize; j++)  {
-                Rule rule = sym [i].rule [j];
-
-                System.out.format ("    %d ", j);
-                for ( ; null != rule; rule = rule.nxt)  {
-                    char c = '!';
-                    if (rule.sym.cond == rule.cond)
-                        c = '_';
-                    System.out.format ("   %c %c %-4s",
-                        c, rule.cond, rule.sym.lbl);
-                }
-                System.out.println ();
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    private void ruleCheck ()
-    {
-        ruleChainCheck (symSig, symSigSize);
-        ruleChainCheck (symTo,  symToSize);
-    }
-
-    // ------------------------------------------------------------------------
-    private void ruleNew (
-        String fld [] )
-    {
-        PnlSym sym      = symFind (fld [1]);
-        System.out.format ("   ruleNew: sym %s\n", sym.lbl);
-
-        Rule rule0   = null;
-
-        for (int i = 2; i < fld.length; i++)  {
-            Rule rule   = new Rule ();
-            rule.sym    = symFind (fld [i].substring(1));
-            rule.cond   = fld [i].charAt(0);
-            rule.nxt    = rule0;
-            rule0       = rule;
-
-            System.out.format ("    ruleNew: %c %s\n", rule.cond, rule.sym.lbl);
-        }
-
-        sym.rule [sym.ruleSize++] = rule0;
-
-
-        System.out.format ("     ruleNew: %s - ", sym.lbl);
-        for  ( ; null != rule0; rule0 = rule0.nxt)
-            System.out.format ("   %c %s", rule0.cond, rule0.sym.lbl);
-        System.out.format ("\n");
     }
 
     // ------------------------------------------------------------------------
@@ -712,49 +655,7 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    // main processes command line arguments settign the debug level and
-
-    public static void main (String[] args)
-            throws FileNotFoundException, IOException, IllegalArgumentException
-    {
-        String ip = null;
-        int    i;
-
-        for (i = 0; i < args.length; i++) {
-            System.out.format ("main: %d %s\n", i, args[i]);
-
-            if (args[i].startsWith("-ip"))  {
-                ip = args[i].substring(3);
-                System.out.format ("main: ip %s\n", ip);
-            }
-            else if (args[i].startsWith("-"))  {
-                throw new IllegalArgumentException (
-                            "unknown option - " + args[i]);
-            }
-            else
-                break;
-        }
-
-        CtcPanel disp = new CtcPanel (args [i], ip);
-        disp.timer ();
-    }
-
-    // ------------------------------------------------------------------------
-    // process mouse press, search for element closest to mouse location
-
-    public void mousePressed (MouseEvent ev)
-    {
-        leverAdjust (ev.getX(), ev.getY());
-    }
-
-    // ------------------------------------------------------------------------
-    // ignore these mouse events
-    public void mouseClicked  (MouseEvent e) { }
-    public void mouseEntered  (MouseEvent e) { }
-    public void mouseExited   (MouseEvent e) { }
-    public void mouseReleased (MouseEvent e) { }
-
-    // ------------------------------------------------------------------------
+    // change position of lever based on mouse press
     private void leverAdjust (
         int  x,
         int  y )
@@ -820,23 +721,118 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    private void update ()
+    private void dispSymList (
+        int    ctcCol,
+        String type,
+        PnlSym sym )
     {
-        System.out.format ("update\n");
+        for ( ; null != sym; sym = sym.nxtSym)  {
+            System.out.format ("  dispSymList: %2d %-4s %4s %c\n",
+                                        ctcCol, type, sym.lbl, sym.cond);
+            for (int i = 0; i < sym.ruleSize; i++)  {
+                System.out.format ("    dispSymList: rules %d -", i);
+                Rule rule = sym.rule [i];
+                for ( ; null != rule; rule = rule.nxt)
+                    System.out.format (", %c %-5s", rule.cond, rule.sym.lbl);
+                System.out.format ("\n");
+            }
+        }
+    }
 
-        // toggle code button
-        for (int col = 0; col < nCol; col++)  {
-            if (ctcCol [col] == null)
+    // --------------------------------
+    private void inventory ()
+    {
+        System.out.format ("inventory:\n");
+
+        for (int i = 0; i < CtcColMax; i++) {
+            CtcCol ctc = ctcCol [i];
+            if (null == ctc)
                 continue;
 
-            if (0 < ctcCol [col].code)
-                if (0 == ctcCol [col].code--)
-                    ctcCol [col].code = 0;
+            dispSymList (i, "to",   ctc.toSym);
+            dispSymList (i, "sigL", ctc.sigLsym);
+            dispSymList (i, "sigR", ctc.sigRsym);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    PnlSym symFind (
+        String lbl )
+    {
+        for (int i = 0; i < symSigSize; i++)
+            if (symSig [i].lbl.equals(lbl))
+                return symSig [i];
+
+        for (int i = 0; i < symToSize; i++)
+            if (symTo [i].lbl.equals(lbl))
+                return symTo [i];
+
+        System.out.format ("ERROR symFind: %s not found\n", lbl);
+        System.exit (4);
+
+        return null;
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleChainCheck (
+        PnlSym[]  sym,
+        int       symSize )
+    {
+        for (int i = 0; i < symSize; i++)  {
+            if (0 == sym [i].ruleSize)
+                continue;
+
+            System.out.format ("  ruleChainCheck: %s\n", sym [i].lbl);
+
+            for (int j = 0 ; j < sym [i].ruleSize; j++)  {
+                Rule rule = sym [i].rule [j];
+
+                System.out.format ("    %d ", j);
+                for ( ; null != rule; rule = rule.nxt)  {
+                    char c = '!';
+                    if (rule.sym.cond == rule.cond)
+                        c = '_';
+                    System.out.format ("   %c %c %-4s",
+                        c, rule.cond, rule.sym.lbl);
+                }
+                System.out.println ();
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleCheck ()
+    {
+        ruleChainCheck (symSig, symSigSize);
+        ruleChainCheck (symTo,  symToSize);
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleNew (
+        String fld [] )
+    {
+        PnlSym sym      = symFind (fld [1]);
+        System.out.format ("   ruleNew: sym %s\n", sym.lbl);
+
+        Rule rule0   = null;
+
+        for (int i = 2; i < fld.length; i++)  {
+            Rule rule   = new Rule ();
+            rule.sym    = symFind (fld [i].substring(1));
+            rule.cond   = fld [i].charAt(0);
+            rule.nxt    = rule0;
+            rule0       = rule;
+
+            System.out.format ("    ruleNew: %c %s\n", rule.cond, rule.sym.lbl);
         }
 
-        ruleCheck ();
+        sym.rule [sym.ruleSize++] = rule0;
 
-        repaint ();
+
+        System.out.format ("     ruleNew: %s - ", sym.lbl);
+        for  ( ; null != rule0; rule0 = rule0.nxt)
+            System.out.format ("   %c %s", rule0.cond, rule0.sym.lbl);
+        System.out.format ("\n");
     }
 
     // ------------------------------------------------------------------------
