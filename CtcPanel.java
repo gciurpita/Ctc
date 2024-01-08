@@ -105,13 +105,14 @@ public class CtcPanel extends JPanel
 
     private static final String Title           = "Pacific Southern Railway";
 
-    final int       CANVAS_WIDTH    = 800;
-    final int       CANVAS_HEIGHT   = 400;
+    int             CANVAS_WIDTH    = 800;
+    int             CANVAS_HEIGHT   = 400;
 
     private int     dbg             = 0;
 
     String[]        pnlRow          = new String[10];
     int             nPnlRow         = 0;
+    int             maxRowLen       = 0;
 
     final int       CtcColMax       = 20;
     CtcCol          ctcCol []       = new CtcCol [CtcColMax];
@@ -229,9 +230,12 @@ public class CtcPanel extends JPanel
 
         loadCfg ("Resources/ctcNumbered");
         tileWid = imgTile [0].img.getWidth (null);
-
         loadPnl (pnlFile);
+
         inventory();
+
+        System.out.format ("CtcPanel: wid %d, len %d\n", tileWid, maxRowLen);
+        CANVAS_WIDTH  = tileWid * (2 + maxRowLen);
 
 
         // set up screen graphics
@@ -517,6 +521,10 @@ public class CtcPanel extends JPanel
             // -----------------------------------
             if (fld[0].equals("row"))  {
                 pnlRow [nPnlRow++] = line.substring (4);
+
+                int len = line.substring (4).length();
+                if (maxRowLen < len)
+                    maxRowLen = len;
             }
 
             // -----------------------------------
