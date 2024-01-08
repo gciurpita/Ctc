@@ -64,6 +64,19 @@ public class CtcPanel extends JPanel
 
         // -------------------------------------
         public PnlSym (
+            int     plateNum,
+            char    cond_ )
+        {
+            ctcCol  = plateNum;
+            cond    = cond_;
+            lbl     = "L" + plateNum;
+
+
+            System.out.format (" PnlSym: %2d %c  %s\n", plateNum, cond_, lbl);
+        }
+
+        // -------------------------------------
+        public PnlSym (
             String  ctcCol_,
             String  row_,
             String  col_,
@@ -548,6 +561,17 @@ public class CtcPanel extends JPanel
                     if (ctcCol [idx] == null)
                         ctcCol [idx] = new CtcCol ();
                     ctcCol [idx].to    = 0;
+
+
+                    ctcCol [idx].symLvr  = symLvr [symLvrSize++]
+                            = new PnlSym (idx, 'n');
+
+                    if (null == ctcCol [idx].symLvr)  {
+                        System.out.format (
+                            "Error - loadPnl idx %d, symLvr %d\n",
+                                idx, symLvrSize);
+                        System.exit (6);
+                    }
                 }
             }
 
@@ -772,6 +796,10 @@ public class CtcPanel extends JPanel
     PnlSym symFind (
         String lbl )
     {
+        for (int i = 0; i < symLvrSize; i++)
+            if (symLvr [i].lbl.equals(lbl))
+                return symLvr [i];
+
         for (int i = 0; i < symSigSize; i++)
             if (symSig [i].lbl.equals(lbl))
                 return symSig [i];
