@@ -71,8 +71,7 @@ public class CtcPanel extends JPanel
             cond    = cond_;
             lbl     = "L" + plateNum;
 
-
-            System.out.format (" PnlSym: %2d %c  %s\n", plateNum, cond_, lbl);
+         // System.out.format (" PnlSym: %2d %c  %s\n", plateNum, cond_, lbl);
         }
 
         // -------------------------------------
@@ -245,11 +244,9 @@ public class CtcPanel extends JPanel
         tileWid = imgTile [0].img.getWidth (null);
         loadPnl (pnlFile);
 
-        inventory();
+    //  inventory();
 
-        System.out.format ("CtcPanel: wid %d, len %d\n", tileWid, maxRowLen);
         CANVAS_WIDTH  = tileWid * (2 + maxRowLen);
-
 
         // set up screen graphics
         colWid  = imgTo [0].img.getWidth (null);
@@ -553,25 +550,24 @@ public class CtcPanel extends JPanel
             }
 
             // -----------------------------------
-            else if (fld[0].equals("ctcTo"))  {
+            else if (fld[0].equals("ctc"))  {
                 String[]    sField = fld[1].split(",");
 
                 for (int i = 0; i < sField.length; i++)  {
-                    int idx = Integer.parseInt(sField[i]);
-                    if (ctcCol [idx] == null)
-                        ctcCol [idx] = new CtcCol ();
-                    ctcCol [idx].to    = 0;
+                    int num = Integer.parseInt(sField[i]);
+                    ctcCol [num] = new CtcCol ();
 
+                    ctcCol [num].symLvr  = symLvr [symLvrSize++]
+                            = new PnlSym (num, 'n');
 
-                    ctcCol [idx].symLvr  = symLvr [symLvrSize++]
-                            = new PnlSym (idx, 'n');
+                    if (false)
+                        System.out.format (" loadPnl: %2d %s\n",
+                                        num, ctcCol [num].symLvr.lbl);
 
-                    if (null == ctcCol [idx].symLvr)  {
-                        System.out.format (
-                            "Error - loadPnl idx %d, symLvr %d\n",
-                                idx, symLvrSize);
-                        System.exit (6);
-                    }
+                    if (0 == (num % 2))
+                        ctcCol [num].to  = 0;
+                    else
+                        ctcCol [num].sig = 2;
                 }
             }
 
@@ -609,13 +605,16 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     private void linkLevers ()
     {
+        System.out.format ("linkLevers:\n");
+
         for (int col = 0; col < CtcColMax; col++)  {
             if (ctcCol [col] == null)
                 continue;
 
             if (false)
-                System.out.format (" linkLevers: col %d\n", col);
+                System.out.format (" linkLevers: plate %2d\n", col);
 
+            if (0 == (col % 2)) {       // TO plate
             // turnouts
             for (int i = 0; i < symToSize; i++)
                 if (symTo [i].ctcCol == col)  {
@@ -623,6 +622,11 @@ public class CtcPanel extends JPanel
                         ctcCol [col].symTo = symTo [i];
                     else
                         ctcCol [col].symTo.nxtSym = symTo [i];
+
+                    if (false)
+                        System.out.format (
+                            "  linkLevers: TO %2d, col %d, row %d\n",
+                                i, symTo [i].col, symTo [i].row);
 
                     PnlSym sym = symTo [i];
                     sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0';
@@ -656,6 +660,9 @@ public class CtcPanel extends JPanel
                             i, sym.tile, sym.xLbl, sym.yLbl);
                 }
 
+            }
+
+            else
             // signals
             for (int i = 0; i < symSigSize; i++)  {
                 PnlSym sym = symSig [i];
@@ -701,60 +708,51 @@ public class CtcPanel extends JPanel
 
         int col = x / colWid;
         int dX  = x % colWid;
+        int num = 0;
 
         int pktType = 0;
         int pos     = 0;
 
-        if (ctcCol [col] == null)  {
-            System.out.format (" leverAdjust: col %d null\n", col);
-            return;
-        }
-
         if (y < RowOff)
             return;
 
-        if (y < (rowHt1))  {
-            if ((dX < colWid / 2))
-                ctcCol [col].to = LvrLeft;
-            else
-                ctcCol [col].to = LvrRight;
+        if (y < (rowHt1))  {    // top row
+            num = 2 * col;
+            if (null == ctcCol [num])
+                return;
 
-            pktType = Sckt.PKT_LVR_TO;
-            pos     = ctcCol [col].to;
+            if ((dX < colWid / 2))
+                ctcCol [num].to = LvrLeft;
+            else
+                ctcCol [num].to = LvrRight;
         }
 
         else if (y < (rowHt2))  {
-            if (dX < (colWid / 3))
-                ctcCol [col].sig = LvrLeft;
-            else if (dX < (colWid * 2 / 3))
-                ctcCol [col].sig = LvrCenter;
-            else
-                ctcCol [col].sig = LvrRight;
+            num = (2 * col) + 1;
+            if (null == ctcCol [num])
+                return;
 
-            pktType = Sckt.PKT_LVR_SIG;
-            pos     = ctcCol [col].sig;
+            if (dX < (colWid / 3))
+                ctcCol [num].sig = LvrLeft;
+            else if (dX < (colWid * 2 / 3))
+                ctcCol [num].sig = LvrCenter;
+            else
+                ctcCol [num].sig = LvrRight;
         }
 
         else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
-            ctcCol [col].code = 2;
+    //      ctcCol [col].code = 2;
+            return;
 
         else
             return;
 
-        if (0 != dbg)
+    //  if (0 != dbg)
             System.out.format (
             " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d, sw %d, sig %d\n",
-                x, y, col, dX, colWid/2, ctcCol [col].to, ctcCol [col].sig);
+                x, y, col, dX, colWid/2, ctcCol [num].to, ctcCol [num].sig);
 
         repaint ();
-
-        buf [0] = (byte) col;
-        buf [1] = (byte) pos;
-
-        System.out.format ("leverAdjust: type %d %02x %02x\n",
-                                        pktType, buf [0], buf [1]);
-        if (scktEn)
-            sckt.sendPkt ((byte) pktType, buf, 2);
     }
 
     // ------------------------------------------------------------------------
@@ -886,7 +884,7 @@ public class CtcPanel extends JPanel
         int         lvrIdx )
     {
         if (0 != dbg)
-            System.out.format ("  paintPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
+            System.out.format ("  paintToPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
         final int  TrackH  = 2;
 
@@ -937,7 +935,7 @@ public class CtcPanel extends JPanel
         int         lvrIdx )
     {
         if (0 != dbg)
-            System.out.format ("  paintPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
+            System.out.format ("  paintSigPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
         final int  SigRred = 16;
         final int  SigLred = 17;
@@ -1012,24 +1010,26 @@ public class CtcPanel extends JPanel
      // y1 += imgSig [0].img.getHeight (null);
         g2d.fillRect (0, y0, r.width, 50 + y2 - y0);
 
-        for (int col = 0; col < nCol; col++)  {
-            if (ctcCol [col] == null)
+        for (int num = 0; num < ColMax; num++)  {
+            if (ctcCol [num] == null)
                 continue;
 
-            int x0 = col * colWid;
+            int x0 = colWid * (num / 2);
 
-            if (0 <= ctcCol [col].to)
-                paintToPlate  (g2d, x0, y0, col, ctcCol  [col].to);
+         // System.out.format (" paintCtcPlates: num %d\n", num);
 
-            if (0 <= ctcCol [col].sig)
-             // paintPlate (g2d, x0, y1, true,  col, sigPos [col]);
-                paintSigPlate (g2d, x0, y1, col, ctcCol [col].sig);
+            if (0 == (num % 2))
+                paintToPlate  (g2d, x0, y0, num, ctcCol  [num].to);
+            else
+                paintSigPlate (g2d, x0, y1, num, ctcCol [num].sig);
 
             // code button
+            if (false)  {
             Image img = imgCode [0].img;
-            if (0 < ctcCol [col].code)
+            if (0 < ctcCol [num].code)
                 img  = imgLamp [1].img;
             g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
+            }
         }
     }
 
