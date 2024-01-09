@@ -564,9 +564,9 @@ public class CtcPanel extends JPanel
                                          = new PnlSym (num);
 
                     if (0 == (num % 2))
-                        ctcCol [num].pos = 0;
+                        ctcCol [num].pos = ctcCol [num].to  = 0;
                     else
-                        ctcCol [num].pos = 2;
+                        ctcCol [num].pos = ctcCol [num].sig = 2;
 
                  // if (false)
                  //     System.out.format (" loadPnl: %2d %s\n",
@@ -916,7 +916,7 @@ public class CtcPanel extends JPanel
         }
 
         // lever
-        g2d.drawImage (imgTo  [col].img,     x0, y0, this);
+        g2d.drawImage (imgTo  [col/2].img,   x0, y0, this);
         g2d.drawImage (imgLvr [ctc.pos].img, x0 + 6, y0 + 44, this);
 
         to   = ctcCol [col].symTo;
@@ -987,7 +987,7 @@ public class CtcPanel extends JPanel
         symR = ctcCol [col].symSigR;
 
         // lever
-        g2d.drawImage (imgSig [col].img,     x0, y0, this);
+        g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
         g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
 
         // lamps
