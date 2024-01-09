@@ -64,14 +64,13 @@ public class CtcPanel extends JPanel
 
         // -------------------------------------
         public PnlSym (
-            int     plateNum,
-            char    cond_ )
+            int     plateNum )
         {
             ctcCol  = plateNum;
-            cond    = cond_;
+            cond    = ' ';
             lbl     = "L" + plateNum;
 
-         // System.out.format (" PnlSym: %2d %c  %s\n", plateNum, cond_, lbl);
+            System.out.format (" PnlSym: %2d %c  %s\n", plateNum, cond, lbl);
         }
 
         // -------------------------------------
@@ -100,6 +99,7 @@ public class CtcPanel extends JPanel
         int     to;
         int     sig;
         int     code;
+        int     pos;
 
         PnlSym  symLvr;
         PnlSym  symTo;
@@ -141,6 +141,9 @@ public class CtcPanel extends JPanel
 
     PnlSym          symLvr []       = new PnlSym  [MaxPnlSym];
     int             symLvrSize      = 0;
+
+    PnlSym          symCode []      = new PnlSym  [MaxPnlSym];
+    int             symCodeSize     = 0;
 
     Rule            rules []        = new Rule [50];
     int             rulesSize       = 0;
@@ -289,19 +292,15 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     private void update ()
     {
-        System.out.format ("update\n");
+     // System.out.format ("update\n");
 
-        // toggle code button
+        // process code button
         for (int col = 0; col < nCol; col++)  {
-            if (ctcCol [col] == null)
-                continue;
-
-            if (0 < ctcCol [col].code)
-                if (0 == ctcCol [col].code--)
-                    ctcCol [col].code = 0;
+            if (null != symCode [col])
+                symCode [col].cond = ' ';
         }
 
-        ruleCheck ();
+     // ruleCheck ();
         repaint ();
     }
 
@@ -555,19 +554,24 @@ public class CtcPanel extends JPanel
 
                 for (int i = 0; i < sField.length; i++)  {
                     int num = Integer.parseInt(sField[i]);
-                    ctcCol [num] = new CtcCol ();
-
+                    ctcCol [num]         = new CtcCol ();
                     ctcCol [num].symLvr  = symLvr [symLvrSize++]
-                            = new PnlSym (num, 'n');
-
-                    if (false)
-                        System.out.format (" loadPnl: %2d %s\n",
-                                        num, ctcCol [num].symLvr.lbl);
+                                         = new PnlSym (num);
 
                     if (0 == (num % 2))
-                        ctcCol [num].to  = 0;
+                        ctcCol [num].pos = 0;
                     else
-                        ctcCol [num].sig = 2;
+                        ctcCol [num].pos = 2;
+
+                 // if (false)
+                 //     System.out.format (" loadPnl: %2d %s\n",
+                 //                     num, ctcCol [num].lbl);
+
+                    int col = num / 2;
+                    if (null == symCode [col])  {
+                        symCode [col] = new PnlSym (col);
+                        System.out.format (" loadPnl: code %d\n", col);
+                    }
                 }
             }
 
@@ -716,41 +720,47 @@ public class CtcPanel extends JPanel
         if (y < RowOff)
             return;
 
-        if (y < (rowHt1))  {    // top row
+        if (y < (rowHt1))  {        // to lever
             num = 2 * col;
             if (null == ctcCol [num])
                 return;
 
             if ((dX < colWid / 2))
-                ctcCol [num].to = LvrLeft;
+                ctcCol [num].pos = LvrLeft;
             else
-                ctcCol [num].to = LvrRight;
+                ctcCol [num].pos = LvrRight;
         }
 
-        else if (y < (rowHt2))  {
+        else if (y < (rowHt2))  {   // signal lever
             num = (2 * col) + 1;
             if (null == ctcCol [num])
                 return;
 
             if (dX < (colWid / 3))
-                ctcCol [num].sig = LvrLeft;
+                ctcCol [num].pos = LvrLeft;
             else if (dX < (colWid * 2 / 3))
-                ctcCol [num].sig = LvrCenter;
+                ctcCol [num].pos = LvrCenter;
             else
-                ctcCol [num].sig = LvrRight;
+                ctcCol [num].pos = LvrRight;
         }
 
-        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))
-    //      ctcCol [col].code = 2;
-            return;
+        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))  {    // code
+            System.out.format (" leverAdjust: code col %2d\n", col);
+
+            if (null != symCode [col])  {
+                symCode [col].cond = 'p';
+                System.out.format (" leverAdjust: col %2d, lbl %s, %c\n",
+                    col, symLvr [col].lbl, symCode [col].cond);
+            }
+        }
 
         else
             return;
 
-    //  if (0 != dbg)
+        if (false)   
             System.out.format (
-            " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d, sw %d, sig %d\n",
-                x, y, col, dX, colWid/2, ctcCol [num].to, ctcCol [num].sig);
+            " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d\n",
+                x, y, col, dX, colWid/2);
 
         repaint ();
     }
@@ -890,6 +900,8 @@ public class CtcPanel extends JPanel
 
         g2d.setColor (Color.white);
 
+        CtcCol ctc  = ctcCol [col];
+        PnlSym lvr  = ctcCol [col].symLvr;
         PnlSym to   = ctcCol [col].symTo;
 
         // label turnouts
@@ -899,8 +911,8 @@ public class CtcPanel extends JPanel
         }
 
         // lever
-        g2d.drawImage (imgTo  [col].img, x0, y0, this);
-        g2d.drawImage (imgLvr [lvrIdx].img, x0 + 6, y0 + 44, this);
+        g2d.drawImage (imgTo  [col].img,     x0, y0, this);
+        g2d.drawImage (imgLvr [ctc.pos].img, x0 + 6, y0 + 44, this);
 
         to   = ctcCol [col].symTo;
 
@@ -944,8 +956,11 @@ public class CtcPanel extends JPanel
 
         g2d.setColor (Color.white);
 
+        CtcCol ctc  = ctcCol [col];
+        PnlSym lvr  = ctcCol [col].symLvr;
         PnlSym symL = ctcCol [col].symSigL;
         PnlSym symR = ctcCol [col].symSigR;
+
         int    xOff = tileWid * 5/4;
         int    yOff = tileWid * 3/4;
 
@@ -967,8 +982,8 @@ public class CtcPanel extends JPanel
         symR = ctcCol [col].symSigR;
 
         // lever
-        g2d.drawImage (imgSig [col].img, x0, y0, this);
-        g2d.drawImage (imgLvr [lvrIdx].img, x0 + 5, y0 + 57, this);
+        g2d.drawImage (imgSig [col].img,     x0, y0, this);
+        g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
 
         // lamps
         if (0 == lvrIdx && symL != null)  {
@@ -1005,31 +1020,28 @@ public class CtcPanel extends JPanel
         int         y1     = y0 + imgTo  [0].img.getHeight (null);
         int         y2     = y1 + imgSig [0].img.getHeight (null);
 
-     // g2d.setColor (new Color(49, 107, 53));   // CTC  green
         g2d.setColor (new Color(115, 104, 50));  // #736832
-     // y1 += imgSig [0].img.getHeight (null);
         g2d.fillRect (0, y0, r.width, 50 + y2 - y0);
 
         for (int num = 0; num < ColMax; num++)  {
-            if (ctcCol [num] == null)
-                continue;
-
             int x0 = colWid * (num / 2);
 
-         // System.out.format (" paintCtcPlates: num %d\n", num);
+            // code button
+            if (0 == num % 2 && null != symCode [num/2])  {
+                Image img = imgCode [0].img;
+                if (' ' != symCode [num/2].cond)
+                    img  = imgCode [1].img;
+                g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
+            }
+
+            // to or signal
+            if (ctcCol [num] == null)
+                continue;
 
             if (0 == (num % 2))
                 paintToPlate  (g2d, x0, y0, num, ctcCol  [num].to);
             else
                 paintSigPlate (g2d, x0, y1, num, ctcCol [num].sig);
-
-            // code button
-            if (false)  {
-            Image img = imgCode [0].img;
-            if (0 < ctcCol [num].code)
-                img  = imgLamp [1].img;
-            g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
-            }
         }
     }
 
