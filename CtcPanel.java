@@ -98,7 +98,6 @@ public class CtcPanel extends JPanel
     class CtcCol {
         int     to;
         int     sig;
-        int     code;
         int     pos;
 
         PnlSym  symLvr;
@@ -296,8 +295,14 @@ public class CtcPanel extends JPanel
 
         // process code button
         for (int col = 0; col < nCol; col++)  {
-            if (null != symCode [col])
+            if (null != symCode [col] && 'p' == symCode [col].cond)  {
                 symCode [col].cond = ' ';
+
+                if (null != ctcCol [2*col])
+                    ctcCol [2*col].to     = ctcCol [2*col].pos;
+                if (null != ctcCol [2*col +1])
+                    ctcCol [2*col +1].sig = ctcCol [2*col +1].pos;
+            }
         }
 
      // ruleCheck ();
@@ -1039,7 +1044,7 @@ public class CtcPanel extends JPanel
                 continue;
 
             if (0 == (num % 2))
-                paintToPlate  (g2d, x0, y0, num, ctcCol  [num].to);
+                paintToPlate  (g2d, x0, y0, num, ctcCol [num].to);
             else
                 paintSigPlate (g2d, x0, y1, num, ctcCol [num].sig);
         }
