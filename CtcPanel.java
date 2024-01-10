@@ -285,7 +285,7 @@ public class CtcPanel extends JPanel
         };
 
         Timer timer = new Timer("Timer");
-        timer.scheduleAtFixedRate (task, 0, 1000);
+        timer.scheduleAtFixedRate (task, 0, 3000);  // 3 sec
     }
 
     // ------------------------------------------------------------------------
@@ -297,15 +297,31 @@ public class CtcPanel extends JPanel
         for (int col = 0; col < nCol; col++)  {
             if (null != symCode [col] && 'p' == symCode [col].cond)  {
                 symCode [col].cond = ' ';
+                System.out.format ("update: col %d\n", col);
 
-                if (null != ctcCol [2*col])
+                if (null != ctcCol [2*col])  {
+                    if (0 == ctcCol [2*col].pos)
+                        ctcCol [2*col].symLvr.cond = 'l';
+                    else
+                        ctcCol [2*col].symLvr.cond = 'r';
+
                     ctcCol [2*col].to     = ctcCol [2*col].pos;
-                if (null != ctcCol [2*col +1])
+                }
+
+                if (null != ctcCol [2*col +1])  {
+                    if (0 == ctcCol [2*col].pos)
+                        ctcCol [2*col].symLvr.cond = 'l';
+                    else if (1 == ctcCol [2*col].pos)
+                        ctcCol [2*col].symLvr.cond = 'r';
+                    else
+                        ctcCol [2*col].symLvr.cond = 'c';
+
                     ctcCol [2*col +1].sig = ctcCol [2*col +1].pos;
+                }
             }
         }
 
-     // ruleCheck ();
+        ruleCheck ();
         repaint ();
     }
 
@@ -542,18 +558,6 @@ public class CtcPanel extends JPanel
             }
 
             // -----------------------------------
-            else if (fld[0].equals("ctcSig"))  {
-                String[]    sField = fld[1].split(",");
-
-                for (int i = 0; i < sField.length; i++)  {
-                    int idx = Integer.parseInt(sField[i]);
-                    if (ctcCol [idx] == null)
-                        ctcCol [idx] = new CtcCol ();
-                    ctcCol [idx].sig = 2;
-                }
-            }
-
-            // -----------------------------------
             else if (fld[0].equals("ctc"))  {
                 String[]    sField = fld[1].split(",");
 
@@ -563,10 +567,15 @@ public class CtcPanel extends JPanel
                     ctcCol [num].symLvr  = symLvr [symLvrSize++]
                                          = new PnlSym (num);
 
-                    if (0 == (num % 2))
-                        ctcCol [num].pos = ctcCol [num].to  = 0;
-                    else
-                        ctcCol [num].pos = ctcCol [num].sig = 2;
+                    if (0 == (num % 2))  {
+                        ctcCol [num].pos         = ctcCol [num].to  = 0;
+                        ctcCol [num].symLvr.cond = 'l';
+
+                    }
+                    else  {
+                        ctcCol [num].pos         = ctcCol [num].sig = 2;
+                        ctcCol [num].symLvr.cond = 'c';
+                    }
 
                  // if (false)
                  //     System.out.format (" loadPnl: %2d %s\n",
@@ -749,13 +758,15 @@ public class CtcPanel extends JPanel
                 ctcCol [num].pos = LvrRight;
         }
 
-        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))  {    // code
-            System.out.format (" leverAdjust: code col %2d\n", col);
+        // code button
+        else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))  {
+         // System.out.format (" leverAdjust: code col %2d\n", col);
 
             if (null != symCode [col])  {
                 symCode [col].cond = 'p';
-                System.out.format (" leverAdjust: col %2d, lbl %s, %c\n",
-                    col, symLvr [col].lbl, symCode [col].cond);
+                if (false)
+                    System.out.format (" leverAdjust: col %2d, lbl %s, %c\n",
+                        col, symLvr [col].lbl, symCode [col].cond);
             }
         }
 
@@ -836,19 +847,25 @@ public class CtcPanel extends JPanel
             if (0 == sym [i].ruleSize)
                 continue;
 
-            System.out.format ("  ruleChainCheck: %s\n", sym [i].lbl);
-
             for (int j = 0 ; j < sym [i].ruleSize; j++)  {
                 Rule rule = sym [i].rule [j];
 
-                System.out.format ("    %d ", j);
+                System.out.format ("  ruleChainCheck: %4s %2d",
+                                                    sym [i].lbl, j);
+
+                boolean match = true;
                 for ( ; null != rule; rule = rule.nxt)  {
                     char c = '!';
                     if (rule.sym.cond == rule.cond)
                         c = '_';
                     System.out.format ("   %c %c %-4s",
                         c, rule.cond, rule.sym.lbl);
+                    if ('!' == c)
+                        match = false;
                 }
+
+                if (match)
+                    System.out.format (" match");
                 System.out.println ();
             }
         }
@@ -857,6 +874,7 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     private void ruleCheck ()
     {
+        System.out.println ("\nrulesCheck:");
         ruleChainCheck (symSig, symSigSize);
         ruleChainCheck (symTo,  symToSize);
     }
