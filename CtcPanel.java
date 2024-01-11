@@ -64,13 +64,14 @@ public class CtcPanel extends JPanel
 
         // -------------------------------------
         public PnlSym (
+            String  prefix,
             int     plateNum )
         {
             ctcCol  = plateNum;
             cond    = ' ';
-            lbl     = "L" + plateNum;
+            lbl     = prefix + plateNum;
 
-            System.out.format (" PnlSym: %2d %c  %s\n", plateNum, cond, lbl);
+         // System.out.format (" PnlSym: %2d %c  %s\n", plateNum, cond, lbl);
         }
 
         // -------------------------------------
@@ -294,42 +295,65 @@ public class CtcPanel extends JPanel
      // System.out.format ("update\n");
 
         // process code button
-        for (int col = 0; col < nCol; col++)  {
+        for (int col = 1; col <= nCol; col++)  {
             if (null != symCode [col] && 'p' == symCode [col].cond)  {
                 symCode [col].cond = ' ';
-                System.out.format ("update: col %d\n", col);
 
-                if (null != ctcCol [2*col])  {
-                    if (0 == ctcCol [2*col].pos)  {
-                        ctcCol [2*col].symLvr.cond = 'l';
+                int     num = 2 * col - 1;
+                System.out.format ("update: col %d, num %d\n", col, num);
 
-                        PnlSym sym = ctcCol [2*col].symTo;
-                        for ( ; null != sym; sym = sym.nxtSym)
-                            sym.cond  = 'n';
+                // turnout
+                CtcCol  ctc = ctcCol [num];
+                if (null != ctc)  {
+                    if (0 == ctc.pos)  {
+                        if ('l' != ctc.symLvr.cond) {
+                            ctc.symLvr.cond = 'l';
+                            System.out.format (
+                                "update: pos %d, cond %c %s\n",
+                                    ctc.pos, ctc.symLvr.cond, ctc.symLvr.lbl);
+
+                            PnlSym sym = ctc.symTo;
+                            if (null == ctc.symTo)
+                                System.out.format ( "Error update: sym null\n");
+
+
+                            for ( ; null != sym; sym = sym.nxtSym)  {
+                                sym.cond  = 'N';
+                                System.out.format (
+                                    "update: cond %c %s\n", sym.cond, sym.lbl);
+                            }
+                        }
                     }
-                    else {
-                        ctcCol [2*col].symLvr.cond = 'r';
+                    else if ('r' != ctc.symLvr.cond) {
+                        ctc.symLvr.cond = 'r';
+                            System.out.format (
+                                "update: pos %d, cond %c %s\n",
+                                    ctc.pos, ctc.symLvr.cond, ctc.symLvr.lbl);
 
-                        PnlSym sym = ctcCol [2*col].symTo;
+                        PnlSym sym = ctc.symTo;
                         for ( ; null != sym; sym = sym.nxtSym)
-                            sym.cond  = 'r';
+                            sym.cond  = 'R';
                     }
                 }
 
-                if (null != ctcCol [2*col +1])  {
-                    if (0 == ctcCol [2*col].pos)
-                        ctcCol [2*col].symLvr.cond = 'l';
-                    else if (1 == ctcCol [2*col].pos)
-                        ctcCol [2*col].symLvr.cond = 'r';
+                // signal 
+                ctc = ctcCol [num+1];
+                if (null != ctc)  {
+                    if (0 == ctc.pos)
+                        ctc.symLvr.cond = 'l';
+                    else if (1 == ctc.pos)
+                        ctc.symLvr.cond = 'r';
                     else
-                        ctcCol [2*col].symLvr.cond = 'c';
+                        ctc.symLvr.cond = 'c';
 
-                    ctcCol [2*col +1].sig = ctcCol [2*col +1].pos;
+                    ctc.sig = ctc.pos;
+                    System.out.format ("update: col %d, pos %d, cond %c %s\n",
+                                col, ctc.pos, ctc.symLvr.cond, ctc.symLvr.lbl);
                 }
             }
         }
 
-        ruleCheck ();
+     // ruleCheck ();
         repaint ();
     }
 
@@ -569,13 +593,17 @@ public class CtcPanel extends JPanel
             else if (fld[0].equals("ctc"))  {
                 String[]    sField = fld[1].split(",");
 
+                System.out.format (" loadPnl: %s\n", line);
+
                 for (int i = 0; i < sField.length; i++)  {
                     int num = Integer.parseInt(sField[i]);
                     ctcCol [num]         = new CtcCol ();
                     ctcCol [num].symLvr  = symLvr [symLvrSize++]
-                                         = new PnlSym (num);
+                                         = new PnlSym ("L", num);
 
-                    if (0 == (num % 2))  {
+                    System.out.format ("  loadPnl: num %d\n", num);
+
+                    if (1 == (num % 2))  {
                         ctcCol [num].pos         = ctcCol [num].to  = 0;
                         ctcCol [num].symLvr.cond = 'l';
 
@@ -585,14 +613,14 @@ public class CtcPanel extends JPanel
                         ctcCol [num].symLvr.cond = 'c';
                     }
 
-                 // if (false)
-                 //     System.out.format (" loadPnl: %2d %s\n",
-                 //                     num, ctcCol [num].lbl);
+                    if (true)
+                        System.out.format ("   loadPnl: ctc num %2d %s\n",
+                                        num, ctcCol [num].symLvr.lbl);
 
-                    int col = num / 2;
+                    int col = 1 + (num-1) / 2;
                     if (null == symCode [col])  {
-                        symCode [col] = new PnlSym (col);
                         System.out.format (" loadPnl: code %d\n", col);
+                        symCode [col] = new PnlSym ("C", col);
                     }
                 }
             }
@@ -606,13 +634,13 @@ public class CtcPanel extends JPanel
             // -----------------------------------
             else if (fld[0].equals("turnout"))  {
                 symTo [symToSize++]     = new PnlSym (
-                        fld [1], fld [2], fld [3], fld [4], 'n');
+                        fld [1], fld [2], fld [3], fld [4], 'N');
             }
 
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
-                System.out.format ("  loadPnl: %s\n", line);
-                ruleNew (fld);
+             // System.out.format ("  loadPnl: %s\n", line);
+ //             ruleNew (fld);
             }
 
             // -----------------------------------
@@ -633,25 +661,25 @@ public class CtcPanel extends JPanel
     {
         System.out.format ("linkLevers:\n");
 
-        for (int col = 0; col < CtcColMax; col++)  {
-            if (ctcCol [col] == null)
+        for (int num = 0; num < CtcColMax; num++)  {
+            if (ctcCol [num] == null)
                 continue;
 
-            if (false)
-                System.out.format (" linkLevers: plate %2d\n", col);
+            if (true)
+                System.out.format (" linkLevers: plate %2d\n", num);
 
-            if (0 == (col % 2)) {       // TO plate
+            if (1 == (num % 2)) {       // TO plate
             // turnouts
             for (int i = 0; i < symToSize; i++)
-                if (symTo [i].ctcCol == col)  {
-                    if (ctcCol [col].symTo == null)
-                        ctcCol [col].symTo = symTo [i];
+                if (symTo [i].ctcCol == num)  {
+                    if (ctcCol [num].symTo == null)
+                        ctcCol [num].symTo = symTo [i];
                     else
-                        ctcCol [col].symTo.nxtSym = symTo [i];
+                        ctcCol [num].symTo.nxtSym = symTo [i];
 
-                    if (false)
+                    if (true)
                         System.out.format (
-                            "  linkLevers: TO %2d, col %d, row %d\n",
+                            "  linkLevers: TO %2d, num %d, row %d\n",
                                 i, symTo [i].col, symTo [i].row);
 
                     PnlSym sym = symTo [i];
@@ -692,32 +720,32 @@ public class CtcPanel extends JPanel
             // signals
             for (int i = 0; i < symSigSize; i++)  {
                 PnlSym sym = symSig [i];
-                if (sym.ctcCol == col)  {
+                if (sym.ctcCol == num)  {
                     // left
                     if (sym.lbl.contains ("L"))  {
-                        if (ctcCol [col].symSigL == null)
-                            ctcCol [col].symSigL = sym;
+                        if (ctcCol [num].symSigL == null)
+                            ctcCol [num].symSigL = sym;
                         else  {
-                            sym.nxtSym          = ctcCol [col].symSigL;
-                            ctcCol [col].symSigL = sym;
+                            sym.nxtSym          = ctcCol [num].symSigL;
+                            ctcCol [num].symSigL = sym;
                         }
                         if (false)
                             System.out.format (
-                                "  linkLevers: col %d, sig %d  %s\n",
-                                                    col, i, sym.lbl);
+                                "  linkLevers: num %d, sig %d  %s\n",
+                                                    num, i, sym.lbl);
                     }
                     // right
                     else if (sym.lbl.contains ("R"))  {
-                        if (ctcCol [col].symSigR == null)
-                            ctcCol [col].symSigR = sym;
+                        if (ctcCol [num].symSigR == null)
+                            ctcCol [num].symSigR = sym;
                         else  {
-                            sym.nxtSym          = ctcCol [col].symSigR;
-                            ctcCol [col].symSigR = sym;
+                            sym.nxtSym          = ctcCol [num].symSigR;
+                            ctcCol [num].symSigR = sym;
                         }
                         if (false)
                             System.out.format (
-                                "  linkLevers: col %d, sig %d  %s\n",
-                                                    col, i, sym.lbl);
+                                "  linkLevers: num %d, sig %d  %s\n",
+                                                    num, i, sym.lbl);
                     }
                 }
             }
@@ -743,7 +771,9 @@ public class CtcPanel extends JPanel
             return;
 
         if (y < (rowHt1))  {        // to lever
-            num = 2 * col;
+            num = 2 * col + 1;
+            System.out.format ("leverAdjust: x %d, col %d, num %d\n",
+                                                x, col, num);
             if (null == ctcCol [num])
                 return;
 
@@ -754,7 +784,7 @@ public class CtcPanel extends JPanel
         }
 
         else if (y < (rowHt2))  {   // signal lever
-            num = (2 * col) + 1;
+            num = (2 * col) + 2;
             if (null == ctcCol [num])
                 return;
 
@@ -770,11 +800,11 @@ public class CtcPanel extends JPanel
         else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))  {
          // System.out.format (" leverAdjust: code col %2d\n", col);
 
-            if (null != symCode [col])  {
-                symCode [col].cond = 'p';
+            if (null != symCode [col+1])  {
+                symCode [col+1].cond = 'p';
                 if (false)
                     System.out.format (" leverAdjust: col %2d, lbl %s, %c\n",
-                        col, symLvr [col].lbl, symCode [col].cond);
+                        col, symLvr [col+1].lbl, symCode [col+1].cond);
             }
         }
 
@@ -948,7 +978,8 @@ public class CtcPanel extends JPanel
         to   = ctcCol [col].symTo;
 
         // lamps
-        if (LvrLeft == lvrIdx)  {
+     // if (LvrLeft == lvrIdx)  {
+        if ('l' == lvr.cond)  {
             g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
             g2d.drawImage (imgLamp [0].img,  x0 + 34, y0 + 4, this);
 
@@ -1008,7 +1039,9 @@ public class CtcPanel extends JPanel
         }
         symR = ctcCol [col].symSigR;
 
-        // lever
+        // plate & lever
+ //     System.out.format (" paintSigPlate: plate %d\n", col/2);
+
         g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
         g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
 
@@ -1050,13 +1083,14 @@ public class CtcPanel extends JPanel
         g2d.setColor (new Color(115, 104, 50));  // #736832
         g2d.fillRect (0, y0, r.width, 50 + y2 - y0);
 
-        for (int num = 0; num < ColMax; num++)  {
-            int x0 = colWid * (num / 2);
+        for (int num = 1; num < ColMax; num++)  {
+            int col = 1 + (num-1) / 2;
+            int x0  = colWid * ((num-1) / 2);
 
             // code button
-            if (0 == num % 2 && null != symCode [num/2])  {
+            if (null != symCode [col])  {
                 Image img = imgCode [0].img;
-                if (' ' != symCode [num/2].cond)
+                if (' ' != symCode [col].cond)
                     img  = imgCode [1].img;
                 g2d.drawImage (img, x0 + CodeXoff, y2 + CodeYoff, this);
             }
@@ -1065,7 +1099,9 @@ public class CtcPanel extends JPanel
             if (ctcCol [num] == null)
                 continue;
 
-            if (0 == (num % 2))
+ //         System.out.format (" paintCtcPlate: num %d, num/2 %d, x0 %d\n",
+ //                                                     num, num/2, x0);
+            if (1 == (num % 2))
                 paintToPlate  (g2d, x0, y0, num, ctcCol [num].to);
             else
                 paintSigPlate (g2d, x0, y1, num, ctcCol [num].sig);
@@ -1104,9 +1140,8 @@ public class CtcPanel extends JPanel
         for (int i = 0; i < symToSize; i++)  {
             final int  TrackH  = 2;
             PnlSym to = symTo [i];
-            System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
-            if ('n' == to.cond)
-             // g2d.drawImage (imgTile [to.tile].img, to.x, to.y, this);
+         // System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
+            if ('N' == to.cond)
                 g2d.drawImage (imgTile [TrackH].img, to.x, to.y, this);
         }
     }
