@@ -300,12 +300,20 @@ public class CtcPanel extends JPanel
                 System.out.format ("update: col %d\n", col);
 
                 if (null != ctcCol [2*col])  {
-                    if (0 == ctcCol [2*col].pos)
+                    if (0 == ctcCol [2*col].pos)  {
                         ctcCol [2*col].symLvr.cond = 'l';
-                    else
+
+                        PnlSym sym = ctcCol [2*col].symTo;
+                        for ( ; null != sym; sym = sym.nxtSym)
+                            sym.cond  = 'n';
+                    }
+                    else {
                         ctcCol [2*col].symLvr.cond = 'r';
 
-                    ctcCol [2*col].to     = ctcCol [2*col].pos;
+                        PnlSym sym = ctcCol [2*col].symTo;
+                        for ( ; null != sym; sym = sym.nxtSym)
+                            sym.cond  = 'r';
+                    }
                 }
 
                 if (null != ctcCol [2*col +1])  {
@@ -773,7 +781,7 @@ public class CtcPanel extends JPanel
         else
             return;
 
-        if (false)   
+        if (false)
             System.out.format (
             " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d\n",
                 x, y, col, dX, colWid/2);
@@ -844,6 +852,8 @@ public class CtcPanel extends JPanel
         int       symSize )
     {
         for (int i = 0; i < symSize; i++)  {
+ //      // System.out.format ("ruleChainCheck: %s\n", sym [i].lbl);
+
             if (0 == sym [i].ruleSize)
                 continue;
 
@@ -928,12 +938,10 @@ public class CtcPanel extends JPanel
         PnlSym to   = ctcCol [col].symTo;
 
         // label turnouts
-        while (to != null)  {
+        for ( ; to != null; to = to.nxtSym)
             g2d.drawString (to.lbl, to.x + to.xLbl, to.y + to.yLbl);
-            to = to.nxtSym;
-        }
 
-        // lever
+        // plate & lever
         g2d.drawImage (imgTo  [col/2].img,   x0, y0, this);
         g2d.drawImage (imgLvr [ctc.pos].img, x0 + 6, y0 + 44, this);
 
@@ -944,6 +952,7 @@ public class CtcPanel extends JPanel
             g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
             g2d.drawImage (imgLamp [0].img,  x0 + 34, y0 + 4, this);
 
+          if (false)
             while (to != null)  {
              // System.out.format (" pntTo: %s\n", to.lbl);
                 g2d.drawImage (imgTile [TrackH].img,  to.x, to.y, this);
@@ -953,11 +962,6 @@ public class CtcPanel extends JPanel
         else  {
             g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 3, this);
             g2d.drawImage (imgLamp [1].img,  x0 + 34, y0 + 4, this);
-
-            while (to != null)  {
-                g2d.drawImage (imgTile [to.tile].img,  to.x, to.y, this);
-                to = to.nxtSym;
-            }
         }
     }
 
@@ -1094,6 +1098,16 @@ public class CtcPanel extends JPanel
                 else
                     g2d.drawImage (imgTile [idx].img, x0, y0, this);
             }
+        }
+
+        // set turnouts
+        for (int i = 0; i < symToSize; i++)  {
+            final int  TrackH  = 2;
+            PnlSym to = symTo [i];
+            System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
+            if ('n' == to.cond)
+             // g2d.drawImage (imgTile [to.tile].img, to.x, to.y, this);
+                g2d.drawImage (imgTile [TrackH].img, to.x, to.y, this);
         }
     }
 

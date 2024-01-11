@@ -37,10 +37,6 @@ turnout   4     5    7  5
 turnout   6     3   10  7A
 turnout   6     5   12  7B
 
-turnout   5     3   22  12
-turnout   8     3   29  17
-turnout   11    3   43  21
-
 ctc    2,3,4,5,6,7
 
 # rule    3   n3   n7A s4R s4L
