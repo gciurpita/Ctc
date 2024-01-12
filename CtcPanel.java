@@ -30,15 +30,25 @@ public class CtcPanel extends JPanel
         implements MouseListener, KeyListener
 {
     // ---------------------------------------------------------
-    class Img   {
-        Image   img;
-    }
+    class CtcCol {
+        int     to;
+        int     sig;
+        int     pos;
+
+        PnlSym  symLvr;
+        PnlSym  symTo;
+        PnlSym  symSigL;
+        PnlSym  symSigR;
+
+        // -------------------------------------
+        CtcCol () {
+            to = sig = -1;
+        }
+    };
 
     // ---------------------------------------------------------
-    class Rule   {
-        PnlSym  sym;
-        char    cond;
-        Rule    nxt;
+    class Img   {
+        Image   img;
     }
 
     // ---------------------------------------------------------
@@ -61,6 +71,7 @@ public class CtcPanel extends JPanel
         int     ruleSize   = 0;
 
         char    cond;
+        int     imgIdx;
 
         // -------------------------------------
         public PnlSym (
@@ -76,46 +87,39 @@ public class CtcPanel extends JPanel
 
         // -------------------------------------
         public PnlSym (
-            String  ctcCol_,
-            String  row_,
-            String  col_,
+            int     ctcCol_,
+            int     row_,
+            int     col_,
             String  lbl_,
-            char    cond_ )
+            char    cond_,
+            int     imgIdx_ )
         {
-            ctcCol  = Integer.parseInt (ctcCol_);
-            row     = Integer.parseInt (row_);
-            col     = Integer.parseInt (col_);
+            ctcCol  = ctcCol_;
+            row     = row_;
+            col     = col_;
             lbl     = lbl_;
+            imgIdx  = imgIdx_;
 
             x       = tileWid * col;
             y       = tileWid * row;
             cond    = cond_;
+
 
          // System.out.format (" PnlSym: %3dx%3d  %s\n", x, y, lbl);
         }
     }
 
     // ---------------------------------------------------------
-    class CtcCol {
-        int     to;
-        int     sig;
-        int     pos;
-
-        PnlSym  symLvr;
-        PnlSym  symTo;
-        PnlSym  symSigL;
-        PnlSym  symSigR;
-
-        // -------------------------------------
-        CtcCol () {
-            to = sig = -1;
-        }
-    };
+    class Rule   {
+        PnlSym  sym;
+        char    cond;
+        Rule    nxt;
+    }
 
     // ---------------------------------------------------------
     JFrame frame = new JFrame ();
 
-    private static final String Title           = "Pacific Southern Railway";
+    private static final String Title           = "CTC";
 
     int             CANVAS_WIDTH    = 800;
     int             CANVAS_HEIGHT   = 400;
@@ -353,7 +357,7 @@ public class CtcPanel extends JPanel
             }
         }
 
-     // ruleCheck ();
+        ruleCheck ();
         repaint ();
     }
 
@@ -627,20 +631,30 @@ public class CtcPanel extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("signal"))  {
+                int ctcCol = Integer.parseInt (fld [1]);
+                int row    = Integer.parseInt (fld [2]);
+                int col    = Integer.parseInt (fld [3]);
+                int imgIdx = (int) pnlRow [row].charAt(col) - '0';
+
                 symSig [symSigSize++]     = new PnlSym (
-                        fld [1], fld [2], fld [3], fld [4], 's');
+                        ctcCol, row, col, fld [4], 's', imgIdx);
             }
 
             // -----------------------------------
             else if (fld[0].equals("turnout"))  {
+                int ctcCol = Integer.parseInt (fld [1]);
+                int row    = Integer.parseInt (fld [2]);
+                int col    = Integer.parseInt (fld [3]);
+                int imgIdx = (int) pnlRow [row].charAt(col) - '0';
+
                 symTo [symToSize++]     = new PnlSym (
-                        fld [1], fld [2], fld [3], fld [4], 'N');
+                        ctcCol, row, col, fld [4], 's', imgIdx);
             }
 
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
              // System.out.format ("  loadPnl: %s\n", line);
- //             ruleNew (fld);
+                ruleNew (fld);
             }
 
             // -----------------------------------
@@ -881,32 +895,49 @@ public class CtcPanel extends JPanel
         PnlSym[]  sym,
         int       symSize )
     {
+        boolean dbg   = true;
         for (int i = 0; i < symSize; i++)  {
- //      // System.out.format ("ruleChainCheck: %s\n", sym [i].lbl);
-
             if (0 == sym [i].ruleSize)
                 continue;
 
+            if (dbg)
+                System.out.format ("ruleChainCheck: %s\n", sym [i].lbl);
+
             for (int j = 0 ; j < sym [i].ruleSize; j++)  {
+                boolean match = true;
                 Rule rule = sym [i].rule [j];
 
-                System.out.format ("  ruleChainCheck: %4s %2d",
+                if (dbg)
+                    System.out.format ("  ruleChainCheck: %4s %2d",
                                                     sym [i].lbl, j);
 
-                boolean match = true;
                 for ( ; null != rule; rule = rule.nxt)  {
                     char c = '!';
                     if (rule.sym.cond == rule.cond)
                         c = '_';
-                    System.out.format ("   %c %c %-4s",
-                        c, rule.cond, rule.sym.lbl);
                     if ('!' == c)
                         match = false;
+
+                    if (dbg)  {
+                        System.out.format ("   %c %c %-4s",
+                            c, rule.cond, rule.sym.lbl);
+                        if (match)
+                            System.out.format ("m");
+                        else
+                            System.out.format ("n");
+                    }
                 }
 
-                if (match)
-                    System.out.format (" match");
-                System.out.println ();
+                if (dbg)
+                    System.out.println ();
+
+                sym [i].cond = ' ';
+                if (match)  {
+                    sym [i].cond = 'C';
+                    System.out.format ("ruleChainCheck: %c %s match\n",
+                                                  sym [i].cond, sym [i].lbl);
+                    break;      // check no additional rules
+                }
             }
         }
     }
@@ -1023,21 +1054,23 @@ public class CtcPanel extends JPanel
         int    yOff = tileWid * 3/4;
 
         // set all signals to stop
+      if (true)  {
         while (symL != null)  {
-            g2d.drawImage  (imgTile [SigLred].img,  symL.x, symL.y, this);
+ //         g2d.drawImage  (imgTile [SigLred].img,  symL.x, symL.y, this);
             g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
             symL = symL.nxtSym;
         }
         symL = ctcCol [col].symSigL;
 
         while (symR != null)  {
-            g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
+ //         g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
 
             int xOff2 = 5 + g2d.getFontMetrics().stringWidth (symR.lbl);
             g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
             symR = symR.nxtSym;
         }
         symR = ctcCol [col].symSigR;
+      }
 
         // plate & lever
  //     System.out.format (" paintSigPlate: plate %d\n", col/2);
@@ -1047,14 +1080,14 @@ public class CtcPanel extends JPanel
 
         // lamps
         if (0 == lvrIdx && symL != null)  {
-            g2d.drawImage (imgTile [SigLgr].img, symL.x, symL.y, this);
+ //         g2d.drawImage (imgTile [SigLgr].img, symL.x, symL.y, this);
 
             g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
             g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
             g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
         }
         else if (1 == lvrIdx && symR != null)  { // right
-            g2d.drawImage (imgTile [SigRgr].img, symR.x, symR.y, this);
+ //         g2d.drawImage (imgTile [SigRgr].img, symR.x, symR.y, this);
 
             g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
             g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
@@ -1136,13 +1169,27 @@ public class CtcPanel extends JPanel
             }
         }
 
-        // set turnouts
+        // set turnouts -- are by default reversed
         for (int i = 0; i < symToSize; i++)  {
             final int  TrackH  = 2;
             PnlSym to = symTo [i];
          // System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
             if ('N' == to.cond)
                 g2d.drawImage (imgTile [TrackH].img, to.x, to.y, this);
+        }
+
+        // set signals -- are by default stop
+        for (int i = 0; i < symSigSize; i++)  {
+            final int  TrackH  = 2;
+            PnlSym sym    = symSig [i];
+            int    imgIdx = sym.imgIdx;
+         // System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
+            if ('C' == sym.cond)  {
+                imgIdx += 30;
+ //             System.out.format ("  paintTrack: %d x %d, %c %s\n",
+ //                     sym.x, sym.y, sym.cond, sym.lbl);
+            }
+            g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
         }
     }
 
