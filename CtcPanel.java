@@ -1067,24 +1067,6 @@ public class CtcPanel extends JPanel
         int    xOff = tileWid * 5/4;
         int    yOff = tileWid * 3/4;
 
-        // set all signals to stop
-      if (true)  {
-        while (symL != null)  {
-            g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
-            symL = symL.nxtSym;
-        }
-        symL = ctcCol [col].symSigL;
-
-        while (symR != null)  {
-            int xOff2 = 5 + g2d.getFontMetrics().stringWidth (symR.lbl);
-            g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
-            symR = symR.nxtSym;
-        }
-        symR = ctcCol [col].symSigR;
-      }
-
-        System.out.format ("paintSigPlate: num %d, %c,\n",
-                        col, ctcCol [col].lamp);
         // plate & lever
         g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
         g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
@@ -1127,8 +1109,8 @@ public class CtcPanel extends JPanel
             if ('C' == sym.cond)  {
                 ctcCol [sym.ctcNum].lamp = sym.type;
 
-                System.out.format ("paintSigLamps: num %d, %c, %s\n",
-                        sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
+             // System.out.format ("paintSigLamps: num %d, %c, %s\n",
+             //         sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
                 imgIdx += 30;
                 g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
             }
