@@ -683,51 +683,52 @@ public class CtcPanel extends JPanel
                 System.out.format (" linkLevers: plate %2d\n", num);
 
             if (1 == (num % 2)) {       // TO plate
-            // turnouts
-            for (int i = 0; i < symToSize; i++)
-                if (symTo [i].ctcCol == num)  {
-                    if (ctcCol [num].symTo == null)
-                        ctcCol [num].symTo = symTo [i];
-                    else
-                        ctcCol [num].symTo.nxtSym = symTo [i];
-
-                    if (true)
-                        System.out.format (
-                            "  linkLevers: TO %2d, num %d, row %d\n",
-                                i, symTo [i].col, symTo [i].row);
-
-                    PnlSym sym = symTo [i];
-                    sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0';
-
-                    switch (sym.tile)  {
-                    case 8:     // DL
-                        sym.xLbl =  tileWid * 2/4;
-                        sym.yLbl =  tileWid * 7/4;
-                        break;
-                    case 9:     // DR
-                        sym.xLbl =  tileWid * 6/4;
-                        sym.yLbl =  tileWid * 5/4;
-                        break;
-                    case 10:    // UL
-                        sym.xLbl = -tileWid * 7/4;
-                        sym.yLbl =  tileWid * 1/4;
-                        break;
-                    case 11:    // UR
-                        sym.xLbl =  tileWid * 6/4;
-                        sym.yLbl =  tileWid * 1/4;
-                        break;
-                    default:    // flat
-                        sym.xLbl =  tileWid * 8/4;
-                        sym.yLbl =  0;
-                        break;
-                    };
-
-                    if (false)
-                        System.out.format (
-                        "   linkLevers: TO %d, tile %2d, %3d x %3d\n",
-                            i, sym.tile, sym.xLbl, sym.yLbl);
-                }
-
+                // turnouts
+                for (int i = 0; i < symToSize; i++)     // ?????????????
+                    if (symTo [i].ctcCol == num)  {
+                        if (ctcCol [num].symTo == null)
+                            ctcCol [num].symTo = symTo [i];
+                        else
+                            ctcCol [num].symTo.nxtSym = symTo [i];
+    
+                        if (true)
+                            System.out.format (
+                                "  linkLevers: TO %2d, num %d, row %d\n",
+                                    i, symTo [i].col, symTo [i].row);
+    
+                        PnlSym sym = symTo [i];
+                        sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0';
+    
+                        symTo [i].cond = 'N';
+    
+                        switch (sym.tile)  {
+                        case 8:     // DL
+                            sym.xLbl =  tileWid * 2/4;
+                            sym.yLbl =  tileWid * 7/4;
+                            break;
+                        case 9:     // DR
+                            sym.xLbl =  tileWid * 6/4;
+                            sym.yLbl =  tileWid * 5/4;
+                            break;
+                        case 10:    // UL
+                            sym.xLbl = -tileWid * 7/4;
+                            sym.yLbl =  tileWid * 1/4;
+                            break;
+                        case 11:    // UR
+                            sym.xLbl =  tileWid * 6/4;
+                            sym.yLbl =  tileWid * 1/4;
+                            break;
+                        default:    // flat
+                            sym.xLbl =  tileWid * 8/4;
+                            sym.yLbl =  0;
+                            break;
+                        };
+    
+                        if (false)
+                            System.out.format (
+                            "   linkLevers: TO %d, tile %2d, %3d x %3d\n",
+                                i, sym.tile, sym.xLbl, sym.yLbl);
+                    }
             }
 
             else
