@@ -45,7 +45,9 @@ ctc    3,4,5,6,7,8
 
 rule    4R  rL4  R3
 rule    4R  rL4  N3   N7A
-rule    4R  rL4  N3   R7A  c8L
+rule    4R  rL4  N3   R7A  cL8
 
 rule    4LB lL4  R3
 rule    4L  lL4  N3   N7A
+
+rule    8L  lL8  cL4  N3   R7A
