@@ -35,6 +35,11 @@ public class CtcPanel extends JPanel
         int     sig;
         int     pos;
 
+        int     x0;
+        int     y0;
+
+        char    lamp;
+
         PnlSym  symLvr;
         PnlSym  symTo;
         PnlSym  symSigL;
@@ -53,7 +58,7 @@ public class CtcPanel extends JPanel
 
     // ---------------------------------------------------------
     class PnlSym  {
-        int     ctcCol;
+        int     ctcNum;
         int     row;
         int     col;
 
@@ -72,13 +77,14 @@ public class CtcPanel extends JPanel
 
         char    cond;
         int     imgIdx;
+        char    type;
 
         // -------------------------------------
         public PnlSym (
             String  prefix,
             int     plateNum )
         {
-            ctcCol  = plateNum;
+            ctcNum  = plateNum;
             cond    = ' ';
             lbl     = prefix + plateNum;
 
@@ -87,14 +93,14 @@ public class CtcPanel extends JPanel
 
         // -------------------------------------
         public PnlSym (
-            int     ctcCol_,
+            int     ctcNum_,
             int     row_,
             int     col_,
             String  lbl_,
             char    cond_,
             int     imgIdx_ )
         {
-            ctcCol  = ctcCol_;
+            ctcNum  = ctcNum_;
             row     = row_;
             col     = col_;
             lbl     = lbl_;
@@ -682,10 +688,14 @@ public class CtcPanel extends JPanel
             if (true)
                 System.out.format (" linkLevers: plate %2d\n", num);
 
+            ctcCol [num].x0 = ((num-1) / 2) * imgTo [0].img.getWidth (null);
+
             if (1 == (num % 2)) {       // TO plate
                 // turnouts
                 for (int i = 0; i < symToSize; i++)     // ?????????????
-                    if (symTo [i].ctcCol == num)  {
+                    if (symTo [i].ctcNum == num)  {
+                        ctcCol [num].y0 = RowOff;
+
                         if (ctcCol [num].symTo == null)
                             ctcCol [num].symTo = symTo [i];
                         else
@@ -735,9 +745,12 @@ public class CtcPanel extends JPanel
             // signals
             for (int i = 0; i < symSigSize; i++)  {
                 PnlSym sym = symSig [i];
-                if (sym.ctcCol == num)  {
+                if (sym.ctcNum == num)  {
+                    ctcCol [num].y0 = RowOff + imgTo  [0].img.getHeight (null);
+
                     // left
                     if (sym.lbl.contains ("L"))  {
+                        sym.type = 'L';
                         if (ctcCol [num].symSigL == null)
                             ctcCol [num].symSigL = sym;
                         else  {
@@ -751,6 +764,7 @@ public class CtcPanel extends JPanel
                     }
                     // right
                     else if (sym.lbl.contains ("R"))  {
+                        sym.type = 'R';
                         if (ctcCol [num].symSigR == null)
                             ctcCol [num].symSigR = sym;
                         else  {
@@ -1010,7 +1024,6 @@ public class CtcPanel extends JPanel
         to   = ctcCol [col].symTo;
 
         // lamps
-     // if (LvrLeft == lvrIdx)  {
         if ('l' == lvr.cond)  {
             g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 3, this);
             g2d.drawImage (imgLamp [0].img,  x0 + 34, y0 + 4, this);
@@ -1057,15 +1070,12 @@ public class CtcPanel extends JPanel
         // set all signals to stop
       if (true)  {
         while (symL != null)  {
- //         g2d.drawImage  (imgTile [SigLred].img,  symL.x, symL.y, this);
             g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
             symL = symL.nxtSym;
         }
         symL = ctcCol [col].symSigL;
 
         while (symR != null)  {
- //         g2d.drawImage (imgTile [SigRred].img,  symR.x, symR.y, this);
-
             int xOff2 = 5 + g2d.getFontMetrics().stringWidth (symR.lbl);
             g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
             symR = symR.nxtSym;
@@ -1073,31 +1083,55 @@ public class CtcPanel extends JPanel
         symR = ctcCol [col].symSigR;
       }
 
+        System.out.format ("paintSigPlate: num %d, %c,\n",
+                        col, ctcCol [col].lamp);
         // plate & lever
- //     System.out.format (" paintSigPlate: plate %d\n", col/2);
-
         g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
         g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
 
         // lamps
-        if (0 == lvrIdx && symL != null)  {
- //         g2d.drawImage (imgTile [SigLgr].img, symL.x, symL.y, this);
-
+        if ('L' == ctcCol [col].lamp)  {                    // left
             g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
             g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
             g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
         }
-        else if (1 == lvrIdx && symR != null)  { // right
- //         g2d.drawImage (imgTile [SigRgr].img, symR.x, symR.y, this);
-
+        else if ('R' == ctcCol [col].lamp)  {               // left
             g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
             g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
             g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, this);
         }
-        else  { // center/vertical
+        else  {                                             // center
             g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
             g2d.drawImage (imgLamp [10].img, x0 + 18, y0 +  6, this);
             g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    private void paintSigLamps (
+        Graphics2D  g2d )
+    {
+        // all stop
+        for (int i = 0; i < symSigSize; i++)  {
+            PnlSym sym               = symSig [i];
+            int    imgIdx            = sym.imgIdx;
+            ctcCol [sym.ctcNum].lamp = ' ';
+            g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
+        }
+
+        // clear one
+        for (int i = 0; i < symSigSize; i++)  {
+            PnlSym sym               = symSig [i];
+            int    imgIdx            = sym.imgIdx;
+
+            if ('C' == sym.cond)  {
+                ctcCol [sym.ctcNum].lamp = sym.type;
+
+                System.out.format ("paintSigLamps: num %d, %c, %s\n",
+                        sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
+                imgIdx += 30;
+                g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
+            }
         }
     }
 
@@ -1133,8 +1167,6 @@ public class CtcPanel extends JPanel
             if (ctcCol [num] == null)
                 continue;
 
- //         System.out.format (" paintCtcPlate: num %d, num/2 %d, x0 %d\n",
- //                                                     num, num/2, x0);
             if (1 == (num % 2))
                 paintToPlate  (g2d, x0, y0, num, ctcCol [num].to);
             else
@@ -1178,20 +1210,6 @@ public class CtcPanel extends JPanel
             if ('N' == to.cond)
                 g2d.drawImage (imgTile [TrackH].img, to.x, to.y, this);
         }
-
-        // set signals -- are by default stop
-        for (int i = 0; i < symSigSize; i++)  {
-            final int  TrackH  = 2;
-            PnlSym sym    = symSig [i];
-            int    imgIdx = sym.imgIdx;
-         // System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
-            if ('C' == sym.cond)  {
-                imgIdx += 30;
- //             System.out.format ("  paintTrack: %d x %d, %c %s\n",
- //                     sym.x, sym.y, sym.cond, sym.lbl);
-            }
-            g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
-        }
     }
 
     // ------------------------------------------------------------------------
@@ -1203,10 +1221,6 @@ public class CtcPanel extends JPanel
     {
         Graphics2D  g2d = (Graphics2D) g;
         Rectangle   r   = frame.getBounds();
-
-        // set background to black
-     // g2d.setColor (Color.black);
-     // g2d.setColor (new Color.parseColor("#316b35"));
 
         // -----------------------------------------------
         AffineTransform transform = new AffineTransform ();
@@ -1220,6 +1234,7 @@ public class CtcPanel extends JPanel
         g2d.fillRect (0, 0, r.width, r.height);
 
         paintTrack     (g2d, r.width, r.height);
+        paintSigLamps  (g2d);
         paintCtcPlates (g2d, transform);
     }
 }
