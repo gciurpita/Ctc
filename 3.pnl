@@ -50,4 +50,9 @@ rule    4R  rL4  N3   R7A  cL8
 rule    4LB lL4  R3
 rule    4L  lL4  N3   N7A
 
+rule    6LB lL6  R5
+rule    6R  rL6  R5
+rule    6R  rL6  cL8  N5   N7A
+
 rule    8L  lL8  cL4  N3   R7A
+rule    8L  lL8  cL6  N7A

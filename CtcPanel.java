@@ -896,7 +896,7 @@ public class CtcPanel extends JPanel
         PnlSym[]  sym,
         int       symSize )
     {
-        boolean dbg   = true;
+        boolean dbg   = false;
         for (int i = 0; i < symSize; i++)  {
             if (0 == sym [i].ruleSize)
                 continue;
