@@ -78,6 +78,7 @@ public class CtcPanel extends JPanel
         char    cond;
         int     imgIdx;
         char    type;
+        char    state;
 
         // -------------------------------------
         public PnlSym (
@@ -257,7 +258,7 @@ public class CtcPanel extends JPanel
         tileWid = imgTile [0].img.getWidth (null);
         loadPnl (pnlFile);
 
-    //  inventory();
+        inventory();
 
         CANVAS_WIDTH  = tileWid * (2 + maxRowLen);
 
@@ -315,7 +316,11 @@ public class CtcPanel extends JPanel
                 // turnout
                 CtcCol  ctc = ctcCol [num];
                 if (null != ctc)  {
-                    if (0 == ctc.pos)  {
+                    if ('L' == ctc.symTo.state)  {
+                        System.out.format (
+                            "update: turnout %s locked !!\n", ctc.symTo.lbl);
+                    }
+                    else if (0 == ctc.pos)  {
                         if ('l' != ctc.symLvr.cond) {
                             ctc.symLvr.cond = 'l';
                             System.out.format (
@@ -346,15 +351,27 @@ public class CtcPanel extends JPanel
                     }
                 }
 
+                // --------------------------------------
                 // signal 
                 ctc = ctcCol [num+1];
                 if (null != ctc)  {
-                    if (0 == ctc.pos)
-                        ctc.symLvr.cond = 'l';
-                    else if (1 == ctc.pos)
-                        ctc.symLvr.cond = 'r';
-                    else
+                    if (LvrCenter == ctc.pos)  {
                         ctc.symLvr.cond = 'c';
+                        ruleUnlock (ctc.symSigL);
+                        ruleUnlock (ctc.symSigR);
+                    }
+                    else if ('L' == ctc.symSigL.state)  {
+                        System.out.format (
+                            "update: signal %s locked !!\n", ctc.symSigL.lbl);
+                    }
+                    else if ('L' == ctc.symSigR.state)  {
+                        System.out.format (
+                            "update: signal %s locked !!\n", ctc.symSigR.lbl);
+                    }
+                    else if (LvrLeft == ctc.pos)
+                        ctc.symLvr.cond = 'l';
+                    else if (LvrRight == ctc.pos)
+                        ctc.symLvr.cond = 'r';
 
                     ctc.sig = ctc.pos;
                     System.out.format ("update: col %d, pos %d, cond %c %s\n",
@@ -694,6 +711,7 @@ public class CtcPanel extends JPanel
                 // turnouts
                 for (int i = 0; i < symToSize; i++)     // ?????????????
                     if (symTo [i].ctcNum == num)  {
+                        symTo [i].type  = 'T';
                         ctcCol [num].y0 = RowOff;
 
                         if (ctcCol [num].symTo == null)
@@ -915,6 +933,11 @@ public class CtcPanel extends JPanel
             if (0 == sym [i].ruleSize)
                 continue;
 
+            if ('L' == sym [i].state)  {
+                System.out.format ("  ruleChainCheck: %4s locked\n", sym [i].lbl);
+                continue;
+            }
+
             if (dbg)
                 System.out.format ("ruleChainCheck: %s\n", sym [i].lbl);
 
@@ -949,12 +972,54 @@ public class CtcPanel extends JPanel
                 sym [i].cond = ' ';
                 if (match)  {
                     sym [i].cond = 'C';
-                    System.out.format ("ruleChainCheck: %c %s match\n",
+                    System.out.format ("    ruleChainCheck: %c %s match\n",
                                                   sym [i].cond, sym [i].lbl);
+                    ruleLock (sym [i], j, 'L');
                     break;      // check no additional rules
                 }
             }
         }
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleUnlock (
+        PnlSym  sym )
+    {
+        do { 
+            if ('L' == sym.state) {
+                sym.state = ' ';
+                for (int j = 0 ; j < sym.ruleSize; j++)  {
+                    System.out.format ("      ruleUnLock: %s %d", sym.lbl, j);
+
+                    Rule rule = sym.rule [j];
+                    for ( ; null != rule; rule = rule.nxt)  {
+                        rule.sym.state = ' ';
+                        System.out.format (" %s", rule.sym.lbl);
+                    }
+                    System.out.println ();
+                }
+
+            }
+
+            sym = sym.nxtSym;
+        } while (null != sym);
+    }
+
+    // ------------------------------------------------------------------------
+    private void ruleLock (
+        PnlSym  sym,
+        int     ruleIdx,
+        char    state )
+    {
+        Rule    rule = sym.rule [ruleIdx];
+
+        System.out.format ("      ruleLock %c %s: ", state, sym.lbl);
+        sym.state = state;
+        for ( ; null != rule; rule = rule.nxt)  {
+            rule.sym.state = state;
+            System.out.format (" %s", rule.sym.lbl);
+        }
+        System.out.println ();
     }
 
     // ------------------------------------------------------------------------
