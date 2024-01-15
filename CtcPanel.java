@@ -360,11 +360,11 @@ public class CtcPanel extends JPanel
                         ruleUnlock (ctc.symSigL);
                         ruleUnlock (ctc.symSigR);
                     }
-                    else if ('L' == ctc.symSigL.state)  {
+                    else if (null != ctc.symSigL && 'L' == ctc.symSigL.state) {
                         System.out.format (
                             "update: signal %s locked !!\n", ctc.symSigL.lbl);
                     }
-                    else if ('L' == ctc.symSigR.state)  {
+                    else if (null != ctc.symSigR && 'L' == ctc.symSigR.state) {
                         System.out.format (
                             "update: signal %s locked !!\n", ctc.symSigR.lbl);
                     }
