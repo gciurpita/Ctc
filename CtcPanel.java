@@ -1110,6 +1110,8 @@ public class CtcPanel extends JPanel
         int         y0,
         int         col,
         int         lvrIdx )
+    {
+        if (0 != dbg)
             System.out.format ("  paintSigPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
         final int  SigRred = 16;
@@ -1126,6 +1128,15 @@ public class CtcPanel extends JPanel
 
         int    xOff = tileWid * 5/4;
         int    yOff = tileWid * 3/4;
+
+        // signal labels
+        for (symL = ctcCol [col].symSigL; symL != null; symL = symL.nxtSym)
+            g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
+
+        for (symR = ctcCol [col].symSigR; symR != null; symR = symR.nxtSym)  {
+            int xOff2 = 5 + g2d.getFontMetrics().stringWidth (symR.lbl);
+            g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
+        }
 
         // plate & lever
         g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
