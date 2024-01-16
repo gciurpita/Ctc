@@ -352,7 +352,7 @@ public class CtcPanel extends JPanel
                 }
 
                 // --------------------------------------
-                // signal 
+                // signal
                 ctc = ctcCol [num+1];
                 if (null != ctc)  {
                     if (LvrCenter == ctc.pos)  {
@@ -718,17 +718,17 @@ public class CtcPanel extends JPanel
                             ctcCol [num].symTo = symTo [i];
                         else
                             ctcCol [num].symTo.nxtSym = symTo [i];
-    
+
                         if (true)
                             System.out.format (
                                 "  linkLevers: TO %2d, num %d, row %d\n",
                                     i, symTo [i].col, symTo [i].row);
-    
+
                         PnlSym sym = symTo [i];
                         sym.tile = (int) pnlRow [sym.row].charAt(sym.col) - '0';
-    
+
                         symTo [i].cond = 'N';
-    
+
                         switch (sym.tile)  {
                         case 8:     // DL
                             sym.xLbl =  tileWid * 2/4;
@@ -751,7 +751,7 @@ public class CtcPanel extends JPanel
                             sym.yLbl =  0;
                             break;
                         };
-    
+
                         if (false)
                             System.out.format (
                             "   linkLevers: TO %d, tile %2d, %3d x %3d\n",
@@ -985,7 +985,7 @@ public class CtcPanel extends JPanel
     private void ruleUnlock (
         PnlSym  sym )
     {
-        do { 
+        for ( ; null != sym; sym = sym.nxtSym)  {
             if ('L' == sym.state) {
                 sym.state = ' ';
                 for (int j = 0 ; j < sym.ruleSize; j++)  {
@@ -998,11 +998,8 @@ public class CtcPanel extends JPanel
                     }
                     System.out.println ();
                 }
-
             }
-
-            sym = sym.nxtSym;
-        } while (null != sym);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -1113,8 +1110,6 @@ public class CtcPanel extends JPanel
         int         y0,
         int         col,
         int         lvrIdx )
-    {
-        if (0 != dbg)
             System.out.format ("  paintSigPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
         final int  SigRred = 16;
