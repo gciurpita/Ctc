@@ -29,7 +29,7 @@ signal    4     0    7  4LB
 signal    4     2   13  4L
 signal    4     4    3  4R
 signal    8     4   13  8L
-signal    8     6    3  6R
+signal    6     6    3  6R
 signal    6     6   10  6LB
 
 turnout   3     3    4  3

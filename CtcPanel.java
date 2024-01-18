@@ -199,6 +199,8 @@ public class CtcPanel extends JPanel
     final int       CodeYoff        =  5;
     int             codeDia;
 
+    boolean         ruleFlag        = true;
+
     Sckt            sckt;
     boolean         scktEn           = false;
     byte[]          buf              = new byte [100];
@@ -380,7 +382,8 @@ public class CtcPanel extends JPanel
             }
         }
 
-        ruleCheck ();
+        if (ruleFlag)
+            ruleCheck ();
         repaint ();
     }
 
@@ -441,6 +444,8 @@ public class CtcPanel extends JPanel
             default:
                 break;      // ignore char keypresses belwo
         }
+
+        repaint ();
     }
 
     // --------------------------------
@@ -449,6 +454,8 @@ public class CtcPanel extends JPanel
         byte[]  buf     = new byte [10];
 
         char    c = e.getKeyChar();
+        System.out.format ("keyTyeped: %c\n", c);
+
         switch (c)  {
             case '0':
             case '1':
@@ -459,13 +466,14 @@ public class CtcPanel extends JPanel
                 break;
 
             case 'r':
-                repaint();
+                ruleFlag = ! ruleFlag;
+                System.out.format ("keyTyeped: r %d\n", ruleFlag);
                 break;
 
             case '?':
                 System.out.format ("key commands:\n");
                 System.out.format ("    [0-9] show tower\n");
-                System.out.format ("    r - repaint\n");
+                System.out.format ("    r - pause ruleCheck\n");
                 System.out.format ("   -> - + tower (right arrow)\n");
                 System.out.format ("   <- - - tower (left arrow)\n");
                 System.out.format ("    ? - this help display\n");
@@ -696,13 +704,15 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     private void linkLevers ()
     {
-        System.out.format ("linkLevers:\n");
+        boolean dbg = false;
+
+        System.out.format ("\nlinkLevers:\n");
 
         for (int num = 0; num < CtcColMax; num++)  {
             if (ctcCol [num] == null)
                 continue;
 
-            if (true)
+            if (dbg)
                 System.out.format (" linkLevers: plate %2d\n", num);
 
             ctcCol [num].x0 = ((num-1) / 2) * imgTo [0].img.getWidth (null);
@@ -719,7 +729,7 @@ public class CtcPanel extends JPanel
                         else
                             ctcCol [num].symTo.nxtSym = symTo [i];
 
-                        if (true)
+                        if (dbg)
                             System.out.format (
                                 "  linkLevers: TO %2d, num %d, row %d\n",
                                     i, symTo [i].col, symTo [i].row);
@@ -752,7 +762,7 @@ public class CtcPanel extends JPanel
                             break;
                         };
 
-                        if (false)
+                        if (dbg)
                             System.out.format (
                             "   linkLevers: TO %d, tile %2d, %3d x %3d\n",
                                 i, sym.tile, sym.xLbl, sym.yLbl);
@@ -763,6 +773,12 @@ public class CtcPanel extends JPanel
             // signals
             for (int i = 0; i < symSigSize; i++)  {
                 PnlSym sym = symSig [i];
+
+                if (dbg)
+                    System.out.format (
+                        "    linkLevers: num %d, [%d] %d %s\n",
+                            num, i, sym.ctcNum, sym.lbl);
+
                 if (sym.ctcNum == num)  {
                     ctcCol [num].y0 = RowOff + imgTo  [0].img.getHeight (null);
 
@@ -775,9 +791,9 @@ public class CtcPanel extends JPanel
                             sym.nxtSym          = ctcCol [num].symSigL;
                             ctcCol [num].symSigL = sym;
                         }
-                        if (false)
+                        if (dbg)
                             System.out.format (
-                                "  linkLevers: num %d, sig %d  %s\n",
+                                "      linkLevers: num %d, sigL %d  %s\n",
                                                     num, i, sym.lbl);
                     }
                     // right
@@ -789,9 +805,9 @@ public class CtcPanel extends JPanel
                             sym.nxtSym          = ctcCol [num].symSigR;
                             ctcCol [num].symSigR = sym;
                         }
-                        if (false)
+                        if (dbg)
                             System.out.format (
-                                "  linkLevers: num %d, sig %d  %s\n",
+                                "      linkLevers: num %d, sigR %d  %s\n",
                                                     num, i, sym.lbl);
                     }
                 }
@@ -873,10 +889,10 @@ public class CtcPanel extends JPanel
         PnlSym sym )
     {
         for ( ; null != sym; sym = sym.nxtSym)  {
-            System.out.format ("  dispSymList: %2d %-4s %4s %c\n",
+            System.out.format ("    dispSymList: %2d %-4s %4s %c\n",
                                         ctcCol, type, sym.lbl, sym.cond);
             for (int i = 0; i < sym.ruleSize; i++)  {
-                System.out.format ("    dispSymList: rules %d -", i);
+                System.out.format ("      dispSymList: rules %d -", i);
                 Rule rule = sym.rule [i];
                 for ( ; null != rule; rule = rule.nxt)
                     System.out.format (", %c %-5s", rule.cond, rule.sym.lbl);
@@ -888,13 +904,14 @@ public class CtcPanel extends JPanel
     // --------------------------------
     private void inventory ()
     {
-        System.out.format ("inventory:\n");
+        System.out.format ("\ninventory:\n");
 
         for (int i = 0; i < CtcColMax; i++) {
             CtcCol ctc = ctcCol [i];
             if (null == ctc)
                 continue;
 
+            System.out.format ("  inventory: num %d\n", i);
             dispSymList (i, "to",   ctc.symTo);
             dispSymList (i, "sigL", ctc.symSigL);
             dispSymList (i, "sigR", ctc.symSigR);
@@ -1142,6 +1159,10 @@ public class CtcPanel extends JPanel
         g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
         g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
 
+        if (false)
+            System.out.format (
+                "paintSigPlate: Num %d, lamp %c\n", col, ctcCol [col].lamp);
+
         // lamps
         if ('L' == ctcCol [col].lamp)  {                    // left
             g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
@@ -1180,8 +1201,10 @@ public class CtcPanel extends JPanel
             if ('C' == sym.cond)  {
                 ctcCol [sym.ctcNum].lamp = sym.type;
 
-             // System.out.format ("paintSigLamps: num %d, %c, %s\n",
-             //         sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
+                if (false)
+                    System.out.format ("paintSigLamps: num %d, %c, %s\n",
+                        sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
+
                 imgIdx += 30;
                 g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
             }
