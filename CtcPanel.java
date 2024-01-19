@@ -605,6 +605,7 @@ public class CtcPanel extends JPanel
     private void loadPnl (String pnlFile)
             throws FileNotFoundException, IOException
     {
+        boolean dbg = false;
         System.out.format (" loadPnl: %s\n", pnlFile);
 
         BufferedReader br = new BufferedReader(new FileReader(pnlFile));
@@ -612,7 +613,7 @@ public class CtcPanel extends JPanel
 
         while ((line = br.readLine()) != null)  {
             String[]    fld = line.split("  *");
-            if (0 != dbg)
+            if (dbg)
                 System.out.format ("   loadPnl: %s - %s\n", line, fld [0]);
 
             // -----------------------------------
@@ -665,6 +666,17 @@ public class CtcPanel extends JPanel
                 int ctcCol = Integer.parseInt (fld [1]);
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
+
+                if (nPnlRow <= row) {
+                    System.out.format ("loadPnl: row out of range, %d\n", row);
+                    System.exit(10);
+                }
+
+                if (pnlRow [row].length() <= col) {
+                    System.out.format ("loadPnl: col out of range, %d\n", col);
+                    System.exit(10);
+                }
+
                 int imgIdx = (int) pnlRow [row].charAt(col) - '0';
 
                 symSig [symSigSize++]     = new PnlSym (
@@ -676,6 +688,17 @@ public class CtcPanel extends JPanel
                 int ctcCol = Integer.parseInt (fld [1]);
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
+
+                if (nPnlRow <= row) {
+                    System.out.format ("loadPnl: row out of range, %d\n", row);
+                    System.exit(10);
+                }
+
+                if (pnlRow [row].length() <= col) {
+                    System.out.format ("loadPnl: col out of range, %d\n", col);
+                    System.exit(10);
+                }
+
                 int imgIdx = (int) pnlRow [row].charAt(col) - '0';
 
                 symTo [symToSize++]     = new PnlSym (
@@ -1259,7 +1282,7 @@ public class CtcPanel extends JPanel
         if (0 != dbg)
             System.out.format ("paintTrack:\n");
 
-        for (int row = 0; row < 8; row++)  {
+        for (int row = 0; row < nPnlRow; row++)  {
          // System.out.format ("  paintTrack: %d %s\n", row, pnlRow [row]);
 
             for (int i = 0; i < pnlRow [row].length(); i++)  {

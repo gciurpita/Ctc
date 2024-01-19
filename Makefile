@@ -25,7 +25,9 @@
 # --------------------------------------------------------------------
 run : $(Classes)
 		java $(Targ)  3.pnl
-#		java $(Targ)  Resources/ctcNumbered
+
+four : $(Classes)
+		java $(Targ)  4.pnl
 
 all : $(Classes)
 
@@ -41,12 +43,6 @@ runJar : jar
 
 view : $(Jar)
 		appletviewer driver.html
-
-xgr :
-		plot.k $(Topt) S=$(Sopt) $(Targ).out | tee $(Targ).xgr
-
-xgr2 :
-		plot.k  S=TE,mph,lbs1:10 $(Targ).out | tee $(Targ).xgr
 
 ids : tileIds.exe
 		$^ Resources/blackScreenTiles.cfg | tee $@
