@@ -357,11 +357,19 @@ public class CtcPanel extends JPanel
                 // signal
                 ctc = ctcCol [num+1];
                 if (null != ctc)  {
+                    System.out.format ("update: col %d, num %d\n", col, num+1);
+
                     if (LvrCenter == ctc.pos)  {
                         ctc.symLvr.cond = 'c';
-                        ruleUnlock (ctc.symSigL);
-                        ruleUnlock (ctc.symSigR);
+                        ruleUnlock (ctc.symSigL);   // ???
+                        ruleUnlock (ctc.symSigR);   // ???
                     }
+                    else if ('L' == ctc.symLvr.state) {
+                        System.out.format (
+                            "update: sig lever %s locked\n", ctc.symSigL.lbl);
+                    }
+
+                    // are these 2 checks needed ???
                     else if (null != ctc.symSigL && 'L' == ctc.symSigL.state) {
                         System.out.format (
                             "update: signal %s locked !!\n", ctc.symSigL.lbl);
@@ -370,14 +378,20 @@ public class CtcPanel extends JPanel
                         System.out.format (
                             "update: signal %s locked !!\n", ctc.symSigR.lbl);
                     }
-                    else if (LvrLeft == ctc.pos)
+
+                    else if (LvrLeft == ctc.pos)  {
                         ctc.symLvr.cond = 'l';
+                        System.out.format (
+                            "update: signal set cond %c\n", ctc.symLvr.cond);
+                    }
                     else if (LvrRight == ctc.pos)
                         ctc.symLvr.cond = 'r';
 
                     ctc.sig = ctc.pos;
-                    System.out.format ("update: col %d, pos %d, cond %c %s\n",
-                                col, ctc.pos, ctc.symLvr.cond, ctc.symLvr.lbl);
+                    System.out.format (
+                        "update: col %d, pos %d, cond %c state %c %s\n",
+                                col, ctc.pos, ctc.symLvr.cond,
+                                ctc.symLvr.state, ctc.symLvr.lbl);
                 }
             }
         }
@@ -1065,6 +1079,13 @@ public class CtcPanel extends JPanel
         System.out.println ("\nrulesCheck:");
         ruleChainCheck (symSig, symSigSize);
         ruleChainCheck (symTo,  symToSize);
+
+        if (true)  {
+            for (int i = 0; i < symSigSize; i++)  {
+                System.out.format ("   ruleCheck: %c %c %s\n",
+                    symSig [i].cond, symSig [i].state, symSig [i].lbl);
+            }
+        }
     }
 
     // ------------------------------------------------------------------------
