@@ -43,6 +43,6 @@ rule    6L  lL6
 rule    6R  rL6  N5 cL12
 rule    6RB rL6  R5 cL12
 
-rule   12LB lL12 R11
-rule   12L  lL12 N11
+rule   12LB lL12 R11 cL6
+rule   12L  lL12 N11 cL6
 rule   12R  rL12
