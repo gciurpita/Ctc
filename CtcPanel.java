@@ -78,7 +78,8 @@ public class CtcPanel extends JPanel
         char    cond;
         int     imgIdx;
         char    type;
-        char    state;
+     // char    state;
+        int     lock;
 
         // -------------------------------------
         public PnlSym (
@@ -318,7 +319,7 @@ public class CtcPanel extends JPanel
                 // turnout
                 CtcCol  ctc = ctcCol [num];
                 if (null != ctc)  {
-                    if ('L' == ctc.symTo.state)  {
+                    if (0 != ctc.symTo.lock)  {
                         System.out.format (
                             "update: turnout %s locked !!\n", ctc.symTo.lbl);
                     }
@@ -364,17 +365,17 @@ public class CtcPanel extends JPanel
                         ruleUnlock (ctc.symSigL);   // ???
                         ruleUnlock (ctc.symSigR);   // ???
                     }
-                    else if ('L' == ctc.symLvr.state) {
+                    else if (0 != ctc.symLvr.lock) {
                         System.out.format (
                             "update: sig lever %s locked\n", ctc.symSigL.lbl);
                     }
 
                     // are these 2 checks needed ???
-                    else if (null != ctc.symSigL && 'L' == ctc.symSigL.state) {
+                    else if (null != ctc.symSigL && 0 != ctc.symSigL.lock) {
                         System.out.format (
                             "update: signal %s locked !!\n", ctc.symSigL.lbl);
                     }
-                    else if (null != ctc.symSigR && 'L' == ctc.symSigR.state) {
+                    else if (null != ctc.symSigR && 0 != ctc.symSigR.lock) {
                         System.out.format (
                             "update: signal %s locked !!\n", ctc.symSigR.lbl);
                     }
@@ -389,9 +390,9 @@ public class CtcPanel extends JPanel
 
                     ctc.sig = ctc.pos;
                     System.out.format (
-                        "update: col %d, pos %d, cond %c state %c %s\n",
+                        "update: col %d, pos %d, cond %c lock %d %s\n",
                                 col, ctc.pos, ctc.symLvr.cond,
-                                ctc.symLvr.state, ctc.symLvr.lbl);
+                                ctc.symLvr.lock, ctc.symLvr.lbl);
                 }
             }
         }
@@ -987,7 +988,7 @@ public class CtcPanel extends JPanel
             if (0 == sym [i].ruleSize)
                 continue;
 
-            if ('L' == sym [i].state)  {
+            if (0 != sym [i].lock)  {
                 System.out.format ("  ruleChainCheck: %4s locked\n", sym [i].lbl);
                 continue;
             }
@@ -1040,14 +1041,17 @@ public class CtcPanel extends JPanel
         PnlSym  sym )
     {
         for ( ; null != sym; sym = sym.nxtSym)  {
-            if ('L' == sym.state) {
-                sym.state = ' ';
+            if (0 != sym.lock) {
+                if (0 < sym.lock)
+                    sym.lock--;
+
                 for (int j = 0 ; j < sym.ruleSize; j++)  {
                     System.out.format ("      ruleUnLock: %s %d", sym.lbl, j);
 
                     Rule rule = sym.rule [j];
                     for ( ; null != rule; rule = rule.nxt)  {
-                        rule.sym.state = ' ';
+                        if (0 < sym.lock)
+                            sym.lock--;
                         System.out.format (" %s", rule.sym.lbl);
                     }
                     System.out.println ();
@@ -1065,9 +1069,9 @@ public class CtcPanel extends JPanel
         Rule    rule = sym.rule [ruleIdx];
 
         System.out.format ("      ruleLock %c %s: ", state, sym.lbl);
-        sym.state = state;
+        sym.lock++;
         for ( ; null != rule; rule = rule.nxt)  {
-            rule.sym.state = state;
+            rule.sym.lock++;
             System.out.format (" %s", rule.sym.lbl);
         }
         System.out.println ();
@@ -1082,8 +1086,8 @@ public class CtcPanel extends JPanel
 
         if (true)  {
             for (int i = 0; i < symSigSize; i++)  {
-                System.out.format ("   ruleCheck: %c %c %s\n",
-                    symSig [i].cond, symSig [i].state, symSig [i].lbl);
+                System.out.format ("   ruleCheck: %c, lock %d %s\n",
+                    symSig [i].cond, symSig [i].lock, symSig [i].lbl);
             }
         }
     }
