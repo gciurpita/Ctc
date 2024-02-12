@@ -206,6 +206,8 @@ public class CtcPanel extends JPanel
     boolean         scktEn           = false;
     byte[]          buf              = new byte [100];
 
+    LayoutIf        layIf            = new LayoutIf ();
+
     // ---------------------------------------------------------
     public enum ImgType { Code, Lamp, Lever, PlateSig, PlateTo, Tile, None };
 
@@ -300,13 +302,45 @@ public class CtcPanel extends JPanel
         };
 
         Timer timer = new Timer("Timer");
-        timer.scheduleAtFixedRate (task, 0, 3000);  // 3 sec
+        timer.scheduleAtFixedRate (task, 0, 1000);  // 1 sec
     }
 
     // ------------------------------------------------------------------------
     private void update ()
     {
      // System.out.format ("update\n");
+
+        // check response
+        if (true) {
+            Msg msg;
+            while (null != (msg = layIf.receive ()))  {
+                System.out.format ("update: receive %c %2d %c\n",
+                    msg.type, msg.id, msg.state);
+
+                int num =  msg.id;
+                CtcCol ctc = ctcCol [num];
+                PnlSym sym = ctcCol [num].symTo;  
+
+                if (null == sym)  {
+                    System.out.format ( "Error update: receive - sym null\n");
+                    System.exit (2);
+                }
+
+                if ('T' == msg.type)  {
+                    if ('N' == msg.state)
+                        ctc.symLvr.cond = 'l';
+                    else
+                        ctc.symLvr.cond = 'r';
+
+                    // handle multiple turnouts (e.g. crossover)
+                    for ( ; null != sym; sym = sym.nxtSym)  {
+                        sym.cond  = msg.state;
+                        System.out.format ( "update: receive - cond %c %s\n",
+                                                            sym.cond, sym.lbl);
+                    }
+                }
+            }
+        }
 
         // process code button
         for (int col = 1; col <= nCol; col++)  {
@@ -319,38 +353,24 @@ public class CtcPanel extends JPanel
                 // turnout
                 CtcCol  ctc = ctcCol [num];
                 if (null != ctc)  {
+                    System.out.format (
+                        " update: num %d, lck %d, pos %d, cond %c\n",
+                            num, ctc.symTo.lock, ctc.pos, ctc.symLvr.cond);
+
                     if (0 != ctc.symTo.lock)  {
                         System.out.format (
                             "update: turnout %s locked !!\n", ctc.symTo.lbl);
                     }
-                    else if (0 == ctc.pos)  {
-                        if ('l' != ctc.symLvr.cond) {
-                            ctc.symLvr.cond = 'l';
-                            System.out.format (
-                                "update: pos %d, cond %c %s\n",
-                                    ctc.pos, ctc.symLvr.cond, ctc.symLvr.lbl);
 
-                            PnlSym sym = ctc.symTo;
-                            if (null == ctc.symTo)
-                                System.out.format ( "Error update: sym null\n");
-
-
-                            for ( ; null != sym; sym = sym.nxtSym)  {
-                                sym.cond  = 'N';
-                                System.out.format (
-                                    "update: cond %c %s\n", sym.cond, sym.lbl);
-                            }
-                        }
+                    // --------------------------------------
+                    else if (LvrLeft == ctc.pos)  {
+                        if ('l' != ctc.symLvr.cond)
+                            layIf.send ('T', num, 'N');
                     }
-                    else if ('r' != ctc.symLvr.cond) {
-                        ctc.symLvr.cond = 'r';
-                            System.out.format (
-                                "update: pos %d, cond %c %s\n",
-                                    ctc.pos, ctc.symLvr.cond, ctc.symLvr.lbl);
 
-                        PnlSym sym = ctc.symTo;
-                        for ( ; null != sym; sym = sym.nxtSym)
-                            sym.cond  = 'R';
+                    // --------------------------------------
+                    else if ('r' != ctc.symLvr.cond) {
+                        layIf.send ('T', num, 'R');
                     }
                 }
 
