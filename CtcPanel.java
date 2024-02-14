@@ -302,7 +302,7 @@ public class CtcPanel extends JPanel
         };
 
         Timer timer = new Timer("Timer");
-        timer.scheduleAtFixedRate (task, 0, 1000);  // 1 sec
+        timer.scheduleAtFixedRate (task, 0, 3000);  // 1 sec
     }
 
     // ------------------------------------------------------------------------
@@ -347,19 +347,20 @@ public class CtcPanel extends JPanel
             if (null != symCode [col] && 'p' == symCode [col].cond)  {
                 symCode [col].cond = ' ';
 
-                int     num = 2 * col - 1;
-                System.out.format ("update: col %d, num %d\n", col, num);
+                System.out.format ("update: col %d\n", col);
 
                 // turnout
+                int     num = 2 * col - 1;
                 CtcCol  ctc = ctcCol [num];
                 if (null != ctc)  {
                     System.out.format (
-                        " update: num %d, lck %d, pos %d, cond %c\n",
-                            num, ctc.symTo.lock, ctc.pos, ctc.symLvr.cond);
+                        " update: num %d, pos %d, cond %c, lck %d  %s\n",
+                            num, ctc.pos, ctc.symLvr.cond, ctc.symTo.lock,
+                            ctc.symLvr.lbl);
 
                     if (0 != ctc.symTo.lock)  {
                         System.out.format (
-                            "update: turnout %s locked !!\n", ctc.symTo.lbl);
+                            "   update: turnout %s locked !!\n", ctc.symTo.lbl);
                     }
 
                     // --------------------------------------
@@ -376,43 +377,48 @@ public class CtcPanel extends JPanel
 
                 // --------------------------------------
                 // signal
-                ctc = ctcCol [num+1];
+                num = num + 1;
+                ctc = ctcCol [num];
                 if (null != ctc)  {
-                    System.out.format ("update: col %d, num %d\n", col, num+1);
+                    System.out.format (
+                        " update: num %d, pos %d, cond %c, lck %d  %s\n",
+                            num, ctc.pos, ctc.symLvr.cond, ctc.symLvr.lock,
+                            ctc.symLvr.lbl);
 
-                    if (LvrCenter == ctc.pos)  {
-                        ctc.symLvr.cond = 'c';
-                        ruleUnlock (ctc.symSigL);   // ???
-                        ruleUnlock (ctc.symSigR);   // ???
-                    }
-                    else if (0 != ctc.symLvr.lock) {
+                 // if (LvrCenter == ctc.pos)  {
+                 //     ctc.symLvr.cond = 'c';
+                 //  // ruleUnlock (ctc.symSigL);   // ???
+                 //  // ruleUnlock (ctc.symSigR);   // ???
+                 // }
+                 // else if (0 != ctc.symLvr.lock) {
+                    if (0 != ctc.symLvr.lock) {
                         System.out.format (
-                            "update: sig lever %s locked\n", ctc.symSigL.lbl);
+                            "   update: sig lever %s locked\n",
+                                ctc.symSigL.lbl);
                     }
 
                     // are these 2 checks needed ???
                     else if (null != ctc.symSigL && 0 != ctc.symSigL.lock) {
-                        System.out.format (
-                            "update: signal %s locked !!\n", ctc.symSigL.lbl);
+                        System.out.format ( "    update: signal %s locked!\n",
+                                ctc.symSigL.lbl);
                     }
                     else if (null != ctc.symSigR && 0 != ctc.symSigR.lock) {
-                        System.out.format (
-                            "update: signal %s locked !!\n", ctc.symSigR.lbl);
+                        System.out.format ( "    update: signal %s locked!\n",
+                                ctc.symSigR.lbl);
                     }
 
                     else if (LvrLeft == ctc.pos)  {
                         ctc.symLvr.cond = 'l';
-                        System.out.format (
-                            "update: signal set cond %c\n", ctc.symLvr.cond);
+                        System.out.format ( "    update: signal set cond %c\n",
+                            ctc.symLvr.cond);
                     }
                     else if (LvrRight == ctc.pos)
                         ctc.symLvr.cond = 'r';
 
                     ctc.sig = ctc.pos;
                     System.out.format (
-                        "update: col %d, pos %d, cond %c lock %d %s\n",
-                                col, ctc.pos, ctc.symLvr.cond,
-                                ctc.symLvr.lock, ctc.symLvr.lbl);
+                        "   update: num %d, pos %d, cond %c %s\n",
+                                num, ctc.pos, ctc.symLvr.cond, ctc.symLvr.lbl);
                 }
             }
         }
@@ -1106,7 +1112,7 @@ public class CtcPanel extends JPanel
 
         if (true)  {
             for (int i = 0; i < symSigSize; i++)  {
-                System.out.format ("   ruleCheck: %c, lock %d %s\n",
+                System.out.format ("   ruleCheck: cond %c, lock %d %s\n",
                     symSig [i].cond, symSig [i].lock, symSig [i].lbl);
             }
         }
