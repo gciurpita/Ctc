@@ -999,6 +999,47 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    private void ruleLock (
+        PnlSym  sym,
+        int     ruleIdx,
+        char    state )
+    {
+        Rule    rule = sym.rule [ruleIdx];
+
+        System.out.format ("      ruleLock %c %s: ", state, sym.lbl);
+        sym.lock++;
+        for ( ; null != rule; rule = rule.nxt)  {
+            rule.sym.lock++;
+            System.out.format (" %s", rule.sym.lbl);
+        }
+        System.out.println ();
+    }
+
+    // --------------------------------
+    private void ruleUnlock (
+        PnlSym  sym )
+    {
+        for ( ; null != sym; sym = sym.nxtSym)  {
+            if (0 != sym.lock) {
+                if (0 < sym.lock)
+                    sym.lock--;
+
+                for (int j = 0 ; j < sym.ruleSize; j++)  {
+                    System.out.format ("      ruleUnLock: %s %d", sym.lbl, j);
+
+                    Rule rule = sym.rule [j];
+                    for ( ; null != rule; rule = rule.nxt)  {
+                        if (0 < sym.lock)
+                            sym.lock--;
+                        System.out.format (" %s", rule.sym.lbl);
+                    }
+                    System.out.println ();
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     private void ruleChainCheck (
         PnlSym[]  sym,
         int       symSize )
@@ -1054,47 +1095,6 @@ public class CtcPanel extends JPanel
                 }
             }
         }
-    }
-
-    // ------------------------------------------------------------------------
-    private void ruleUnlock (
-        PnlSym  sym )
-    {
-        for ( ; null != sym; sym = sym.nxtSym)  {
-            if (0 != sym.lock) {
-                if (0 < sym.lock)
-                    sym.lock--;
-
-                for (int j = 0 ; j < sym.ruleSize; j++)  {
-                    System.out.format ("      ruleUnLock: %s %d", sym.lbl, j);
-
-                    Rule rule = sym.rule [j];
-                    for ( ; null != rule; rule = rule.nxt)  {
-                        if (0 < sym.lock)
-                            sym.lock--;
-                        System.out.format (" %s", rule.sym.lbl);
-                    }
-                    System.out.println ();
-                }
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    private void ruleLock (
-        PnlSym  sym,
-        int     ruleIdx,
-        char    state )
-    {
-        Rule    rule = sym.rule [ruleIdx];
-
-        System.out.format ("      ruleLock %c %s: ", state, sym.lbl);
-        sym.lock++;
-        for ( ; null != rule; rule = rule.nxt)  {
-            rule.sym.lock++;
-            System.out.format (" %s", rule.sym.lbl);
-        }
-        System.out.println ();
     }
 
     // ------------------------------------------------------------------------
