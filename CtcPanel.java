@@ -1014,7 +1014,6 @@ public class CtcPanel extends JPanel
         Rule    rule = sym.rule [ruleIdx];
 
         System.out.format ("      ruleLock %c %s: ", state, sym.lbl);
-        sym.lock++;
         for ( ; null != rule; rule = rule.nxt)  {
             rule.sym.lock++;
             System.out.format (" %s", rule.sym.lbl);
@@ -1031,7 +1030,6 @@ public class CtcPanel extends JPanel
 
         System.out.format ("      ruleLock %s: ", sym.lbl);
         rule.lock = true;
-        sym.lock++;
         for ( ; null != rule; rule = rule.nxt)  {
             rule.sym.lock++;
             System.out.format (" %s(%d)", rule.sym.lbl, rule.sym.lock);
@@ -1067,6 +1065,7 @@ public class CtcPanel extends JPanel
 
         System.out.format (" ruleChainCheck: %d\n", symSize);
 
+        // for each sym
         for (int i = 0; i < symSize; i++)  {
             if (0 == sym [i].ruleSize)
                 continue;
@@ -1079,6 +1078,7 @@ public class CtcPanel extends JPanel
             if (dbg)
                 System.out.format ("ruleChainCheck: %s\n", sym [i].lbl);
 
+            // for each sym rule
             for (int j = 0 ; j < sym [i].ruleSize; j++)  {
                 boolean match = true;
                 Rule rule = sym [i].rule [j];
@@ -1088,11 +1088,11 @@ public class CtcPanel extends JPanel
                                                     sym [i].lbl, j);
 
                 for ( ; null != rule; rule = rule.nxt)  {
-                    char c = '!';
-                    if (rule.sym.cond == rule.cond)
-                        c = '_';
-                    if ('!' == c)
+                    char c = '_';
+                    if (rule.sym.cond != rule.cond)  {
                         match = false;
+                        c = '!';
+                    }
 
                     if (dbg)  {
                         System.out.format ("   %c %c %-4s",
@@ -1107,14 +1107,12 @@ public class CtcPanel extends JPanel
                 if (dbg)
                     System.out.println ();
 
-                sym [i].cond = ' ';
                 if (match)  {
-                    if (! sym [i].rule [j].lock)  {
-                        sym [i].cond = 'C';
-                        System.out.format ("    ruleChainCheck: %c %s match\n",
-                                                  sym [i].cond, sym [i].lbl);
+                    sym [i].cond = 'C';
+                    if (! sym [i].rule [j].lock)
                         ruleLock (sym [i], j);
-                    }
+                    System.out.format ("    ruleChainCheck: %s match\n",
+                                              sym [i].lbl);
                     break;      // check no additional rules
                 }
 
@@ -1123,6 +1121,11 @@ public class CtcPanel extends JPanel
                         "    ruleChainCheck: %s can be unlocked\n",
                             sym [i].lbl);
                     ruleUnlock (sym [i], j);
+                }
+                else if (' ' != sym [i].cond)  {
+                    sym [i].cond = ' ';
+                    System.out.format (
+                        "    ruleChainCheck: %s reset\n", sym [i].lbl);
                 }
             }
         }
@@ -1136,19 +1139,36 @@ public class CtcPanel extends JPanel
         ruleChainCheck (symTo,  symToSize);
 
         if (true)  {
+            System.out.format ("  ruleCheck:\n");
+
             for (int i = 0; i < symSigSize; i++)  {
                 if (0 == symSig [i].ruleSize)
                     continue;
 
+                System.out.format ("   %-4s  cond %c, lock %d\n",
+                    symSig [i].lbl, symSig [i].cond, symSig [i].lock);
+
                 for (int j = 0 ; j < symSig [i].ruleSize; j++)  {
                     Rule rule = symSig [i].rule [j];
 
-                    if (symSig [i].rule [j].lock)
-                        System.out.format ("   ruleCheck: cond %c lock %d %s\n",
-                            rule.cond, symSig [i].lock, symSig [i].lbl);
-                    else
-                        System.out.format ("   ruleCheck: cond %c        %s\n",
-                            rule.cond, symSig [i].lbl);
+                    if (false) {
+                        if (symSig [i].rule [j].lock)
+                            System.out.format (
+                                "   ruleCheck: cond %c locked %s\n",
+                                    rule.cond, symSig [i].lbl);
+                        else
+                            System.out.format (
+                                "   ruleCheck: cond %c        %s\n",
+                                    rule.cond, symSig [i].lbl);
+                    }
+                    else  {
+                        char lock = 'F';
+                        if (rule.lock)
+                            lock = 'T';
+                        System.out.format (
+                            "      %d: cond %c, lock %c\n",
+                                    j, rule.cond, lock);
+                    }
                 }
             }
         }
@@ -1311,7 +1331,7 @@ public class CtcPanel extends JPanel
             if ('C' == sym.cond)  {
                 ctcCol [sym.ctcNum].lamp = sym.type;
 
-                if (false)
+                if (true)
                     System.out.format ("paintSigLamps: num %d, %c, %s\n",
                         sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
 
