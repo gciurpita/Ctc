@@ -36,6 +36,9 @@ public class CtcPanel extends JPanel
         int     id;
         char    state;      // 'O'ccupied
 
+        int     x;
+        int     y;
+
         // -------------------------------------
         private Blk (
             int  id_,
@@ -46,6 +49,9 @@ public class CtcPanel extends JPanel
             col   = col_;
             row   = row_;
             state = ' ';
+
+            x     = tileWid * col;
+            y     = tileWid * row;
         }
 
         // -------------------------------------
@@ -353,7 +359,7 @@ public class CtcPanel extends JPanel
 
                 int num =  msg.id;
                 CtcCol ctc = ctcCol [num];
-                PnlSym sym = ctcCol [num].symTo;  
+                PnlSym sym = ctcCol [num].symTo;
 
                 if (null == sym)  {
                     System.out.format ( "Error update: receive - sym null\n");
@@ -962,14 +968,14 @@ public class CtcPanel extends JPanel
             int row = y / tileWid;
             int idx = blkFind (col, row);
 
-            blk [idx].tgl ();
-
             System.out.format ("mousePress: (%d, %d)", x, y);
             System.out.format (" col %d, row %d", col, row);
             System.out.format (", idx %d", idx);
             if (0 <= idx)  {
                 System.out.format (", id %d", blk [idx].id);
                 System.out.format (" %c",     blk [idx].state);
+
+                blk [idx].tgl ();
             }
             System.out.format ("\n");
             return;
@@ -1484,6 +1490,38 @@ public class CtcPanel extends JPanel
             if ('N' == to.cond)
                 g2d.drawImage (imgTile [TrackH].img, to.x, to.y, this);
         }
+
+        // block occupancy
+        for (int n = 0; n < blkSize; n++)  {
+            System.out.format ("paintTrack: %d, col %d, row %d, id %d\n",
+                                    n, blk [n].col, blk [n].row, blk [n].id);
+
+            if ('O' == blk [n].state)  {  // occupied, add offset to red tile
+                follow (g2d, blk [n].row, blk [n].col, 30);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    public void follow (
+        Graphics2D  g2d,
+        int  row,
+        int  col,
+        int  offset )
+    {
+        System.out.format (" follow: col %d, row %d\n", col, row);
+
+        final int BlockHR = 4;
+        final int BlockHL = 5;
+
+        int tile = pnlRow [row].charAt(col) - '0';
+        do  {
+            int idx  = offset + tile;
+            g2d.drawImage (
+                imgTile [idx].img, col * tileWid, row * tileWid, this);
+
+            tile = pnlRow [row].charAt(++col) - '0';
+        } while (BlockHR != tile && BlockHL != tile);
     }
 
     // ------------------------------------------------------------------------
