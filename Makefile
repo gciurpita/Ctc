@@ -29,6 +29,9 @@
 run : $(Classes)
 		java $(Targ)  3.pnl
 
+blk : $(Classes)
+		java $(Targ)  6.pnl
+
 8L : $(Classes)
 		java $(Targ)  5.pnl
 

@@ -30,6 +30,35 @@ public class CtcPanel extends JPanel
         implements MouseListener, KeyListener
 {
     // ---------------------------------------------------------
+    class Blk {
+        int     col;
+        int     row;
+        int     id;
+        char    state;      // 'O'ccupied
+
+        // -------------------------------------
+        private Blk (
+            int  id_,
+            int  col_,
+            int  row_ )
+        {
+            id    = id_;
+            col   = col_;
+            row   = row_;
+            state = ' ';
+        }
+
+        // -------------------------------------
+        public void tgl ()
+        {
+            if ('O' == state)
+                state = ' ';
+            else
+                state = 'O';
+        }
+    }
+
+    // ---------------------------------------------------------
     class CtcCol {
         int     to;
         int     sig;
@@ -179,6 +208,10 @@ public class CtcPanel extends JPanel
 
     Img             imgTile []      = new Img     [100];
     int             imgTileSize     = 0;
+
+    final int       MaxBlk          = 20;
+    Blk             blk []          = new Blk     [MaxBlk];
+    int             blkSize         = 0;
 
     final int       ImgIdxSig       = 3;
     final int       ImgIdxSw        = 4;
@@ -461,7 +494,7 @@ public class CtcPanel extends JPanel
 
     public void mousePressed  (MouseEvent ev)
     {
-        leverAdjust (ev.getX(), ev.getY());
+        mousePress (ev.getX(), ev.getY());
     }
 
     // ------------------------------------------------------------------------
@@ -665,6 +698,19 @@ public class CtcPanel extends JPanel
                 int len = line.substring (4).length();
                 if (maxRowLen < len)
                     maxRowLen = len;
+            }
+
+            // -----------------------------------
+            else if (fld[0].equals("block"))  {
+                if (MaxBlk == blkSize)  {
+                    System.out.format ("Error - loadPnl - MaxBlk exceeded\n");
+                    System.exit (1);
+                }
+
+                int id     = Integer.parseInt (fld [1]);
+                int row    = Integer.parseInt (fld [2]);
+                int col    = Integer.parseInt (fld [3]);
+                blk [blkSize++]   = new Blk (id, col, row);
             }
 
             // -----------------------------------
@@ -881,12 +927,27 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    int blkFind (
+        int  col,
+        int  row )
+    {
+        for (int n = 0; n < blkSize; n++)
+            if (blk [n].col == col && blk [n].row == row)  {
+                System.out.format ("blkfind: id %d\n", blk [n].id);
+                return n;
+            }
+
+        System.out.format ("blkfind: not found\n");
+        return -1;
+    }
+
+    // ------------------------------------------------------------------------
     // change position of lever based on mouse press
-    private void leverAdjust (
+    private void mousePress (
         int  x,
         int  y )
     {
-     // System.out.format ("leverAdjust: %3d x %3d\n", x, y);
+     // System.out.format ("mousePress: %3d x %3d\n", x, y);
 
         int col = x / colWid;
         int dX  = x % colWid;
@@ -895,12 +956,29 @@ public class CtcPanel extends JPanel
         int pktType = 0;
         int pos     = 0;
 
-        if (y < RowOff)
-            return;
+        // ---------------------------------------------------------
+        if (y < RowOff)  {
+                col = x / tileWid;
+            int row = y / tileWid;
+            int idx = blkFind (col, row);
 
+            blk [idx].tgl ();
+
+            System.out.format ("mousePress: (%d, %d)", x, y);
+            System.out.format (" col %d, row %d", col, row);
+            System.out.format (", idx %d", idx);
+            if (0 <= idx)  {
+                System.out.format (", id %d", blk [idx].id);
+                System.out.format (" %c",     blk [idx].state);
+            }
+            System.out.format ("\n");
+            return;
+        }
+
+        // ---------------------------------------------------------
         if (y < (rowHt1))  {        // to lever
             num = 2 * col + 1;
-            System.out.format ("leverAdjust: x %d, col %d, num %d\n",
+            System.out.format ("mousePress: x %d, col %d, num %d\n",
                                                 x, col, num);
             if (null == ctcCol [num])
                 return;
@@ -926,12 +1004,12 @@ public class CtcPanel extends JPanel
 
         // code button
         else if (CodeXoff <= dX && dX < (CodeXoff + codeDia))  {
-         // System.out.format (" leverAdjust: code col %2d\n", col);
+         // System.out.format (" mousePress: code col %2d\n", col);
 
             if (null != symCode [col+1])  {
                 symCode [col+1].cond = 'p';
                 if (false)
-                    System.out.format (" leverAdjust: col %2d, lbl %s, %c\n",
+                    System.out.format (" mousePress: col %2d, lbl %s, %c\n",
                         col, symLvr [col+1].lbl, symCode [col+1].cond);
             }
         }
@@ -941,7 +1019,7 @@ public class CtcPanel extends JPanel
 
         if (false)
             System.out.format (
-            " leverAdjust: (%3d, %3d), col %d, dX %2d, | %d\n",
+            " mousePress: (%3d, %3d), col %d, dX %2d, | %d\n",
                 x, y, col, dX, colWid/2);
 
         repaint ();
@@ -1006,22 +1084,6 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
-    private void ruleLock__ (
-        PnlSym  sym,
-        int     ruleIdx,
-        char    state )
-    {
-        Rule    rule = sym.rule [ruleIdx];
-
-        System.out.format ("      ruleLock %c %s: ", state, sym.lbl);
-        for ( ; null != rule; rule = rule.nxt)  {
-            rule.sym.lock++;
-            System.out.format (" %s", rule.sym.lbl);
-        }
-        System.out.println ();
-    }
-
-    // --------------------------------
     private void ruleLock (
         PnlSym  sym,
         int     ruleIdx )
@@ -1063,7 +1125,8 @@ public class CtcPanel extends JPanel
     {
         boolean dbg   = false;
 
-        System.out.format (" ruleChainCheck: %d\n", symSize);
+        if (ruleFlag)
+            System.out.format (" ruleChainCheck: %d\n", symSize);
 
         // for each sym
         for (int i = 0; i < symSize; i++)  {
@@ -1071,7 +1134,8 @@ public class CtcPanel extends JPanel
                 continue;
 
             if (0 != sym [i].lock)  {
-                System.out.format ("  ruleChainCheck: %4s locked\n", sym [i].lbl);
+                System.out.format (
+                    "  ruleChainCheck: %4s locked\n", sym [i].lbl);
  //             continue;
             }
 
@@ -1111,20 +1175,23 @@ public class CtcPanel extends JPanel
                     sym [i].cond = 'C';
                     if (! sym [i].rule [j].lock)
                         ruleLock (sym [i], j);
-                    System.out.format ("    ruleChainCheck: %s match\n",
+                    if (ruleFlag)
+                        System.out.format ("    ruleChainCheck: %s match\n",
                                               sym [i].lbl);
                     break;      // check no additional rules
                 }
 
                 else if (sym [i].rule [j].lock)  {
-                    System.out.format (
+                    if (ruleFlag)
+                        System.out.format (
                         "    ruleChainCheck: %s can be unlocked\n",
                             sym [i].lbl);
                     ruleUnlock (sym [i], j);
                 }
                 else if (' ' != sym [i].cond)  {
                     sym [i].cond = ' ';
-                    System.out.format (
+                    if (ruleFlag)
+                        System.out.format (
                         "    ruleChainCheck: %s reset\n", sym [i].lbl);
                 }
             }
@@ -1134,11 +1201,12 @@ public class CtcPanel extends JPanel
     // ------------------------------------------------------------------------
     private void ruleCheck ()
     {
-        System.out.println ("\nrulesCheck:");
+        if (ruleFlag)
+            System.out.println ("\nrulesCheck:");
         ruleChainCheck (symSig, symSigSize);
         ruleChainCheck (symTo,  symToSize);
 
-        if (true)  {
+        if (ruleFlag)  {
             System.out.format ("  ruleCheck:\n");
 
             for (int i = 0; i < symSigSize; i++)  {
