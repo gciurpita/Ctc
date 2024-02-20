@@ -59,8 +59,10 @@ public class CtcPanel extends JPanel
         {
             if ('O' == state)
                 state = ' ';
-            else
+            else if ('C' == state)
                 state = 'O';
+            else
+                state = 'C';
         }
     }
 
@@ -1517,23 +1519,29 @@ public class CtcPanel extends JPanel
             System.out.format ("paintTrack: %d, col %d, row %d, id %d\n",
                                     n, blk [n].col, blk [n].row, blk [n].id);
 
-            if ('O' == blk [n].state)  {  // occupied, add offset to red tile
-                trace (g2d, blk [n].row, blk [n].col, 30);
-            }
+            if (' ' != blk [n].state)
+                trace (g2d, blk [n]);
         }
     }
 
     // ------------------------------------------------------------------------
     public void trace (
         Graphics2D  g2d,
-        int  row,
-        int  col,
-        int  offset )
+        Blk  blk )
     {
-        System.out.format (" follow: col %d, row %d\n", col, row);
-
         final int BlockHR = 4;
         final int BlockHL = 5;
+
+        int       col     = blk.col;
+        int       row     = blk.row;
+        int       offset  = 0;
+
+        System.out.format ("trace:  col %2d, row %d\n", col, row);
+
+        if ('O' == blk.state)           // occupied, red offset
+            offset = 30;
+        else if ('C' == blk.state)      // cleared, green offset
+            offset = 50;
 
         int tile = pnlRow [row].charAt(col) - '0';
         do  {
@@ -1541,8 +1549,31 @@ public class CtcPanel extends JPanel
             g2d.drawImage (
                 imgTile [idx].img, col * tileWid, row * tileWid, this);
 
-            tile = pnlRow [row].charAt(++col) - '0';
-        } while (BlockHR != tile && BlockHL != tile);
+            switch (tile) {
+            case 7:         // diagonalUD \
+            case 9:         // angleDR -\
+                row++;
+                col++;
+                break;
+
+            case 6:         // diagonalDU /
+            case 11:        // angleUR -/
+                row--;
+                col++;
+                break;
+
+            case 8:         // angleDL /-
+            case 10:        // angleUL \-
+            default:
+                col++;;
+                break;
+            }
+
+            System.out.format (" trace: col %2d, row %d\n", col, row);
+
+            tile = pnlRow [row].charAt(col) - '0';
+            System.out.format (" trace: tile %2d\n", tile);
+        } while (0 <= tile && BlockHR != tile && BlockHL != tile);
 
         int idx  = offset + tile;
         g2d.drawImage (
