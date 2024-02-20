@@ -234,6 +234,7 @@ public class CtcPanel extends JPanel
     int             rowHt1;
     int             rowHt2;
 
+    final int       TrackH  = 2;
     int             tileWid;
 
     final int       CodeXoff        = 15;
@@ -346,6 +347,19 @@ public class CtcPanel extends JPanel
     }
 
     // ------------------------------------------------------------------------
+    private void setTrackTile (
+        PnlSym  sym,
+        int     tileIdx)
+    {
+        char c = (char)tileIdx;
+        c += '0';
+        pnlRow [sym.row] =  pnlRow [sym.row].substring (0, sym.col)  + c
+                          + pnlRow [sym.row].substring (sym.col + 1);
+        System.out.format ("setTrackTile: %d, '%c', \"%s\"\n",
+            tileIdx, c, pnlRow [sym.row]);
+    }
+
+    // ------------------------------------------------------------------------
     private void update ()
     {
      // System.out.format ("update\n");
@@ -375,6 +389,11 @@ public class CtcPanel extends JPanel
                     // handle multiple turnouts (e.g. crossover)
                     for ( ; null != sym; sym = sym.nxtSym)  {
                         sym.cond  = msg.state;
+                        if ('N' == msg.state)
+                            setTrackTile (sym, TrackH);
+                        else
+                            setTrackTile (sym, sym.imgIdx);
+
                         System.out.format ( "update: receive - cond %c %s\n",
                                                             sym.cond, sym.lbl);
                     }
@@ -797,6 +816,8 @@ public class CtcPanel extends JPanel
 
                 symTo [symToSize++]     = new PnlSym (
                         ctcCol, row, col, fld [4], 's', imgIdx);
+
+                setTrackTile (symTo [symToSize-1], TrackH);
             }
 
             // -----------------------------------
@@ -1288,8 +1309,6 @@ public class CtcPanel extends JPanel
         if (0 != dbg)
             System.out.format ("  paintToPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
 
-        final int  TrackH  = 2;
-
         g2d.setColor (Color.white);
 
         CtcCol ctc  = ctcCol [col];
@@ -1483,12 +1502,14 @@ public class CtcPanel extends JPanel
         }
 
         // set turnouts -- are by default reversed
+        if (false)  {
         for (int i = 0; i < symToSize; i++)  {
             final int  TrackH  = 2;
             PnlSym to = symTo [i];
          // System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
             if ('N' == to.cond)
                 g2d.drawImage (imgTile [TrackH].img, to.x, to.y, this);
+        }
         }
 
         // block occupancy
@@ -1497,13 +1518,13 @@ public class CtcPanel extends JPanel
                                     n, blk [n].col, blk [n].row, blk [n].id);
 
             if ('O' == blk [n].state)  {  // occupied, add offset to red tile
-                follow (g2d, blk [n].row, blk [n].col, 30);
+                trace (g2d, blk [n].row, blk [n].col, 30);
             }
         }
     }
 
     // ------------------------------------------------------------------------
-    public void follow (
+    public void trace (
         Graphics2D  g2d,
         int  row,
         int  col,
@@ -1522,6 +1543,10 @@ public class CtcPanel extends JPanel
 
             tile = pnlRow [row].charAt(++col) - '0';
         } while (BlockHR != tile && BlockHL != tile);
+
+        int idx  = offset + tile;
+        g2d.drawImage (
+            imgTile [idx].img, col * tileWid, row * tileWid, this);
     }
 
     // ------------------------------------------------------------------------
