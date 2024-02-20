@@ -877,7 +877,7 @@ public class CtcPanel extends JPanel
 
                         symTo [i].cond = 'N';
 
-                        switch (sym.tile)  {
+                        switch (sym.imgIdx)  {
                         case 8:     // DL
                             sym.xLbl =  tileWid * 2/4;
                             sym.yLbl =  tileWid * 7/4;
