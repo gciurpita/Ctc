@@ -14,7 +14,7 @@ public class Interlock
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
         loadPnl (pnlFile);
-        symList.disp ();
+     // symList.disp ();
         ruleList.disp ();
     }
 
@@ -113,7 +113,7 @@ public class Interlock
     private class RuleList  {
         Rule    head = null;
 
-        private boolean dbg = true;
+        private boolean dbg = false;
 
         // globals from id()
         private String name = "?";
@@ -125,7 +125,8 @@ public class Interlock
             String  fld [],
             SymList symList )
         {
-            System.out.format ("  rule.add:\n");
+            if (dbg)
+                System.out.format ("  rule.add:\n");
 
             id (fld [1]);
 
@@ -150,7 +151,10 @@ public class Interlock
                 System.out.format (" rule.disp: %-4s", rule0.sym.name);
 
                 for (Rule rule = rule0.next; null != rule; rule = rule.next)
-                    System.out.format (" %4s", rule.sym.name);
+                    if ('*' == rule.sym.type)
+                        System.out.format (" %4s* ", rule.sym.name);
+                    else
+                        System.out.format (" %4s,%c", rule.sym.name, rule.cond);
 
                 System.out.println ();
             }
