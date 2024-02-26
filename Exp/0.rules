@@ -36,7 +36,7 @@ signal    4     2   13  4L
 signal    4     4    3  4R
 signal    8     4   13  8L
 signal    6     6    3  6R
-signal    6     6   10  6LB
+signal    6     6   10  6L
 
 turnout   3     3    4  3
 turnout   5     5    7  5
@@ -51,6 +51,10 @@ rule    4R  rL4  8L  N3  R7A
 
 rule    4LB lL4  4R  R3
 rule    4L  lL4  4R  N3  N7A
+
+rule    6L  lL6  6R  R5
+rule    6R  rL6  6L  R5
+rule    6R  rL6  8L  N5   N7A
 
 rule    8L  lL8  4R  N3  R7A
 rule    8L  lL8  6R  N5  N7A
