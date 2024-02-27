@@ -12,9 +12,6 @@
     Sopt    = cyc1:50,psi1,TE,mph,lbs1:10
     Topt    = Tsec=1
 
-    Pnl     = 3.pnl
-    Pnl     = 5.pnl
-
 # --------------------------------------------------------------------
 %.class : %.java
 		javac $(LINT_FLAG) $<
@@ -27,7 +24,7 @@
 
 # --------------------------------------------------------------------
 run : $(Classes)
-		java $(Targ)  6.pnl
+		java $(Targ)  7.pnl
 
 8L : $(Classes)
 		java $(Targ)  5.pnl

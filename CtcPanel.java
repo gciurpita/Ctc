@@ -33,7 +33,7 @@ public class CtcPanel extends JPanel
     class Blk {
         int     col;
         int     row;
-        int     id;
+        String  id;
         char    state;      // 'O'ccupied
 
         int     x;
@@ -41,9 +41,9 @@ public class CtcPanel extends JPanel
 
         // -------------------------------------
         private Blk (
-            int  id_,
-            int  col_,
-            int  row_ )
+            String  id_,
+            int     col_,
+            int     row_ )
         {
             id    = id_;
             col   = col_;
@@ -734,10 +734,10 @@ public class CtcPanel extends JPanel
                     System.exit (1);
                 }
 
-                int id     = Integer.parseInt (fld [1]);
+             // int id     = Integer.parseInt (fld [1]);
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
-                blk [blkSize++]   = new Blk (id, col, row);
+                blk [blkSize++]   = new Blk (fld [1], col, row);
             }
 
             // -----------------------------------
@@ -962,7 +962,7 @@ public class CtcPanel extends JPanel
     {
         for (int n = 0; n < blkSize; n++)
             if (blk [n].col == col && blk [n].row == row)  {
-                System.out.format ("blkfind: id %d\n", blk [n].id);
+                System.out.format ("blkfind: id %s\n", blk [n].id);
                 return n;
             }
 
@@ -995,7 +995,7 @@ public class CtcPanel extends JPanel
             System.out.format (" col %d, row %d", col, row);
             System.out.format (", idx %d", idx);
             if (0 <= idx)  {
-                System.out.format (", id %d", blk [idx].id);
+                System.out.format (", id %s", blk [idx].id);
                 System.out.format (" %c",     blk [idx].state);
 
                 blk [idx].tgl ();
@@ -1242,8 +1242,12 @@ public class CtcPanel extends JPanel
                 if (0 == symSig [i].ruleSize)
                     continue;
 
-                System.out.format ("   %-4s  cond %c, lock %d\n",
-                    symSig [i].lbl, symSig [i].cond, symSig [i].lock);
+                if (0 < symSig [i].lock)
+                    System.out.format ("   %-4s  cond %c, lock %d\n",
+                        symSig [i].lbl, symSig [i].cond, symSig [i].lock);
+                else
+                    System.out.format ("   %-4s  cond %c, lock\n",
+                        symSig [i].lbl, symSig [i].cond);
 
                 for (int j = 0 ; j < symSig [i].ruleSize; j++)  {
                     Rule rule = symSig [i].rule [j];
@@ -1259,7 +1263,7 @@ public class CtcPanel extends JPanel
                                     rule.cond, symSig [i].lbl);
                     }
                     else  {
-                        char lock = 'F';
+                        char lock = '_';
                         if (rule.lock)
                             lock = 'T';
                         System.out.format (
@@ -1516,7 +1520,8 @@ public class CtcPanel extends JPanel
 
         // block occupancy
         for (int n = 0; n < blkSize; n++)  {
-            System.out.format ("paintTrack: %d, col %d, row %d, id %d\n",
+            if (false)
+                System.out.format ("paintTrack: %d, col %d, row %d, id %d\n",
                                     n, blk [n].col, blk [n].row, blk [n].id);
 
             if (' ' != blk [n].state)
@@ -1575,9 +1580,11 @@ public class CtcPanel extends JPanel
             System.out.format (" trace: tile %2d\n", tile);
         } while (0 <= tile && BlockHR != tile && BlockHL != tile);
 
-        int idx  = offset + tile;
-        g2d.drawImage (
-            imgTile [idx].img, col * tileWid, row * tileWid, this);
+        if (BlockHR == tile)  {
+            int idx  = offset + tile;
+            g2d.drawImage (
+                imgTile [idx].img, col * tileWid, row * tileWid, this);
+        }
     }
 
     // ------------------------------------------------------------------------
