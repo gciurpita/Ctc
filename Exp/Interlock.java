@@ -9,6 +9,7 @@ public class Interlock
     SymList  symList  = new SymList ();
     RuleList ruleList = new RuleList ();
 
+    // --------------------------------
     public Interlock (
         String pnlFile )
             throws FileNotFoundException, IOException, IllegalArgumentException
@@ -18,27 +19,43 @@ public class Interlock
         ruleList.disp ();
     }
 
+    // --------------------------------
+    public Interlock (
+        String pnlFile,
+        String cmdFile )
+            throws FileNotFoundException, IOException, IllegalArgumentException
+    {
+        loadPnl (pnlFile);
+     // symList.disp ();
+        ruleList.disp ();
+        cmdProcess (cmdFile);
+    }
+
     // ------------------------------------------------------------------------
     // main processes command line arguments settign the debug level and
 
     public static void main (String[] args)
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
+        String cmdFname = null;
         int    i;
 
         for (i = 0; i < args.length; i++) {
             System.out.format ("main: %d %s\n", i, args[i]);
 
-            if (args[i].startsWith("-"))  {
-                System.out.format ("main:  %s\n", args [i]);
+            if (args [i].startsWith("-"))  {
+                if (args [i].startsWith ("-c"))
+                    cmdFname = args [i].substring (2);
             }
             else
                 break;
         }
 
-        System.out.println (args [i]);
-
-        Interlock intrLck = new Interlock (args [i]);
+        Interlock intrLck;
+        if (null != cmdFname)
+            intrLck = new Interlock (args [i], cmdFname);
+        else
+            intrLck = new Interlock (args [i]);
     }
 
     // ------------------------------------------------------------------------
@@ -76,6 +93,51 @@ public class Interlock
     }
 
     // ------------------------------------------------------------------------
+    //   cmd process
+    private void cmdProcess (String cmdFile)
+            throws FileNotFoundException, IOException
+    {
+        boolean dbg = false;
+        System.out.format ("cmdProcess: %s\n", cmdFile);
+
+        BufferedReader br = new BufferedReader(new FileReader (cmdFile));
+        String         line;
+
+        while ((line = br.readLine()) != null)  {
+            System.out.format (" cmdProcess: %s\n", line);
+            if (0 == line.length () || '#' == line.charAt (0))
+                continue;
+
+            String[]    fld = line.split("  *");
+
+            // ---------------------------
+            if (fld [1].equals ("check"))
+                ruleList.check ();
+
+            // ---------------------------
+            else if (fld [1].equals ("list"))
+                symList.disp ();
+
+            // ---------------------------
+            else if (fld [1].equals ("set"))  {
+                if (fld .length < 3)  {
+                    System.out.format ("Error - cmdProcess - set sym cond\n");
+                    System.exit (2);
+                }
+
+                Sym sym = symList.find (fld [2]);
+                if (null == sym)  {
+                    System.out.format (
+                        "Error - cmdProcess - set not found - %s\n", fld [2]);
+                    System.exit (2);
+                }
+
+                sym.cond = fld [3].charAt (0);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     private int atoi (
         String s )
     {
@@ -91,7 +153,7 @@ public class Interlock
         return val;
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private class Rule  {
         Sym     sym;
         char    cond;
@@ -109,7 +171,7 @@ public class Interlock
         }
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private class RuleList  {
         Rule    head = null;
 
@@ -133,7 +195,7 @@ public class Interlock
             Rule rule0 = new Rule (symList.add (name, type), cond);
             rule0.listNext = head;
             head           = rule0;
-    
+
             for (int i = 2; i < fld.length; i++)  {
                 id (fld [i]);
 
@@ -144,18 +206,44 @@ public class Interlock
         }
 
         // --------------------------------
+        public void check ()
+        {
+            System.out.format ("rule.check:\n");
+            for (Rule rule0 = head; null != rule0; rule0 = rule0.listNext)  {
+                boolean match = true;
+
+                System.out.format (" rule.check: %-4s", rule0.sym.name);
+
+                for (Rule rule = rule0.next; null != rule; rule = rule.next) {
+                    char d = rule.sym.cond;
+                    char c = rule.cond;
+
+                    if (d != c)  {
+                        match = false;
+                        System.out.format ("  %c %c %-4s", d, c, rule.sym.name);
+                    }
+                    else
+                        System.out.format ("  . %c %-4s", c, rule.sym.name);
+                }
+                System.out.println ();
+
+                if (match)
+                    System.out.format (
+                        " rule.check: %-4s match", rule0.sym.name);
+            }
+        }
+
+        // --------------------------------
         public void disp ()
         {
             System.out.format ("rule.disp:\n");
             for (Rule rule0 = head; null != rule0; rule0 = rule0.listNext)  {
                 System.out.format (" rule.disp: %-4s", rule0.sym.name);
 
-                for (Rule rule = rule0.next; null != rule; rule = rule.next)
-                    if ('*' == rule.sym.type)
-                        System.out.format (" %4s* ", rule.sym.name);
-                    else
-                        System.out.format (" %4s,%c", rule.sym.name, rule.cond);
-
+                for (Rule rule = rule0.next; null != rule; rule = rule.next) {
+                    char c = rule.cond;
+                    System.out.format ("  %c %-4s", c, rule.sym.name);
+                }
                 System.out.println ();
             }
         }
@@ -165,10 +253,11 @@ public class Interlock
             String fld )
         {
          // System.out.format ("  rule.id:\n");
-    
+
             char   c0   = fld.charAt (0);
             char   c1   = fld.charAt (1);
 
+            // signals start with a digit
             if (Character.isDigit (c0))  {
                 if (0 != (atoi (fld) % 2)) {
                     System.out.format (
@@ -178,10 +267,18 @@ public class Interlock
                 }
 
                 type = '*';
-                cond = ' ';
+                cond = 'S';
                 name = fld;
             }
 
+            // block prefixed with 'B'
+            else if ('B' == c0)  {
+                type = 'B';
+                cond = 'u';
+                name = fld.substring (0);
+            }
+
+            // switches
             else if (Character.isDigit (c1))  {
                 if (1 != (atoi (fld.substring (1)) % 2)) {
                     System.out.format (
@@ -190,16 +287,29 @@ public class Interlock
                     System.exit (1);
                 }
 
+                if ('N' != c0 && 'D' != c0)  {
+                    System.out.format (
+                        "Error - ruleNew invalid switch cond - %c\n", c0);
+                    System.exit (1);
+                }
+
                 type = 'x';
                 cond = c0;
                 name = fld.substring (1);
             }
 
+            // levers 2nd char is 'L'
             else if ('L' == c1)  {
                 if (0 != (atoi (fld.substring (1)) % 2)) {
                     System.out.format (
                         "Error - ruleNew invalid signal lever - %s\n",
                             fld);
+                    System.exit (1);
+                }
+
+                if ('l' != c0 && 'c' != c0 && 'r' != c0)  {
+                    System.out.format (
+                        "Error - ruleNew invalid lever cond - %c\n", c0);
                     System.exit (1);
                 }
 
@@ -219,7 +329,7 @@ public class Interlock
         }
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private class Sym  {
         String  name;
         char    type;
@@ -234,10 +344,14 @@ public class Interlock
         {
             this.name = name;
             this.type = type;
+            if ('*' == type)
+                this.cond = 'S';
+            else
+                this.cond = ' ';
         }
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private class SymList  {
         Sym     head = null;
         boolean dbg;
@@ -246,7 +360,7 @@ public class Interlock
         public Sym add (
             String  name,
             char    type )
-        {    
+        {
             Sym sym = find (name);
             if (null != sym)
                 return sym;
@@ -263,10 +377,10 @@ public class Interlock
 
         // -------------------------------------
         public void disp ()
-        {    
+        {
             Sym sym = head;
             while (null != sym) {
-                System.out.format (" sym.disp: %-4s %c\n", sym.name, sym.type);
+                System.out.format (" sym.disp: %c %-4s\n", sym.cond, sym.name);
                 sym = sym.next;
             }
         }
@@ -274,7 +388,7 @@ public class Interlock
         // -------------------------------------
         public Sym find (
             String  name )
-        {    
+        {
             if (dbg)
                 System.out.format ("find: %s\n", name);
 
@@ -295,5 +409,5 @@ public class Interlock
         }
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

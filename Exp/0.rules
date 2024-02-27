@@ -45,16 +45,16 @@ turnout   7     5   12  7B
 
 ctc    3,4,5,6,7,8
 
-rule    4R  rL4  4LB R3
+rule    4R  rL4  4LB D3  B3
 rule    4R  rL4  4L  N3  N7A
-rule    4R  rL4  8L  N3  R7A
+rule    4R  rL4  8L  N3  D7A
 
-rule    4LB lL4  4R  R3
+rule    4LB lL4  4R  D3
 rule    4L  lL4  4R  N3  N7A
 
-rule    6L  lL6  6R  R5
-rule    6R  rL6  6L  R5
+rule    6L  lL6  6R  D5
+rule    6R  rL6  6L  D5
 rule    6R  rL6  8L  N5   N7A
 
-rule    8L  lL8  4R  N3  R7A
+rule    8L  lL8  4R  N3  D7A
 rule    8L  lL8  6R  N5  N7A

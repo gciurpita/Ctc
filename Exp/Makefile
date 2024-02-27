@@ -5,6 +5,7 @@
     Srcs    = $(shell echo *java)
     Targ    = Interlock
 
+    Cmd     = -c0.cmd
     Pnl     = 0.rules
 
 %.class : %.java
@@ -12,7 +13,7 @@
 
 # --------------------------------------------------------------------
 all : $(Classes)
-		java $(Targ)  $(Pnl)
+		java $(Targ) $(Cmd) $(Pnl)
 
 # --------------------------------------------------------------------
 neat :
