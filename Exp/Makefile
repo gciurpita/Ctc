@@ -15,6 +15,10 @@
 all : $(Classes)
 		java $(Targ) $(Cmd) $(Pnl)
 
+check :
+		@ echo  $(Srcs)
+		@ echo  $(Classes)
+
 # --------------------------------------------------------------------
 neat :
 		rm -f *~ *.class *.out

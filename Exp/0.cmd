@@ -14,3 +14,7 @@
 
     set  L4  r
     check
+    check
+
+    set  B3  o
+    check
