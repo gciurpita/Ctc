@@ -1,5 +1,7 @@
 public class RuleList  {
-    Rule    head = null;
+    RuleList    next;
+    Rule        head = null;
+    Sym         sym;
 
     private boolean dbg = false;
 
@@ -9,26 +11,24 @@ public class RuleList  {
     private char   cond = '?';
 
     // --------------------------------
-    public void add (
+    public RuleList (
         String  fld [],
         SymList symList )
     {
         if (dbg)
-            System.out.format ("  rule.add:\n");
+            System.out.format (" RuleList: %s\n", fld [1]);
 
-        id (fld [1]);
-
-        Rule rule0 = new Rule (symList.add (name, type), cond);
-        rule0.listNext = head;
-        head           = rule0;
+        Rule rule   = null;
+        Rule rule0  = head;
 
         for (int i = 2; i < fld.length; i++)  {
             id (fld [i]);
 
-            Rule rule = new Rule (symList.add (name, type), cond);
-            rule.next  = rule0.next;
-            rule0.next = rule;
+            rule      = new Rule (symList.add (name, type), cond);
+            rule.next = rule0;
+            rule0     = rule;
         }
+        head = rule;
     }
 
     // ------------------------------------------------------------------------
@@ -50,14 +50,14 @@ public class RuleList  {
     // --------------------------------
     public void check ()
     {
-        System.out.format ("rule.check:\n");
-        for (Rule rule0 = head; null != rule0; rule0 = rule0.listNext)  {
+        System.out.format (" ruleList.check:\n");
+        for (RuleList rl = this; null != rl; rl = rl.next)  {
             boolean match = true;
 
             System.out.format (
-                " rule.check: %c %-4s", rule0.sym.cond, rule0.sym.name);
+                "    %c %-4s", sym.cond, sym.name);
 
-            for (Rule rule = rule0.next; null != rule; rule = rule.next) {
+            for (Rule rule = rl.head; null != rule; rule = rule.next) {
                 char d = rule.sym.cond;
                 char c = rule.cond;
 
@@ -70,7 +70,7 @@ public class RuleList  {
             }
 
             if (match)  {
-                rule0.sym.cond = 'c';
+                sym.cond = 'c';
                 System.out.println (" -- match");
             }
             System.out.println ();
@@ -78,13 +78,15 @@ public class RuleList  {
     }
 
     // --------------------------------
-    public void disp ()
+    public void disp (
+        String name )
     {
-        System.out.format ("rule.disp:\n");
-        for (Rule rule0 = head; null != rule0; rule0 = rule0.listNext)  {
-            System.out.format (" rule.disp: %-4s", rule0.sym.name);
+        System.out.format ("  ruleList.disp:\n");
+        for (RuleList rl = this; null != rl; rl = rl.next)  {
+         // System.out.format ("  ruleList.disp: %-4s", rl.head.sym.name);
+            System.out.format ("    %-4s", name);
 
-            for (Rule rule = rule0.next; null != rule; rule = rule.next) {
+            for (Rule rule = rl.head; null != rule; rule = rule.next) {
                 char c = rule.cond;
                 System.out.format ("  %c %-4s", c, rule.sym.name);
             }

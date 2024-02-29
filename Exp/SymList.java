@@ -7,9 +7,13 @@ public class SymList  {
         String  name,
         char    type )
     {
+        boolean dbg = false;
         Sym sym = find (name);
-        if (null != sym)
+        if (null != sym)  {
+            if (dbg)
+                System.out.format ("symlist.add: %s exists\n", name);
             return sym;
+        }
 
         sym      = new Sym (name, type);
         sym.next = head;
@@ -22,13 +26,46 @@ public class SymList  {
     }
 
     // -------------------------------------
+    public void checkRules ()
+    {
+        System.out.println ("symList.checkRule:");
+        for (Sym sym = head; null != sym; sym = sym.next) {
+            if ('*' != sym.type || null == sym.ruleList)
+                continue;
+            sym.ruleList.check ();
+        }
+        System.out.println ();
+    }
+
+    // -------------------------------------
     public void disp ()
     {
+        System.out.println ("symList.disp:");
         Sym sym = head;
         while (null != sym) {
-            System.out.format (" sym.disp: %c %-4s\n", sym.cond, sym.name);
+            System.out.format (" symList.disp: %c %-4s\n", sym.cond, sym.name);
             sym = sym.next;
         }
+    }
+
+    // -------------------------------------
+    public void dispRules ()
+    {
+        System.out.println ("symList.dispRule:");
+        for (Sym sym = head; null != sym; sym = sym.next) {
+            if ('*' != sym.type)
+                continue;
+
+            System.out.format (" sym.disp: %c %-4s", sym.cond, sym.name);
+            if (null == sym.ruleList)  {
+                System.out.println ();
+                continue;
+            }
+
+            System.out.print (" - has rules\n");
+            sym.ruleList.disp (sym.name);
+        }
+        System.out.println ();
     }
 
     // -------------------------------------

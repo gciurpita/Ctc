@@ -7,7 +7,6 @@ import java.util.*;
 public class Interlock
 {
     SymList  symList  = new SymList ();
-    RuleList ruleList = new RuleList ();
 
     // --------------------------------
     public Interlock (
@@ -15,8 +14,6 @@ public class Interlock
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
         loadPnl (pnlFile);
-     // symList.disp ();
-        ruleList.disp ();
     }
 
     // --------------------------------
@@ -26,8 +23,7 @@ public class Interlock
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
         loadPnl (pnlFile);
-     // symList.disp ();
-        ruleList.disp ();
+
         cmdProcess (cmdFile);
     }
 
@@ -82,7 +78,8 @@ public class Interlock
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
              // System.out.format ("  loadPnl: %s\n", line);
-                ruleList.add (fld, symList);
+                Sym sym = symList.add (fld [1], '*');
+                sym.addRule (fld, symList);
             }
 
             // -----------------------------------
@@ -98,25 +95,36 @@ public class Interlock
             throws FileNotFoundException, IOException
     {
         boolean dbg = false;
-        System.out.format ("cmdProcess: %s\n", cmdFile);
+        System.out.format ("\ncmdProcess: %s\n", cmdFile);
 
         BufferedReader br = new BufferedReader(new FileReader (cmdFile));
         String         line;
 
         while ((line = br.readLine()) != null)  {
+            if (0 == line.length ())
+                continue;
+
             System.out.format (" cmdProcess: %s\n", line);
-            if (0 == line.length () || '#' == line.charAt (0))
+            if ('#' == line.charAt (0))
                 continue;
 
             String[]    fld = line.split("  *");
 
             // ---------------------------
             if (fld [1].equals ("check"))
-                ruleList.check ();
+                symList.checkRules ();
+
+            // ---------------------------
+            else if (fld [1].equals ("dispRules"))
+                symList.dispRules ();
 
             // ---------------------------
             else if (fld [1].equals ("list"))
                 symList.disp ();
+
+            // ---------------------------
+            else if (fld [1].equals ("quit"))
+                System.exit (0);
 
             // ---------------------------
             else if (fld [1].equals ("set"))  {
@@ -133,6 +141,13 @@ public class Interlock
                 }
 
                 sym.cond = fld [3].charAt (0);
+            }
+
+            // ---------------------------
+            else {
+                System.out.format (
+                        "Error - cmdProcess - unknown - %s\n", fld [1]);
+                System.exit (2);
             }
         }
     }
