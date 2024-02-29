@@ -33,27 +33,14 @@ public class RuleList  {
     }
 
     // ------------------------------------------------------------------------
-    private int atoi (
-        String s )
-    {
-        int  val = 0;
-
-        for (int i = 0; i < s.length(); i++)  {
-            char c = s.charAt (i);
-            if (! Character.isDigit (c))
-                break;
-            val = 10*val + c - '0';
-        }
-
-        return val;
-    }
-
-    // --------------------------------
     private void uncheck ()
     {
         System.out.format ("  ruleList.uncheck: %s\n", sym.name);
         for (RuleList rl = this; null != rl; rl = rl.next)  {
-            if (rl.locked)  {
+            if ( ! rl.locked)
+                continue;
+
+            if ( ! check (rl))  {
                 rl.locked = false;
                 sym.cond  = 'S';
                 rl.unlock ();
@@ -63,9 +50,35 @@ public class RuleList  {
     }
 
     // --------------------------------
-    public void check ()
+    public boolean check (
+        RuleList  rl )
     {
-        System.out.format (" ruleList.check:\n");
+        System.out.format (
+            "    %c %-4s", rl.sym.cond, rl.sym.name);
+
+        boolean match = true;
+        for (Rule rule = rl.head; null != rule; rule = rule.next) {
+            char d = rule.sym.cond;
+            char c = rule.cond;
+
+            if (d != c)  {
+                match = false;
+                System.out.format ("  %c %c %-4s", d, c, rule.sym.name);
+            }
+            else
+                System.out.format ("  . %c %-4s", c, rule.sym.name);
+        }
+        if (match)
+            System.out.println (" -- match");
+        System.out.println ();
+
+        return match;
+    }
+
+    // --------------------------------
+    public void checks ()
+    {
+        System.out.format (" ruleList.checks:\n");
 
         if ('c' == sym.cond) {
             uncheck ();
@@ -73,31 +86,12 @@ public class RuleList  {
         }
 
         for (RuleList rl = this; null != rl; rl = rl.next)  {
-            boolean match = true;
-
-            System.out.format (
-                "    %c %-4s", sym.cond, sym.name);
-
-            for (Rule rule = rl.head; null != rule; rule = rule.next) {
-                char d = rule.sym.cond;
-                char c = rule.cond;
-
-                if (d != c)  {
-                    match = false;
-                    System.out.format ("  %c %c %-4s", d, c, rule.sym.name);
-                }
-                else
-                    System.out.format ("  . %c %-4s", c, rule.sym.name);
-            }
-
-            if (match && 'S' == sym.cond)  {
-                System.out.println (" -- match");
+            if (check (rl) && 'S' == sym.cond)  {
                 rl.locked = true;
                 sym.cond  = 'c';
                 rl.lock ();
                 break;
             }
-            System.out.println ();
         }
     }
 
@@ -105,14 +99,16 @@ public class RuleList  {
     private void lock ()
     {
         for (Rule rule = head; null != rule; rule = rule.next)
-            rule.sym.lock++;
+            if ('B' != rule.sym.type)
+                rule.sym.lock++;
     }
 
     // --------------------------------
     private void unlock ()
     {
+        System.out.format ("   ruleList.unlock()\n");
         for (Rule rule = head; null != rule; rule = rule.next)  {
-            if (0 == rule.sym.lock)  {
+            if ('B' != rule.sym.type && 0 == rule.sym.lock)  {
                 System.out.format (
                     "Error - ruleLost.unlock - %s rule element not locked\n",
                         sym.name);
@@ -137,6 +133,22 @@ public class RuleList  {
             }
             System.out.println ();
         }
+    }
+
+    // --------------------------------
+    private int atoi (
+        String s )
+    {
+        int  val = 0;
+
+        for (int i = 0; i < s.length(); i++)  {
+            char c = s.charAt (i);
+            if (! Character.isDigit (c))
+                break;
+            val = 10*val + c - '0';
+        }
+
+        return val;
     }
 
     // --------------------------------

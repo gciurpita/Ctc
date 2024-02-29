@@ -140,7 +140,11 @@ public class Interlock
                     System.exit (2);
                 }
 
-                sym.cond = fld [3].charAt (0);
+                if (0 != sym.lock)
+                    System.out.format (
+                        "  cmdProcess: set %s locked\n", sym.name);
+                else
+                    sym.cond = fld [3].charAt (0);
             }
 
             // ---------------------------

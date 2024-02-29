@@ -15,6 +15,10 @@
     check
     list
 
-    set  B3  o
+    set  3    N
+    check
+    list
+
+    set  B3   o
     check
     list

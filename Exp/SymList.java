@@ -32,9 +32,8 @@ public class SymList  {
         for (Sym sym = head; null != sym; sym = sym.next) {
             if ('*' != sym.type || null == sym.ruleList)
                 continue;
-            sym.ruleList.check ();
+            sym.ruleList.checks ();
         }
-        System.out.println ();
     }
 
     // -------------------------------------
