@@ -1,13 +1,9 @@
     dispRules
     check
 
-    set  L4  c
-#   set  L6  c
-#   set  L8  c
-
-    set  3   D
-#   set  5   N
-    set  7A  N
+    set  3    D
+#   set  5    N
+    set  7A   N
 
     set  B3   u
 #   set  B5   u
@@ -15,9 +11,10 @@
 
 #   list
 
-    set  L4  r
+    set  L4   r
     check
-    check
+    list
 
     set  B3  o
     check
+    list

@@ -4,6 +4,7 @@ public class Sym  {
     char        cond;
     RuleList    ruleList;
     Sym         next;
+    int         lock;
     boolean     dbg = true;
 
     // -------------------------------------
@@ -15,6 +16,8 @@ public class Sym  {
         this.type = type;
         if ('*' == type)
             this.cond = 'S';
+        else if ('L' == type)
+            this.cond = 'c';    // center
         else
             this.cond = '_';
 
@@ -24,8 +27,8 @@ public class Sym  {
 
     // --------------------------------
     public void addRule (
-        String  fld [],
-        SymList symList )
+                    String  fld [],
+                    SymList symList )
     {
         if (dbg)
             System.out.format ("\nsym.addRule: %s\n", fld [1]);

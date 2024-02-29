@@ -41,11 +41,14 @@ public class SymList  {
     public void disp ()
     {
         System.out.println ("symList.disp:");
-        Sym sym = head;
-        while (null != sym) {
-            System.out.format (" symList.disp: %c %-4s\n", sym.cond, sym.name);
-            sym = sym.next;
+        for (Sym sym = head; null != sym; sym = sym.next)  {
+            if (0 < sym.lock)
+                System.out.format (
+                    "    %c %d %-4s\n", sym.cond, sym.lock, sym.name);
+            else
+                System.out.format ("    %c   %-4s\n", sym.cond, sym.name);
         }
+        System.out.println ();
     }
 
     // -------------------------------------

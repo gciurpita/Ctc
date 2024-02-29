@@ -2,6 +2,7 @@ public class RuleList  {
     RuleList    next;
     Rule        head = null;
     Sym         sym;
+    boolean     locked;
 
     private boolean dbg = false;
 
@@ -48,9 +49,29 @@ public class RuleList  {
     }
 
     // --------------------------------
+    private void uncheck ()
+    {
+        System.out.format ("  ruleList.uncheck: %s\n", sym.name);
+        for (RuleList rl = this; null != rl; rl = rl.next)  {
+            if (rl.locked)  {
+                rl.locked = false;
+                sym.cond  = 'S';
+                rl.unlock ();
+            }
+        }
+        System.out.println ();
+    }
+
+    // --------------------------------
     public void check ()
     {
         System.out.format (" ruleList.check:\n");
+
+        if ('c' == sym.cond) {
+            uncheck ();
+            return;
+        }
+
         for (RuleList rl = this; null != rl; rl = rl.next)  {
             boolean match = true;
 
@@ -69,11 +90,35 @@ public class RuleList  {
                     System.out.format ("  . %c %-4s", c, rule.sym.name);
             }
 
-            if (match)  {
-                sym.cond = 'c';
+            if (match && 'S' == sym.cond)  {
                 System.out.println (" -- match");
+                rl.locked = true;
+                sym.cond  = 'c';
+                rl.lock ();
+                break;
             }
             System.out.println ();
+        }
+    }
+
+    // --------------------------------
+    private void lock ()
+    {
+        for (Rule rule = head; null != rule; rule = rule.next)
+            rule.sym.lock++;
+    }
+
+    // --------------------------------
+    private void unlock ()
+    {
+        for (Rule rule = head; null != rule; rule = rule.next)  {
+            if (0 == rule.sym.lock)  {
+                System.out.format (
+                    "Error - ruleLost.unlock - %s rule element not locked\n",
+                        sym.name);
+                System.exit (1);
+            }
+            rule.sym.lock--;
         }
     }
 
