@@ -312,12 +312,17 @@ public class CtcPanel extends JPanel
 
         // set up screen graphics
         colWid  = imgTo [0].img.getWidth (null);
+        colWid  = 4 * tileWid;
         nCol    = CANVAS_WIDTH / colWid;
         rowHt1  = RowOff + imgTo  [0].img.getHeight (null);
         rowHt2  = rowHt1 + imgSig [0].img.getHeight (null);
         codeDia = imgCode [0].img.getWidth (null);
 
         this.setPreferredSize (new Dimension (CANVAS_WIDTH, CANVAS_HEIGHT));
+
+        System.out.format ("CtcPanel: tile wid %d", tileWid);
+        System.out.format (", CTC col wid %d", colWid);
+        System.out.println ();
 
         frame.setContentPane (this);
         frame.pack ();
