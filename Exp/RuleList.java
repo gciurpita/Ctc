@@ -4,7 +4,7 @@ public class RuleList  {
     Sym         sym;
     boolean     locked;
 
-    private boolean dbg = false;
+    private boolean dbg = true;
 
     // globals from id()
     private String name = "?";
@@ -22,13 +22,29 @@ public class RuleList  {
         Rule rule   = null;
         Rule rule0  = head;
 
+        int  err    = 0;
+
         for (int i = 2; i < fld.length; i++)  {
             id (fld [i]);
 
-            rule      = new Rule (symList.add (name, type), cond);
+            Sym sym   = symList.find (name);
+            if (null == sym)  {
+                System.out.format (
+                    " RuleList: unknown sym %s\n", name);
+                err++;
+                continue;
+            }
+
+            rule      = new Rule (sym, cond);
             rule.next = rule0;
             rule0     = rule;
         }
+
+        if (0 < err)  {
+            System.out.format ("RuleList: %d errors\n", err);
+            System.exit (1);
+        }
+
         head = rule;
     }
 

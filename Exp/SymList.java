@@ -1,13 +1,14 @@
 public class SymList  {
     Sym     head = null;
-    boolean dbg;
+    boolean dbg  = false;
 
     // -------------------------------------
     public Sym add (
         String  name,
         char    type )
     {
-        boolean dbg = false;
+     // boolean dbg = false;
+
         Sym sym = find (name);
         if (null != sym)  {
             if (dbg)
@@ -20,13 +21,13 @@ public class SymList  {
         head     = sym;
 
         if (dbg)
-            System.out.format ("add: %s\n", sym.name);
+            System.out.format ("  symList.add: %s\n", sym.name);
 
         return sym;
     }
 
     // -------------------------------------
-    public void checkRules ()
+    public void __checkRules ()
     {
         System.out.println ("symList.checkRule:");
         for (Sym sym = head; null != sym; sym = sym.next) {
@@ -75,19 +76,17 @@ public class SymList  {
         String  name )
     {
         if (dbg)
-            System.out.format ("find: %s\n", name);
+            System.out.format ("  symList.find: %s\n", name);
 
-        Sym sym = head;
-        while (null != sym) {
+        for (Sym sym = head; null != sym; sym = sym.next) {
             if (dbg)
-                System.out.format ("  find: %s %s\n", name, sym.name);
+                System.out.format ("   symlist.find: %s\n", sym.name);
 
             if (sym.name.equals (name))  {
                 if (dbg)
-                    System.out.format ("    find: found\n");
+                    System.out.format ("    symlist.find: found\n");
                 return sym;
             }
-            sym = sym.next;
         }
 
         return null;

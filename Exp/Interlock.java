@@ -6,7 +6,9 @@ import java.util.*;
 
 public class Interlock
 {
+    Ctc      ctc      = null;
     SymList  symList  = new SymList ();
+    Track    trk      = new Track ();
 
     // --------------------------------
     public Interlock (
@@ -57,6 +59,17 @@ public class Interlock
     // ------------------------------------------------------------------------
     //   load panel decription
 
+    private void loadPnlErr (
+        String line,
+        String msg )
+    {
+        System.out.format ("Error: loadPnl - %s\n", msg);
+        System.out.format ("    %s\n", line);
+    }
+
+    // ------------------------------------------------------------------------
+    //   load panel decription
+
     private void loadPnl (String pnlFile)
             throws FileNotFoundException, IOException
     {
@@ -65,6 +78,8 @@ public class Interlock
 
         BufferedReader br = new BufferedReader(new FileReader(pnlFile));
         String         line;
+
+        int            err = 0;
 
         while ((line = br.readLine()) != null)  {
             String[]    fld = line.split("  *");
@@ -76,16 +91,106 @@ public class Interlock
                 ;           // ignore
 
             // -----------------------------------
+            else if (fld[0].equals("block"))  {
+                int nlkId  = Integer.parseInt (fld [1]);
+                int row    = Integer.parseInt (fld [2]);
+                int col    = Integer.parseInt (fld [3]);
+
+                if (! trk.check (col, row, 'B'))  {
+                    loadPnlErr (line, "invalid block tile");
+                    err++;
+                    continue;
+                }
+
+                System.out.format (
+                        " loadPnl block: add block ???\n");
+            }
+
+            // -----------------------------------
+            else if (fld[0].equals("ctc"))  {
+                Ctc c = null;
+                for (int n = 1; n < fld.length; n++)  {
+                    c      = new Ctc (Integer.parseInt (fld [n]));
+                    c.next = ctc;
+                    ctc    = c;
+                }
+            }
+
+            // -----------------------------------
+            else if (fld[0].equals("row"))  {
+                trk.newRow (line.substring (4));
+            }
+
+            // -----------------------------------
             else if (fld[0].equals("rule"))  {
-             // System.out.format ("  loadPnl: %s\n", line);
-                Sym sym = symList.add (fld [1], '*');
+                System.out.format (" loadPnl rule: starts %s\n", fld [1]);
+
+                Sym sym = symList.find (fld [1]);
+                if (null == sym)  {
+                    System.out.format (
+                        "Error - loadPnl rule: unknown sym %s\n", fld [1]);
+                    err++;
+                    continue;
+                }
+                System.out.format (" loadPnl: addrule: %s\n", fld [1]);
                 sym.addRule (fld, symList);
             }
 
             // -----------------------------------
-            else if (0 < line.length()) {
-                ; // System.out.format ("loadPnl: ERROR - %s\n", line);
+            else if (fld[0].equals("signal"))  {
+                int ctcCol = Integer.parseInt (fld [1]);
+                int row    = Integer.parseInt (fld [2]);
+                int col    = Integer.parseInt (fld [3]);
+
+                if (null == ctc || ! ctc.check (ctcCol)) {
+                    loadPnlErr (line, "invalid ctc ID");
+                    err++;
+                    continue;
+                }
+
+                if (! trk.check (col, row, '*'))  {
+                    loadPnlErr (line, "invalid track tile");
+                    err++;
+                    continue;
+                }
+
+                System.out.format (" loadPnl signal: %s\n", fld [4]);
+                Sym sym = symList.add (fld [4], '*');
             }
+
+            // -----------------------------------
+            else if (fld[0].equals("turnout"))  {
+                int ctcCol = Integer.parseInt (fld [1]);
+                int row    = Integer.parseInt (fld [2]);
+                int col    = Integer.parseInt (fld [3]);
+
+                if (null == ctc || ! ctc.check (ctcCol)) {
+                    loadPnlErr (line, "invalid invalid ctc ID");
+                    err++;
+                    continue;
+                }
+
+                if (! trk.check (col, row, 'x'))  {
+                    loadPnlErr (line, "invalid track tile");
+                    err++;
+                    continue;
+                }
+
+                System.out.format (" loadPnl turnout: %s\n", fld [4]);
+                Sym sym = symList.add (fld [4], 'x');
+            }
+
+            // -----------------------------------
+            else if (0 < line.length()) {
+                loadPnlErr (line, "unknown keyword");
+                err++;
+                continue;
+            }
+        }
+
+        if (0 < err)  {
+            System.out.format ("loadPnl: %d errors\n", err);
+            System.exit (1);
         }
     }
 
@@ -112,7 +217,7 @@ public class Interlock
 
             // ---------------------------
             if (fld [1].equals ("check"))
-                symList.checkRules ();
+                ; // symList.checkRules ();
 
             // ---------------------------
             else if (fld [1].equals ("dispRules"))

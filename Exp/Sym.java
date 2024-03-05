@@ -5,7 +5,7 @@ public class Sym  {
     RuleList    ruleList;
     Sym         next;
     int         lock;
-    boolean     dbg = true;
+    boolean     dbg = false;
 
     // -------------------------------------
     public Sym (
