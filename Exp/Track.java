@@ -26,6 +26,8 @@ public class Track {
     int       nRow     = 0;
     int       maxCol   = 0;
 
+    String    cfgFile  = "../Resources/blackScreenTiles.cfg";
+
     class Tile   {
         Image   img;
     }
@@ -33,7 +35,11 @@ public class Track {
     final int TileSize = 90;
     Tile      tile []  = new Tile [TileSize];
 
-    String    cfgFile  = "../Resources/blackScreenTiles.cfg";
+    int       panelHt;
+    int       panelWid;
+    int       tileHt;
+    int       tileWid;
+
 
     int       dbg      = 0;
 
@@ -42,22 +48,6 @@ public class Track {
             throws FileNotFoundException, IOException
     {
         loadTiles ();
-    }
-
-    // ------------------------------------------------------------------------
-    public int height ()
-    {
-        return tile [0].img.getHeight (null) * nRow;
-    }
-
-    public int tileWidth ()
-    {
-        return tile [0].img.getWidth (null);
-    }
-
-    public int width ()
-    {
-        return tile [0].img.getWidth (null) * maxCol;
     }
 
     // ------------------------------------------------------------------------
@@ -88,6 +78,9 @@ public class Track {
                 System.out.format ("  loadTiles: %s\n", fields [3]);
             }
         }
+
+        tileHt  = tile [0].img.getHeight (null);
+        tileWid = tile [0].img.getWidth  (null);
     }
 
     // ------------------------------------------------------------------------
@@ -150,6 +143,9 @@ public class Track {
 
         if (maxCol < s.length ())
             maxCol = s.length ();
+
+        panelHt  = tileHt  * nRow;
+        panelWid = tileWid * maxCol;
     }
 
     // ------------------------------------------------------------------------
@@ -157,6 +153,36 @@ public class Track {
         Graphics2D  g2d )
     {
         g2d.setColor (Color.black);
-        g2d.fillRect (0, 0, width (), height ());
+        g2d.fillRect (0, 0, panelWid, panelHt);
+
+        if (0 != dbg)
+            System.out.format ("paintTrack:\n");
+
+        for (int row = 0; row < nRow; row++)  {
+         // System.out.format ("  paintTrack: %d %s\n", row, pnlRow [row]);
+
+            for (int col = 0; col < maxCol; col++)  {
+                int  x0   = tileWid * col;
+                int  y0   = tileWid * row;
+                int  idx  = trk [col][row];
+           //   System.out.format ("  %2d, %c  %d\n", i, c, idx);
+
+                if (76 < idx)
+                    System.out.format ("paintTrack: ERROR idx %d > 76\n", idx);
+                else
+                    g2d.drawImage (tile [idx].img, x0, y0, null);
+            }
+        }
+
+        // set turnouts -- are by default reversed
+ //     if (false)  {
+ //     for (int i = 0; i < symToSize; i++)  {
+ //         final int  TrackH  = 2;
+ //         PnlSym to = symTo [i];
+ //      // System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
+ //         if ('N' == to.cond)
+ //             g2d.drawImage (imgTile [TrackH].img, to.x, to.y, null);
+ //     }
+ //     }
     }
 }

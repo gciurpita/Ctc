@@ -45,12 +45,12 @@ public class Interlock extends JPanel
         loadPnl (pnlFile);
 
         // set up screen graphics
-        tileWid   = trk.tileWidth ();
-        canvasWid = trk.width ();
+        tileWid   = trk.tileWid;
+        canvasWid = trk.panelWid;
         colWid    = 4 * tileWid;
 
         nCol      = canvasWid / colWid;
-        trkHt     = trk.height ();
+        trkHt     = trk.panelHt;
         canvasHt  = trkHt + trkHt;   // need ctc col ht
 
         this.setPreferredSize (new Dimension (canvasWid, canvasHt));
