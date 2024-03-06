@@ -15,47 +15,48 @@
 #   77    67  }  hsignalLC.bmp
 
 
-row        A
-row       8422222
-row      6       A
-row   25;2222292242
-row    @       7 A
-row   2522292222:42
+row         A
+row        8422222
+row       6        A
+row 22225;2222229224222
+#   |   |   |   |   |   |   |   |   |   |   
 #   01234567890123456789012345678901234567890123456789
 #             1         2         3         4
-row    @    7 A
-row          :429
+row     @        7 A
+row 22225222922222:4222
+row     @    7 A
+row           :429
 
 #        id   row  col  
-block     1     3    3  13
-block     2     5    3  13
+block     1     3    4  13
+block     2     5    4  13
 # block     2     4    3  13
 
 ctc    3 4 5 6 7 8
 
 #       ctc   row  col  lbl
-signal    4     0    7  4LB
-signal    4     2   13  4L
-signal    4     4    3  4R
-signal    8     4   13  8L
-signal    6     6    3  6R
-signal    6     6   10  6LB
+# signal    4     0    7  4LB
+# signal    4     2   13  4L
+# signal    4     4    3  4R
+# signal    8     4   13  8L
+# signal    6     6    3  6R
+# signal    6     6   10  6LB
 
-turnout   3     3    4  3
-turnout   5     5    7  5
-turnout   7     3   10  7A
-turnout   7     5   12  7B
+# turnout   3     3    4  3
+# turnout   5     5    7  5
+# turnout   7     3   10  7A
+# turnout   7     5   12  7B
 
-rule    4R  rL4  R3
-rule    4R  rL4  N3   N7A
-rule    4R  rL4  N3   R7A  S8L
+# rule    4R  rL4  R3
+# rule    4R  rL4  N3   N7A
+# rule    4R  rL4  N3   R7A  S8L
 
-rule    4LB lL4  R3
-rule    4L  lL4  N3   N7A
+# rule    4LB lL4  R3
+# rule    4L  lL4  N3   N7A
 
-rule    6LB lL6  R5
-rule    6R  rL6  R5
-rule    6R  rL6  cL8  N5   N7A
+# rule    6LB lL6  R5
+# rule    6R  rL6  R5
+# rule    6R  rL6  cL8  N5   N7A
 
-rule    8L  lL8  cL4  N3   R7A
-rule    8L  lL8  cL6  N7A
+# rule    8L  lL8  cL4  N3   R7A
+# rule    8L  lL8  cL6  N7A

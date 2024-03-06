@@ -17,16 +17,25 @@ import javax.imageio.ImageIO;
 
 // -----------------------------------------------------------------------------
 public class Lever {
-    int     lever  []  = new int [40];;
+    int     lvr  []  = new int [41];    // 1-40
 
     String    cfgFile  = "../Resources/ctcNumbered.cfg";
     class Icon   {
         Image   img;
     }
+    Icon      code    [] = new Icon [2];
     Icon      lamp    [] = new Icon [15];
+    Icon      lever   [] = new Icon [3];
     Icon      signal  [] = new Icon [15];
     Icon      turnout [] = new Icon [15];
-    Icon      code    [] = new Icon [2];
+
+    int       iconToHt;
+    int       iconToWid;
+    int       iconSigHt;
+    int       iconSigWid;
+
+    int       colWid     = 64;
+    int       colHt;
 
     int       dbg        = 0;
 
@@ -63,22 +72,27 @@ public class Lever {
             int    id      = Integer.parseInt (fields [2]);
             File   inFile  = new File ("../" + fields [3]);
 
-            if (fields[1].equals("Lamp"))  {
+            if (fields[1].equals("Lever"))  {
+                lever [id]     = new Icon ();
+                lever [id].img = ImageIO.read (inFile);
+            }
+
+            else if (fields[1].equals("Lamp"))  {
                 lamp [id]      = new Icon ();
                 lamp [id].img  = ImageIO.read (inFile);
             }
 
-            if (fields[1].equals("Signal"))  {
+            else if (fields[1].equals("Signal"))  {
                 signal [id]      = new Icon ();
                 signal [id].img  = ImageIO.read (inFile);
             }
 
-            if (fields[1].equals("Turnout"))  {
+            else if (fields[1].equals("Turnout"))  {
                 turnout [id]      = new Icon ();
                 turnout [id].img  = ImageIO.read (inFile);
             }
 
-            if (fields[1].equals("Code"))  {
+            else if (fields[1].equals("Code"))  {
                 code [id]      = new Icon ();
                 code [id].img  = ImageIO.read (inFile);
             }
@@ -86,37 +100,210 @@ public class Lever {
             System.out.format ("  loadIcons: %s\n", fields [3]);
         }
 
-     // tileHt  = tile [0].img.getHeight (null);
-     // tileWid = tile [0].img.getWidth  (null);
+        iconToHt  = turnout [0].img.getHeight (null);
+        iconToWid = turnout [0].img.getWidth  (null);
+        System.out.format (
+                "loadIcons: to wid %d, ht %d", iconToWid, iconToHt);
+
+        iconSigHt  = signal [0].img.getHeight (null);
+        iconSigWid = signal [0].img.getWidth  (null);
+        System.out.format ( ", sig wid %d, ht %d\n", iconSigWid, iconSigHt);
+
+        int iconCodeHt  = code [0].img.getHeight (null);
+        int iconCodeWid = code [0].img.getWidth  (null);
+        System.out.format ( ", cod wid %d, ht %d\n", iconCodeWid, iconCodeHt);
+
+        colHt = iconToHt + iconSigHt + 2 * iconCodeHt;
     }
 
     // --------------------------------
     public void addLever (
         int  ctcId)
     {
-        if (lever.length <= ctcId)  {
+        if (lvr.length <= ctcId)  {
             System.err.format ("Error Lever.addLever range %d\n", ctcId);
             System.exit (3);
         }
 
-        lever [ctcId]++;
+        lvr [ctcId]++;
     }
 
     // --------------------------------
     public boolean check (
         int  ctcId)
     {
-        return (0 < lever [ctcId]);
+        return (0 < lvr [ctcId]);
     }
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    private void paintToPlate (
+        Graphics2D  g2d,
+        int         x0,
+        int         y0,
+        int         col,
+        int         lvrIdx )
+    {
+        if (0 != dbg)
+            System.out.format ("  paintToPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
+
+        g2d.setColor (Color.white);
+
+ //     CtcCol ctc  = ctcCol [col];
+ //     PnlSym lvr  = ctcCol [col].symLvr;
+ //     PnlSym to   = ctcCol [col].symTo;
+
+        // label turnouts
+ //     for ( ; to != null; to = to.nxtSym)
+ //         g2d.drawString (to.lbl, to.x + to.xLbl, to.y + to.yLbl);
+
+        // plate & lvr
+        g2d.drawImage (turnout [col/2].img,   x0, y0, null);
+     // g2d.drawImage (lever   [ctc.pos].img, x0 + 6, y0 + 44, null);
+        g2d.drawImage (lever   [0]      .img, x0 + 6, y0 + 44, null);
+
+     // to   = ctcCol [col].symTo;
+
+        // lamps
+        int lampIdxLeft  = 5;
+        int lampIdxRight = 1;
+
+     // if ('l' == lvr.cond)  {
+        if (false)  {
+            lampIdxLeft  = 6;
+            lampIdxRight = 0;
+        }
+        g2d.drawImage (lamp [lampIdxLeft].img,  x0 +  5, y0 + 3, null);
+        g2d.drawImage (lamp [lampIdxRight].img, x0 + 34, y0 + 4, null);
+    }
+
+    // ------------------------------------------------------------------------
+    private void paintSigPlate (
+        Graphics2D  g2d,
+        int         x0,
+        int         y0,
+        int         col,
+        int         lvrIdx )
+    {
+//      if (0 != dbg)
+//          System.out.format ("  paintSigPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
+
+//      final int  SigRred = 16;
+//      final int  SigLred = 17;
+//      final int  SigRgr  = 46;
+//      final int  SigLgr  = 47;
+
+//      g2d.setColor (Color.white);
+
+//      CtcCol ctc  = ctcCol [col];
+//      PnlSym lvr  = ctcCol [col].symLvr;
+//      PnlSym symL = ctcCol [col].symSigL;
+//      PnlSym symR = ctcCol [col].symSigR;
+
+//      int    xOff = tileWid * 5/4;
+//      int    yOff = tileWid * 3/4;
+
+//      // signal labels
+//      for (symL = ctcCol [col].symSigL; symL != null; symL = symL.nxtSym)
+//          g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
+
+//      for (symR = ctcCol [col].symSigR; symR != null; symR = symR.nxtSym)  {
+//          int xOff2 = 5 + g2d.getFontMetrics().stringWidth (symR.lbl);
+//          g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
+//      }
+
+//      // plate & lvr
+//      g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
+//      g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
+
+//      if (false)
+//          System.out.format (
+//              "paintSigPlate: Num %d, lamp %c\n", col, ctcCol [col].lamp);
+
+//      // lamps
+//      if ('L' == ctcCol [col].lamp)  {                    // left
+//          g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
+//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
+//          g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+//      }
+//      else if ('R' == ctcCol [col].lamp)  {               // left
+//          g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
+//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
+//          g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, this);
+//      }
+//      else  {                                             // center
+//          g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
+//          g2d.drawImage (imgLamp [10].img, x0 + 18, y0 +  6, this);
+//          g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+//      }
+    }
+
+//  // ------------------------------------------------------------------------
+//  private void paintSigLamps (
+//      Graphics2D  g2d )
+//  {
+//      // all stop
+//      for (int i = 0; i < symSigSize; i++)  {
+//          PnlSym sym               = symSig [i];
+//          int    imgIdx            = sym.imgIdx;
+//          ctcCol [sym.ctcNum].lamp = ' ';
+//          g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
+//      }
+
+//      // clear one
+//      for (int i = 0; i < symSigSize; i++)  {
+//          PnlSym sym               = symSig [i];
+//          int    imgIdx            = sym.imgIdx;
+
+//          if ('C' == sym.cond)  {
+//              ctcCol [sym.ctcNum].lamp = sym.type;
+
+//              if (true)
+//                  System.out.format ("paintSigLamps: num %d, %c, %s\n",
+//                      sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
+
+//              imgIdx += 30;
+//              g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
+//          }
+//      }
+//  }
 
     // ------------------------------------------------------------------------
     public void paint (
         Graphics2D  g2d,
+        int         y0,
         int         wid,
         int         ht )
     {
-        g2d.setColor (new Color(115, 104, 50));  // #736832
-        g2d.fillRect (0, ht, wid, ht);
+        System.out.format ("Lever paint:\n");
 
+ //     Rectangle   r      = frame.getBounds();
+        int         y1     = y0 + iconToHt;
+        int         y2     = y1 + iconSigHt;
+
+        g2d.setColor (new Color(115, 104, 50));  // #736832
+        g2d.fillRect (0, y0, wid, y0+ht);
+ 
+        for (int num = 1; num < lvr.length; num += 2)  {
+            if (0 == lvr [num] && 0 == lvr [num+1])
+                continue;
+
+            int col = 1 + (num-1) / 2;
+            int x0  = colWid * ((num-1) / 2);
+
+            if (0 < lvr [num])
+                paintToPlate  (g2d, x0, y0, num, num);
+
+            g2d.drawLine (0, y2, wid, y2);
+
+            if (0 < lvr [num+1])
+                paintSigPlate (g2d, x0, y1, num, num);
+
+            // code button
+            Image img = code [1].img;
+         // if (' ' != symCode [col].cond)
+         //     img  = imgCode [0].img;
+            g2d.drawImage (img, x0 + 15, y2 + 10, null);
+        }
     }
 };

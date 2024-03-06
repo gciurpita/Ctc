@@ -36,6 +36,7 @@ public class Interlock extends JPanel
     int      nCol;
     int      tileWid;
     int      trkHt;
+    int      lvrHt;
 
     // --------------------------------
     public Interlock (
@@ -51,7 +52,9 @@ public class Interlock extends JPanel
 
         nCol      = canvasWid / colWid;
         trkHt     = trk.panelHt;
-        canvasHt  = trkHt + trkHt;   // need ctc col ht
+        lvrHt     = lever.colHt;
+
+        canvasHt  = trkHt + lvrHt;
 
         this.setPreferredSize (new Dimension (canvasWid, canvasHt));
 
@@ -323,6 +326,6 @@ public class Interlock extends JPanel
         g2d.fillRect (0, 0, r.width, r.height);
 
         trk.paint (g2d);
-        lever.paint (g2d, canvasWid, trkHt);
+        lever.paint (g2d, trkHt, canvasWid, lvrHt);
     }
 }
