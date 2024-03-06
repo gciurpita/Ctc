@@ -13,6 +13,9 @@
 
 # --------------------------------------------------------------------
 all : $(Classes)
+		java $(Targ) $(Pnl)
+
+cmd : $(Classes)
 		java $(Targ) $(Cmd) $(Pnl)
 
 check :

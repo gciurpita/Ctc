@@ -1,14 +1,41 @@
 // CTC interlock tester
 
+import java.awt.*;
 import java.io.*;
 import java.lang.*;
+import java.net.*;
+import javax.swing.*;
 import java.util.*;
 
-public class Interlock
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
+import java.awt.image.RGBImageFilter;
+import java.awt.image.FilteredImageSource;
+
+import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import javax.imageio.ImageIO;
+
+// import java.util.Timer;
+// import java.util.TimerTask;
+
+// -----------------------------------------------------------------------------
+public class Interlock extends JPanel
+     // implements MouseListener, KeyListener
 {
+    JFrame   frame    = new JFrame ();
+
     Ctc      ctc      = null;
     SymList  symList  = new SymList ();
     Track    trk      = new Track ();
+
+    int      canvasHt;
+    int      canvasWid;
+    int      colWid;
+    int      nCol;
+    int      tileWid;
+    int      trkHt;
 
     // --------------------------------
     public Interlock (
@@ -16,6 +43,33 @@ public class Interlock
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
         loadPnl (pnlFile);
+
+        // set up screen graphics
+        tileWid   = trk.tileWidth ();
+        canvasWid = trk.width ();
+        colWid    = 4 * tileWid;
+
+        nCol      = canvasWid / colWid;
+        trkHt     = trk.height ();
+        canvasHt  = trkHt + trkHt;   // need ctc col ht
+
+        this.setPreferredSize (new Dimension (canvasWid, canvasHt));
+
+        System.out.format ("CtcPanel: tile wid %d", tileWid);
+        System.out.format (", CTC col wid %d", colWid);
+        System.out.format (", canvas wid %d", canvasWid);
+        System.out.format (", canvas ht %d", canvasHt);
+        System.out.println ();
+
+        frame.setContentPane (this);
+        frame.pack ();
+        frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+        frame.setVisible (true);
+        frame.setTitle   ("CTC Panel");
+
+        // position app near top center of screen
+        Rectangle r = frame.getBounds();        // window size
+        frame.setBounds (900, 0, r.width, r.height);
     }
 
     // --------------------------------
