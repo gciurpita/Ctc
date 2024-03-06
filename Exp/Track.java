@@ -31,15 +31,12 @@ public class Track {
     class Tile   {
         Image   img;
     }
-
-    final int TileSize = 90;
-    Tile      tile []  = new Tile [TileSize];
+    Tile      tile []  = new Tile [90];
 
     int       panelHt;
     int       panelWid;
     int       tileHt;
     int       tileWid;
-
 
     int       dbg      = 0;
 
@@ -75,7 +72,7 @@ public class Track {
                 tile [id]      = new Tile ();
                 tile [id].img  = ImageIO.read (inFile);
 
-                System.out.format ("  loadTiles: %s\n", fields [3]);
+             // System.out.format ("  loadTiles: %s\n", fields [3]);
             }
         }
 

@@ -26,7 +26,7 @@ public class Interlock extends JPanel
 {
     JFrame   frame    = new JFrame ();
 
-    Ctc      ctc      = null;
+    Lever    lever    = new Lever ();
     SymList  symList  = new SymList ();
     Track    trk      = new Track ();
 
@@ -55,7 +55,7 @@ public class Interlock extends JPanel
 
         this.setPreferredSize (new Dimension (canvasWid, canvasHt));
 
-        System.out.format ("CtcPanel: tile wid %d", tileWid);
+        System.out.format ("Interlock: tile wid %d", tileWid);
         System.out.format (", CTC col wid %d", colWid);
         System.out.format (", canvas wid %d", canvasWid);
         System.out.format (", canvas ht %d", canvasHt);
@@ -65,7 +65,7 @@ public class Interlock extends JPanel
         frame.pack ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.setVisible (true);
-        frame.setTitle   ("CTC Panel");
+        frame.setTitle   ("Interlock Panel");
 
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
@@ -162,15 +162,8 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("ctc"))  {
-                Ctc c = null;
-                for (int n = 1; n < fld.length; n++)  {
-
-                    Sym sym = symList.add ("L" + fld [n], 'L');
-
-                    c      = new Ctc (Integer.parseInt (fld [n]));
-                    c.next = ctc;
-                    ctc    = c;
-                }
+                for (int n = 1; n < fld.length; n++)
+                    lever.addLever (Integer.parseInt (fld [n]));
             }
 
             // -----------------------------------
@@ -196,7 +189,7 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
 
-                if (null == ctc || ! ctc.check (ctcCol)) {
+                if (! lever.check (ctcCol)) {
                     loadPnlErr (line, "invalid ctc ID");
                     err++;
                     continue;
@@ -218,7 +211,7 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
 
-                if (null == ctc || ! ctc.check (ctcCol)) {
+                if (! lever.check (ctcCol)) {
                     loadPnlErr (line, "invalid invalid ctc ID");
                     err++;
                     continue;
@@ -330,5 +323,6 @@ public class Interlock extends JPanel
         g2d.fillRect (0, 0, r.width, r.height);
 
         trk.paint (g2d);
+        lever.paint (g2d, canvasWid, trkHt);
     }
 }
