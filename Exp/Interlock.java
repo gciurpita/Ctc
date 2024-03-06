@@ -110,6 +110,9 @@ public class Interlock
             else if (fld[0].equals("ctc"))  {
                 Ctc c = null;
                 for (int n = 1; n < fld.length; n++)  {
+
+                    Sym sym = symList.add ("L" + fld [n], 'L');
+
                     c      = new Ctc (Integer.parseInt (fld [n]));
                     c.next = ctc;
                     ctc    = c;
@@ -123,16 +126,13 @@ public class Interlock
 
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
-                System.out.format (" loadPnl rule: starts %s\n", fld [1]);
-
                 Sym sym = symList.find (fld [1]);
                 if (null == sym)  {
-                    System.out.format (
-                        "Error - loadPnl rule: unknown sym %s\n", fld [1]);
+                    loadPnlErr (line, "unknown sym");
                     err++;
                     continue;
                 }
-                System.out.format (" loadPnl: addrule: %s\n", fld [1]);
+                System.out.format (" loadPnl addrule: %s\n", fld [1]);
                 sym.addRule (fld, symList);
             }
 
@@ -154,7 +154,7 @@ public class Interlock
                     continue;
                 }
 
-                System.out.format (" loadPnl signal: %s\n", fld [4]);
+                System.out.format (" loadPnl signal:  %s\n", fld [4]);
                 Sym sym = symList.add (fld [4], '*');
             }
 
@@ -187,6 +187,8 @@ public class Interlock
                 continue;
             }
         }
+
+     // symList.disp ();
 
         if (0 < err)  {
             System.out.format ("loadPnl: %d errors\n", err);

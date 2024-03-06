@@ -43,6 +43,6 @@ public class Sym  {
             for (RuleList rl = ruleList; null != rl; rl = rl.next)
                 System.out.format (" sym.addRule: ruleList\n");
 
-        ruleList.disp (name);
+     // ruleList.disp (name);
    }
 }

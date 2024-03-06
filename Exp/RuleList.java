@@ -4,7 +4,7 @@ public class RuleList  {
     Sym         sym;
     boolean     locked;
 
-    private boolean dbg = true;
+    private boolean dbg = false;
 
     // globals from id()
     private String name = "?";
@@ -25,7 +25,11 @@ public class RuleList  {
         int  err    = 0;
 
         for (int i = 2; i < fld.length; i++)  {
-            id (fld [i]);
+            if (! id (fld [i]))  {
+                System.out.format ("Error: RuleList: bad id, %s\n", fld [i]);
+                err++;
+                continue;
+            }
 
             Sym sym   = symList.find (name);
             if (null == sym)  {
@@ -42,7 +46,6 @@ public class RuleList  {
 
         if (0 < err)  {
             System.out.format ("RuleList: %d errors\n", err);
-            System.exit (1);
         }
 
         head = rule;
@@ -168,7 +171,7 @@ public class RuleList  {
     }
 
     // --------------------------------
-    public void id (
+    public boolean id (
         String fld )
     {
      // System.out.format ("  rule.id:\n");
@@ -180,9 +183,8 @@ public class RuleList  {
         if (Character.isDigit (c0))  {
             if (0 != (atoi (fld) % 2)) {
                 System.out.format (
-                    "Error - ruleNew invalid signal ID - %s\n",
-                        fld);
-                System.exit (1);
+                    "Error: id - invalid signal ID - %s\n", fld);
+                return false;
             }
 
             type = '*';
@@ -197,24 +199,37 @@ public class RuleList  {
             name = fld.substring (0);
         }
 
-        // switches
+        // switche or signal condition
         else if (Character.isDigit (c1))  {
-            if (1 != (atoi (fld.substring (1)) % 2)) {
-                System.out.format (
-                    "Error - ruleNew invalid switch ID - %s\n",
-                        fld);
-                System.exit (1);
-            }
+            int id = atoi (fld.substring (1));
 
-            if ('N' != c0 && 'D' != c0)  {
-                System.out.format (
-                    "Error - ruleNew invalid switch cond - %c\n", c0);
-                System.exit (1);
-            }
+            if (1 == id % 2) {
+                if ('N' != c0 && 'R' != c0)  {
+                    System.out.format (
+                        "Error: id - invalid switch cond - %c  %s, %d\n",
+                            c0, fld, id);
+                    return false;
+                }
 
-            type = 'x';
-            cond = c0;
-            name = fld.substring (1);
+                type = 'x';
+                cond = c0;
+                name = fld.substring (1);
+
+                return true;
+            }
+            else {
+                if ('S' != c0 && 'c' != c0)  {
+                    System.out.format (
+                        "Error: id invalid signal cond - %s, %d\n", fld, id);
+                    return false;
+                }
+
+                type = '*';
+                cond = c0;
+                name = fld.substring (1);
+
+                return true;
+            }
         }
 
         // levers 2nd char is 'L'
@@ -223,13 +238,13 @@ public class RuleList  {
                 System.out.format (
                     "Error - ruleNew invalid signal lever - %s\n",
                         fld);
-                System.exit (1);
+                return false;
             }
 
             if ('l' != c0 && 'c' != c0 && 'r' != c0)  {
                 System.out.format (
                     "Error - ruleNew invalid lever cond - %c\n", c0);
-                System.exit (1);
+                return false;
             }
 
             type = 'L';
@@ -240,10 +255,12 @@ public class RuleList  {
         else {
             System.out.format (
                 "Error - ruleNew unknown rule - %s\n", fld);
-            System.exit (1);
+            return false;
         }
 
         if (dbg)
             System.out.format (" %13s %c %c %s\n", fld, type, cond, name);
+
+        return true;
     }
 }
