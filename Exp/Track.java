@@ -151,4 +151,12 @@ public class Track {
         if (maxCol < s.length ())
             maxCol = s.length ();
     }
+
+    // ------------------------------------------------------------------------
+    public void paint (
+        Graphics2D  g2d )
+    {
+        g2d.setColor (Color.black);
+        g2d.fillRect (0, 0, width (), height ());
+    }
 }

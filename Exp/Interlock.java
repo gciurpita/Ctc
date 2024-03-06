@@ -316,4 +316,19 @@ public class Interlock extends JPanel
             }
         }
     }
+
+    // ------------------------------------------------------------------------
+    // redraw the screen
+
+    @Override
+    public void paintComponent (Graphics g)
+    {
+        Graphics2D  g2d = (Graphics2D) g;
+        Rectangle   r   = frame.getBounds();
+
+        g2d.setColor (Color.gray);
+        g2d.fillRect (0, 0, r.width, r.height);
+
+        trk.paint (g2d);
+    }
 }
