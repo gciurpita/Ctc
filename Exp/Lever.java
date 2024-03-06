@@ -169,7 +169,7 @@ public class Lever {
         int lampIdxRight = 1;
 
      // if ('l' == lvr.cond)  {
-        if (false)  {
+        if (true)  {
             lampIdxLeft  = 6;
             lampIdxRight = 0;
         }
@@ -212,9 +212,10 @@ public class Lever {
 //          g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
 //      }
 
-//      // plate & lvr
-//      g2d.drawImage (imgSig [col/2].img,   x0, y0, this);
-//      g2d.drawImage (imgLvr [ctc.pos].img, x0 + 5, y0 + 57, this);
+        // plate & lvr
+        g2d.drawImage (signal [col/2].img,   x0, y0, null);
+     // g2d.drawImage (lever  [ctc.pos].img, x0 + 5, y0 + 57, null);
+        g2d.drawImage (lever  [2].img,       x0 + 5, y0 + 57, null);
 
 //      if (false)
 //          System.out.format (
@@ -222,20 +223,23 @@ public class Lever {
 
 //      // lamps
 //      if ('L' == ctcCol [col].lamp)  {                    // left
-//          g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, this);
-//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
-//          g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+//          g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, null);
+//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, null);
+//          g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, null);
 //      }
 //      else if ('R' == ctcCol [col].lamp)  {               // left
-//          g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
-//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, this);
-//          g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, this);
+//          g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, null);
+//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, null);
+//          g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, null);
 //      }
 //      else  {                                             // center
-//          g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, this);
-//          g2d.drawImage (imgLamp [10].img, x0 + 18, y0 +  6, this);
-//          g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, this);
+            int idxLeft   = 5;
+            int idxCenter = 10;
+            int idxRight  = 5;
 //      }
+            g2d.drawImage (lamp [idxLeft].img,   x0 +  5, y0 + 17, null);
+            g2d.drawImage (lamp [idxCenter].img, x0 + 18, y0 +  6, null);
+            g2d.drawImage (lamp [idxRight].img,  x0 + 34, y0 + 18, null);
     }
 
 //  // ------------------------------------------------------------------------
