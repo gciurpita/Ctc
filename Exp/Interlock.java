@@ -198,7 +198,7 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
 
-                if (! trk.check (col, row, 'B'))  {
+                if (! trk.check (col, row, 'B', fld [4]))  {
                     loadPnlErr (line, "invalid block tile");
                     err++;
                     continue;
@@ -210,8 +210,10 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("ctc"))  {
-                for (int n = 1; n < fld.length; n++)
+                for (int n = 1; n < fld.length; n++)  {
                     panel.addLever (Integer.parseInt (fld [n]));
+                    Sym sym = symList.add ("L" + fld [n], 'L');
+                }
             }
 
             // -----------------------------------
@@ -243,7 +245,7 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                if (! trk.check (col, row, '*'))  {
+                if (! trk.check (col, row, '*', fld [4]))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
@@ -265,7 +267,7 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                if (! trk.check (col, row, 'x'))  {
+                if (! trk.check (col, row, 'x', fld [4]))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
@@ -283,7 +285,7 @@ public class Interlock extends JPanel
             }
         }
 
-     // symList.disp ();
+        symList.disp ();
 
         if (0 < err)  {
             System.out.format ("loadPnl: %d errors\n", err);

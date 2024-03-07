@@ -29,9 +29,6 @@ public class Panel {
             this.id   = id;
             this.pos  = 0 == (id % 2) ? 'C' : 'L';
             this.cond = this.pos;
-
-            System.out.format (
-                "Lever: id %2d, pos %c, cond %c\n", id, this.pos, this.cond);
         }
     }
 
@@ -132,11 +129,13 @@ public class Panel {
 
         iconSigHt  = signal [0].img.getHeight (null);
         iconSigWid = signal [0].img.getWidth  (null);
-        System.out.format ( ", sig wid %d, ht %d\n", iconSigWid, iconSigHt);
+        System.out.format ( ", sig wid %d, ht %d", iconSigWid, iconSigHt);
 
         int iconCodeHt  = code [0].img.getHeight (null);
         int iconCodeWid = code [0].img.getWidth  (null);
-        System.out.format ( ", cod wid %d, ht %d\n", iconCodeWid, iconCodeHt);
+        System.out.format ( ", cod wid %d, ht %d", iconCodeWid, iconCodeHt);
+
+        System.out.println ();
 
         colHt = iconToHt + iconSigHt + 2 * iconCodeHt;
     }

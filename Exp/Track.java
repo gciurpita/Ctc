@@ -28,11 +28,36 @@ public class Track {
 
     String    cfgFile  = "../Resources/blackScreenTiles.cfg";
 
+    // -------------------------------------
     class Tile   {
         Image   img;
     }
     Tile      tile []  = new Tile [90];
 
+    // -------------------------------------
+    class ToSig {
+        int     col;
+        int     row;
+        String  name;
+
+        ToSig   next;
+
+        // -------------------------------------
+        public ToSig (
+            int     col,
+            int     row,
+            String  name,
+            ToSig   toSig )
+        {
+            this.col  = col;
+            this.row  = row;
+            this.name = name;
+            next      = toSig;
+        }
+    };
+    ToSig     toSigHd = null;
+
+    // -------------------------------------
     int       panelHt;
     int       panelWid;
     int       tileHt;
@@ -81,26 +106,44 @@ public class Track {
     }
 
     // ------------------------------------------------------------------------
+    final int BlockHl  = 5;
+
+    final int AngleDl  = 8;
+    final int AngleDR  = 9;
+    final int AngleUL  = 10;
+    final int AngleUR  = 11;
+
+    final int HsignalR = 16;
+    final int HsignalL = 17;
+
     public boolean check (
         int     col,
         int     row,
-        char    type )
+        char    type,
+        String  name )
     {
         byte tile = trk [col][row];
 
-     // System.out.format ("  Track.check: 0x%02x %2d x %2d\n", tile, col, row);
+        if (false)
+            System.out.format (
+                "  Track.check: %d %2d x %2d, %c\n", tile, col, row, type);
         
-        if ('*' == type)
-            return (16 <= tile && tile <= 17);
-        else if ('B' == type)
-            return (5 == tile);
-        else if ('x' == type)
-            return (8 <= tile && tile <= 11);
+        if ('*' == type)  {
+            if (tile < HsignalR && HsignalL < tile)
+                return false;
+        }
+        else if ('B' == type)  {
+            if (BlockHl != tile)
+                return false;
+        }
+        else if ('x' == type)  {
+            if (tile < AngleDl && AngleUR < tile)
+                return false;
+        }
 
-        System.out.format ("Error Track.check unknown type '%c'\n", type);
-        System.exit (2);
+        toSigHd = new ToSig (col, row, name, toSigHd);
 
-        return false;
+        return true;
     }
 
     // ------------------------------------------------------------------------
