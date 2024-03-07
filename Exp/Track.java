@@ -116,6 +116,19 @@ public class Track {
         }
     }
 
+    // --------------------------------
+    public void mousePressed (
+        int  x,
+        int  y )
+    {
+        int  col  = x / tileWid;
+        int  row  = y / tileHt;
+        byte tile = trk [col][row];
+
+        System.out.format (
+            "Track.mousePressed: %d, %d, <%d, %d> %d\n", x, y, row, col, tile);
+    }
+
     // ------------------------------------------------------------------------
     public void newRow (
         String  s )

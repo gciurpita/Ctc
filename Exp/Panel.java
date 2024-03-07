@@ -52,6 +52,7 @@ public class Panel {
     int       iconSigHt;
     int       iconSigWid;
 
+    int       y0Panel;
     int       colWid     = 64;
     int       colHt;
 
@@ -150,6 +151,44 @@ public class Panel {
         int  ctcId)
     {
         return (null != lvr [ctcId]);
+    }
+
+    // --------------------------------
+    public void mousePressed (
+        int  x,
+        int  y )
+    {
+        int col   = x / colWid;
+        int dX    = x % colWid;
+        int num   = 1 + (2 * col);
+
+        System.out.format (
+            "Panel.mousePressed: %d %d, col %d, num %d\n", x, y, col, num);
+
+        if (null == lvr [num])
+            return;
+
+        if (y - y0Panel < iconToHt)  {
+            if ((dX < colWid / 2))
+                lvr [num].pos = 'L';
+            else
+                lvr [num].pos = 'R';
+
+            System.out.format (
+                "  Panel.mousePressed: TO %d %c\n", num, lvr [num].pos);
+        }
+        else if (y - y0Panel < (iconToHt + iconSigHt))  {
+            num += 1;
+            if ((dX < colWid / 3))
+                lvr [num].pos = 'L';
+            else if ((colWid * 2 / 3) < dX)
+                lvr [num].pos = 'R';
+            else
+                lvr [num].pos = 'C';
+
+            System.out.format (
+                "  Panel.mousePressed: Sig %d %c\n", num, lvr [num].pos);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -288,9 +327,10 @@ public class Panel {
     {
         System.out.format ("Panel paint:\n");
 
- //     Rectangle   r      = frame.getBounds();
-        int         y1     = y0 + iconToHt;
-        int         y2     = y1 + iconSigHt;
+        y0Panel  = y0;
+
+        int   y1 = y0 + iconToHt;
+        int   y2 = y1 + iconSigHt;
 
         g2d.setColor (new Color(115, 104, 50));  // #736832
         g2d.fillRect (0, y0, wid, y0+ht);

@@ -22,7 +22,7 @@ import javax.imageio.ImageIO;
 
 // -----------------------------------------------------------------------------
 public class Interlock extends JPanel
-     // implements MouseListener, KeyListener
+        implements MouseListener        // , KeyListener
 {
     JFrame   frame    = new JFrame ();
 
@@ -43,6 +43,8 @@ public class Interlock extends JPanel
         String pnlFile )
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
+        addMouseListener (this);
+
         loadPnl (pnlFile);
 
         // set up screen graphics
@@ -112,6 +114,26 @@ public class Interlock extends JPanel
         else
             intrLck = new Interlock (args [i]);
     }
+
+    // ------------------------------------------------------------------------
+    // process mouse press, search for element closest to mouse location
+
+    public void mousePressed  (MouseEvent ev)
+    {
+     // System.out.format ("mousePressed: %d %d\n", ev.getX(), ev.getY());
+        if (ev.getY() < trkHt)
+            trk.mousePressed (ev.getX(), ev.getY());
+        else
+            panel.mousePressed (ev.getX(), ev.getY());
+
+        repaint ();
+    }
+
+    // ignore these mouse events
+    public void mouseClicked  (MouseEvent e) { }
+    public void mouseEntered  (MouseEvent e) { }
+    public void mouseExited   (MouseEvent e) { }
+    public void mouseReleased (MouseEvent e) { }
 
     // ------------------------------------------------------------------------
     //   load panel decription
