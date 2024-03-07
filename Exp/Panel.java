@@ -38,7 +38,9 @@ public class Panel {
     // --------------------------------
     final int Nlvr       = 41;   // 1-40
     Lever     lvr  []    = new Lever [41];
-    boolean   codeBut [] = new boolean [Nlvr /2];
+    int       codeBut [] = new int [Nlvr /2];
+
+    Control   ctl;
 
     String    cfgFile  = "../Resources/ctcNumbered.cfg";
     class Icon   {
@@ -62,9 +64,11 @@ public class Panel {
     int       dbg        = 0;
 
     // --------------------------------
-    public Panel ()
+    public Panel (
+        Control  ctl )
             throws FileNotFoundException, IOException
     {
+        this.ctl = ctl;
         loadIcons ();
     }
 
@@ -157,6 +161,18 @@ public class Panel {
     }
 
     // --------------------------------
+    public void response (
+        char    type,
+        int     id,
+        char    state )
+    {
+        System.out.format (
+            " response: %c %2d %c\n", type, id, state);
+
+        lvr [id].cond = state;
+    }
+
+    // --------------------------------
     public void mousePressed (
         int  x,
         int  y )
@@ -180,6 +196,7 @@ public class Panel {
             else
                 lvr [num].pos = 'R';
 
+            ctl.send ('T', num, lvr [num].pos);
         }
 
         // signal
@@ -191,14 +208,26 @@ public class Panel {
                 lvr [num].pos = 'R';
             else
                 lvr [num].pos = 'C';
+
+            ctl.send ('*', num, lvr [num].pos);
         }
 
         // code
         else
-            codeBut [num] = ! codeBut [num];
+            codeBut [num] = 5;
 
-        // should send code
-        lvr [num].cond = lvr [num].pos;
+    }
+
+    // --------------------------------
+    public void timer ()
+    {
+        for (int num = 1; num < lvr.length; num += 2)  {
+            if (null == lvr [num])
+                continue;
+
+            if (0 < codeBut [num])
+                codeBut [num]--;
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -355,13 +384,11 @@ public class Panel {
             if (null != lvr [num])
                 paintToPlate  (g2d, x0, y0, col, num);
 
-            g2d.drawLine (0, y2, wid, y2);
-
             if (null != lvr [num+1])
                 paintSigPlate (g2d, x0, y1, col, num+1);
 
             // code button
-            int  idx = codeBut [num] ? 1 : 0;
+            int  idx = 0 < codeBut [num] ? 1 : 0;
             g2d.drawImage (code [idx].img, x0 + 15, y2 + 10, null);
         }
     }

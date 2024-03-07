@@ -26,9 +26,10 @@ public class Interlock extends JPanel
 {
     JFrame   frame    = new JFrame ();
 
-    Panel    panel    = new Panel ();
+    Control  ctl      = new Control ();
+    Panel    panel    = new Panel   (ctl);
     SymList  symList  = new SymList ();
-    Track    trk      = new Track ();
+    Track    trk      = new Track   ();
 
     int      canvasHt;
     int      canvasWid;
@@ -84,7 +85,17 @@ public class Interlock extends JPanel
         };
 
         Timer timer = new Timer("Timer");
-        timer.scheduleAtFixedRate (task, 0, 3000);  // 1 sec
+        timer.scheduleAtFixedRate (task, 0, 500);
+    }
+
+    // --------------------------------
+    //   timer task
+    private void timerTask ()
+    {
+        ctl.receive (panel);
+        panel.timer ();
+
+        repaint ();
     }
 
     // --------------------------------
@@ -94,6 +105,8 @@ public class Interlock extends JPanel
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
         loadPnl (pnlFile);
+
+        // ???????????????????
 
         cmdProcess (cmdFile);
     }
@@ -128,13 +141,13 @@ public class Interlock extends JPanel
     // ------------------------------------------------------------------------
     // process mouse press, search for element closest to mouse location
 
-    public void mousePressed  (MouseEvent ev)
+    public void mousePressed  (MouseEvent e)
     {
-     // System.out.format ("mousePressed: %d %d\n", ev.getX(), ev.getY());
-        if (ev.getY() < trkHt)
-            trk.mousePressed (ev.getX(), ev.getY());
+     // System.out.format ("mousePressed: %d %d\n", e.getX(), e.getY());
+        if (e.getY() < trkHt)
+            trk.mousePressed (e.getX(), e.getY());
         else
-            panel.mousePressed (ev.getX(), ev.getY());
+            panel.mousePressed (e.getX(), e.getY());
 
         repaint ();
     }
@@ -144,12 +157,6 @@ public class Interlock extends JPanel
     public void mouseEntered  (MouseEvent e) { }
     public void mouseExited   (MouseEvent e) { }
     public void mouseReleased (MouseEvent e) { }
-
-    // ------------------------------------------------------------------------
-    //   timer task
-    private void timerTask ()
-    {
-    }
 
     // ------------------------------------------------------------------------
     //   load panel decription
