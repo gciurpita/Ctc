@@ -22,6 +22,7 @@ public class Panel {
         char    cond;
         char    pos;
 
+        // --------------------------------
         public Lever (
             int  id )
         {
@@ -35,7 +36,9 @@ public class Panel {
     }
 
     // --------------------------------
-    Lever   lvr  []  = new Lever [41];    // 1-40
+    final int Nlvr       = 41;   // 1-40
+    Lever     lvr  []    = new Lever [41];
+    boolean   codeBut [] = new boolean [Nlvr /2];
 
     String    cfgFile  = "../Resources/ctcNumbered.cfg";
     class Icon   {
@@ -162,21 +165,24 @@ public class Panel {
         int dX    = x % colWid;
         int num   = 1 + (2 * col);
 
-        System.out.format (
-            "Panel.mousePressed: %d %d, col %d, num %d\n", x, y, col, num);
+        if (false)
+            System.out.format (
+                "Panel.mousePressed: %d %d, col %d, num %d\n",
+                    x, y, col, num);
 
         if (null == lvr [num])
             return;
 
+        // turnout
         if (y - y0Panel < iconToHt)  {
             if ((dX < colWid / 2))
                 lvr [num].pos = 'L';
             else
                 lvr [num].pos = 'R';
 
-            System.out.format (
-                "  Panel.mousePressed: TO %d %c\n", num, lvr [num].pos);
         }
+
+        // signal
         else if (y - y0Panel < (iconToHt + iconSigHt))  {
             num += 1;
             if ((dX < colWid / 3))
@@ -185,10 +191,14 @@ public class Panel {
                 lvr [num].pos = 'R';
             else
                 lvr [num].pos = 'C';
-
-            System.out.format (
-                "  Panel.mousePressed: Sig %d %c\n", num, lvr [num].pos);
         }
+
+        // code
+        else
+            codeBut [num] = ! codeBut [num];
+
+        // should send code
+        lvr [num].cond = lvr [num].pos;
     }
 
     // ------------------------------------------------------------------------
@@ -325,7 +335,7 @@ public class Panel {
         int         wid,
         int         ht )
     {
-        System.out.format ("Panel paint:\n");
+     // System.out.format ("Panel paint:\n");
 
         y0Panel  = y0;
 
@@ -351,10 +361,8 @@ public class Panel {
                 paintSigPlate (g2d, x0, y1, col, num+1);
 
             // code button
-            Image img = code [1].img;
-         // if (' ' != symCode [col].cond)
-         //     img  = imgCode [0].img;
-            g2d.drawImage (img, x0 + 15, y2 + 10, null);
+            int  idx = codeBut [num] ? 1 : 0;
+            g2d.drawImage (code [idx].img, x0 + 15, y2 + 10, null);
         }
     }
 };
