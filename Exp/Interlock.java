@@ -26,7 +26,7 @@ public class Interlock extends JPanel
 {
     JFrame   frame    = new JFrame ();
 
-    Lever    lever    = new Lever ();
+    Panel    panel    = new Panel ();
     SymList  symList  = new SymList ();
     Track    trk      = new Track ();
 
@@ -52,7 +52,7 @@ public class Interlock extends JPanel
 
         nCol      = canvasWid / colWid;
         trkHt     = trk.panelHt;
-        lvrHt     = lever.colHt;
+        lvrHt     = panel.colHt;
 
         canvasHt  = trkHt + lvrHt;
 
@@ -166,7 +166,7 @@ public class Interlock extends JPanel
             // -----------------------------------
             else if (fld[0].equals("ctc"))  {
                 for (int n = 1; n < fld.length; n++)
-                    lever.addLever (Integer.parseInt (fld [n]));
+                    panel.addLever (Integer.parseInt (fld [n]));
             }
 
             // -----------------------------------
@@ -192,7 +192,7 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
 
-                if (! lever.check (ctcCol)) {
+                if (! panel.check (ctcCol)) {
                     loadPnlErr (line, "invalid ctc ID");
                     err++;
                     continue;
@@ -214,7 +214,7 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
 
-                if (! lever.check (ctcCol)) {
+                if (! panel.check (ctcCol)) {
                     loadPnlErr (line, "invalid invalid ctc ID");
                     err++;
                     continue;
@@ -326,6 +326,6 @@ public class Interlock extends JPanel
         g2d.fillRect (0, 0, r.width, r.height);
 
         trk.paint (g2d);
-        lever.paint (g2d, trkHt, canvasWid, lvrHt);
+        panel.paint (g2d, trkHt, canvasWid, lvrHt);
     }
 }

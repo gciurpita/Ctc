@@ -16,7 +16,7 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 // -----------------------------------------------------------------------------
-public class Lever {
+public class Panel {
     int     lvr  []  = new int [41];    // 1-40
 
     String    cfgFile  = "../Resources/ctcNumbered.cfg";
@@ -40,7 +40,7 @@ public class Lever {
     int       dbg        = 0;
 
     // --------------------------------
-    public Lever ()
+    public Panel ()
             throws FileNotFoundException, IOException
     {
         loadIcons ();
@@ -121,7 +121,7 @@ public class Lever {
         int  ctcId)
     {
         if (lvr.length <= ctcId)  {
-            System.err.format ("Error Lever.addLever range %d\n", ctcId);
+            System.err.format ("Error Panel.addLever range %d\n", ctcId);
             System.exit (3);
         }
 
@@ -279,7 +279,7 @@ public class Lever {
         int         wid,
         int         ht )
     {
-        System.out.format ("Lever paint:\n");
+        System.out.format ("Panel paint:\n");
 
  //     Rectangle   r      = frame.getBounds();
         int         y1     = y0 + iconToHt;
