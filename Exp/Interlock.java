@@ -17,8 +17,8 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import javax.imageio.ImageIO;
 
-// import java.util.Timer;
-// import java.util.TimerTask;
+import java.util.Timer;
+import java.util.TimerTask;
 
 // -----------------------------------------------------------------------------
 public class Interlock extends JPanel
@@ -75,6 +75,16 @@ public class Interlock extends JPanel
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
         frame.setBounds (900, 0, r.width, r.height);
+
+        // create timer
+        TimerTask task = new TimerTask() {
+            public void run() {
+                timerTask ();
+            }
+        };
+
+        Timer timer = new Timer("Timer");
+        timer.scheduleAtFixedRate (task, 0, 3000);  // 1 sec
     }
 
     // --------------------------------
@@ -134,6 +144,12 @@ public class Interlock extends JPanel
     public void mouseEntered  (MouseEvent e) { }
     public void mouseExited   (MouseEvent e) { }
     public void mouseReleased (MouseEvent e) { }
+
+    // ------------------------------------------------------------------------
+    //   timer task
+    private void timerTask ()
+    {
+    }
 
     // ------------------------------------------------------------------------
     //   load panel decription
