@@ -17,7 +17,25 @@ import javax.imageio.ImageIO;
 
 // -----------------------------------------------------------------------------
 public class Panel {
-    int     lvr  []  = new int [41];    // 1-40
+    private class Lever {
+        int     id;
+        char    cond;
+        char    pos;
+
+        public Lever (
+            int  id )
+        {
+            this.id   = id;
+            this.pos  = 0 == (id % 2) ? 'C' : 'L';
+            this.cond = this.pos;
+
+            System.out.format (
+                "Lever: id %2d, pos %c, cond %c\n", id, this.pos, this.cond);
+        }
+    }
+
+    // --------------------------------
+    Lever   lvr  []  = new Lever [41];    // 1-40
 
     String    cfgFile  = "../Resources/ctcNumbered.cfg";
     class Icon   {
@@ -58,7 +76,7 @@ public class Panel {
         while ((line = br.readLine()) != null)  {
             String[]    fields = line.split("  *");
             if (0 != dbg)
-                System.out.format (" loadTiles: %s - %s\n", line, fields [0]);
+                System.out.format (" loadIcon: %s - %s\n", line, fields [0]);
 
             if (! fields[0].equals("icon"))
                 continue;
@@ -97,13 +115,12 @@ public class Panel {
                 code [id].img  = ImageIO.read (inFile);
             }
 
-            System.out.format ("  loadIcons: %s\n", fields [3]);
+         // System.out.format ("  loadIcons: %s\n", fields [3]);
         }
 
         iconToHt  = turnout [0].img.getHeight (null);
         iconToWid = turnout [0].img.getWidth  (null);
-        System.out.format (
-                "loadIcons: to wid %d, ht %d", iconToWid, iconToHt);
+        System.out.format ("loadIcons: to wid %d, ht %d", iconToWid, iconToHt);
 
         iconSigHt  = signal [0].img.getHeight (null);
         iconSigWid = signal [0].img.getWidth  (null);
@@ -125,14 +142,14 @@ public class Panel {
             System.exit (3);
         }
 
-        lvr [ctcId]++;
+        lvr [ctcId] = new Lever (ctcId);
     }
 
     // --------------------------------
     public boolean check (
         int  ctcId)
     {
-        return (0 < lvr [ctcId]);
+        return (null != lvr [ctcId]);
     }
 
     // ------------------------------------------------------------------------
@@ -142,10 +159,10 @@ public class Panel {
         int         x0,
         int         y0,
         int         col,
-        int         lvrIdx )
+        int         lvrId )
     {
         if (0 != dbg)
-            System.out.format ("  paintToPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
+            System.out.format ("  paintToPlate: %3d %3d, %d\n", x0, y0, lvrId);
 
         g2d.setColor (Color.white);
 
@@ -158,18 +175,15 @@ public class Panel {
  //         g2d.drawString (to.lbl, to.x + to.xLbl, to.y + to.yLbl);
 
         // plate & lvr
-        g2d.drawImage (turnout [col/2].img,   x0, y0, null);
-     // g2d.drawImage (lever   [ctc.pos].img, x0 + 6, y0 + 44, null);
-        g2d.drawImage (lever   [0]      .img, x0 + 6, y0 + 44, null);
-
-     // to   = ctcCol [col].symTo;
+        int pos = ('R' == lvr [lvrId].pos) ? 1 : 0;
+        g2d.drawImage (turnout [lvrId/2].img,   x0, y0, null);
+        g2d.drawImage (lever   [pos].img, x0 + 6, y0 + 44, null);
 
         // lamps
         int lampIdxLeft  = 5;
         int lampIdxRight = 1;
 
-     // if ('l' == lvr.cond)  {
-        if (true)  {
+        if ('L' == lvr [lvrId].cond)  {
             lampIdxLeft  = 6;
             lampIdxRight = 0;
         }
@@ -183,7 +197,7 @@ public class Panel {
         int         x0,
         int         y0,
         int         col,
-        int         lvrIdx )
+        int         lvrId )
     {
 //      if (0 != dbg)
 //          System.out.format ("  paintSigPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
@@ -213,33 +227,26 @@ public class Panel {
 //      }
 
         // plate & lvr
-        g2d.drawImage (signal [col/2].img,   x0, y0, null);
-     // g2d.drawImage (lever  [ctc.pos].img, x0 + 5, y0 + 57, null);
-        g2d.drawImage (lever  [2].img,       x0 + 5, y0 + 57, null);
+        char posCh = lvr [lvrId].pos;
+        int  pos   = 'R' == posCh ? 1 : 'C' == posCh ? 2 : 0;
+        g2d.drawImage (signal [lvrId/2].img,   x0, y0, null);
+        g2d.drawImage (lever  [pos].img,       x0 + 5, y0 + 57, null);
 
-//      if (false)
-//          System.out.format (
-//              "paintSigPlate: Num %d, lamp %c\n", col, ctcCol [col].lamp);
+        // lamps
+        int idxLeft   = 5;
+        int idxCenter = 9;
+        int idxRight  = 5;
 
-//      // lamps
-//      if ('L' == ctcCol [col].lamp)  {                    // left
-//          g2d.drawImage (imgLamp [6].img,  x0 +  5, y0 + 17, null);
-//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, null);
-//          g2d.drawImage (imgLamp [5].img,  x0 + 34, y0 + 18, null);
-//      }
-//      else if ('R' == ctcCol [col].lamp)  {               // left
-//          g2d.drawImage (imgLamp [5].img,  x0 +  5, y0 + 17, null);
-//          g2d.drawImage (imgLamp [9].img,  x0 + 18, y0 +  6, null);
-//          g2d.drawImage (imgLamp [6].img,  x0 + 34, y0 + 18, null);
-//      }
-//      else  {                                             // center
-            int idxLeft   = 5;
-            int idxCenter = 10;
-            int idxRight  = 5;
-//      }
-            g2d.drawImage (lamp [idxLeft].img,   x0 +  5, y0 + 17, null);
-            g2d.drawImage (lamp [idxCenter].img, x0 + 18, y0 +  6, null);
-            g2d.drawImage (lamp [idxRight].img,  x0 + 34, y0 + 18, null);
+        if ('L' == lvr [lvrId].cond)
+            idxLeft   = 6;
+        else if ('R' == lvr [lvrId].cond)
+            idxRight  = 6;
+        else        // 'C'
+            idxCenter = 10;
+
+        g2d.drawImage (lamp [idxLeft].img,   x0 +  5, y0 + 17, null);
+        g2d.drawImage (lamp [idxCenter].img, x0 + 18, y0 +  6, null);
+        g2d.drawImage (lamp [idxRight].img,  x0 + 34, y0 + 18, null);
     }
 
 //  // ------------------------------------------------------------------------
@@ -289,19 +296,19 @@ public class Panel {
         g2d.fillRect (0, y0, wid, y0+ht);
  
         for (int num = 1; num < lvr.length; num += 2)  {
-            if (0 == lvr [num] && 0 == lvr [num+1])
+            if (null == lvr [num] && null == lvr [num+1])
                 continue;
 
             int col = 1 + (num-1) / 2;
             int x0  = colWid * ((num-1) / 2);
 
-            if (0 < lvr [num])
-                paintToPlate  (g2d, x0, y0, num, num);
+            if (null != lvr [num])
+                paintToPlate  (g2d, x0, y0, col, num);
 
             g2d.drawLine (0, y2, wid, y2);
 
-            if (0 < lvr [num+1])
-                paintSigPlate (g2d, x0, y1, num, num);
+            if (null != lvr [num+1])
+                paintSigPlate (g2d, x0, y1, col, num+1);
 
             // code button
             Image img = code [1].img;
