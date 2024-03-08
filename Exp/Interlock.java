@@ -61,11 +61,13 @@ public class Interlock extends JPanel
 
         this.setPreferredSize (new Dimension (canvasWid, canvasHt));
 
-        System.out.format ("Interlock: tile wid %d", tileWid);
-        System.out.format (", CTC col wid %d", colWid);
-        System.out.format (", canvas wid %d", canvasWid);
-        System.out.format (", canvas ht %d", canvasHt);
-        System.out.println ();
+        if (false) {
+            System.out.format ("Interlock: tile wid %d", tileWid);
+            System.out.format (", CTC col wid %d", colWid);
+            System.out.format (", canvas wid %d", canvasWid);
+            System.out.format (", canvas ht %d", canvasHt);
+            System.out.println ();
+        }
 
         frame.setContentPane (this);
         frame.pack ();
@@ -146,8 +148,10 @@ public class Interlock extends JPanel
      // System.out.format ("mousePressed: %d %d\n", e.getX(), e.getY());
         if (e.getY() < trkHt)
             trk.mousePressed (e.getX(), e.getY());
-        else
-            panel.mousePressed (e.getX(), e.getY());
+        else  {
+            if (panel.mousePressed (e.getX(), e.getY()))
+                symList.checkRules ();
+        }
 
         repaint ();
     }

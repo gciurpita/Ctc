@@ -44,5 +44,14 @@ public class Sym  {
                 System.out.format (" sym.addRule: ruleList\n");
 
      // ruleList.disp (name);
-   }
+     }
+
+    // --------------------------------
+    public void disp ()
+    {
+        System.out.format (" Sym %4s  %c  %d", name, cond, lock);
+        if (null != ruleList)
+            System.out.format (" rules");
+        System.out.println ();
+    }
 }

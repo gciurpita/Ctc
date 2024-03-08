@@ -172,7 +172,7 @@ public class Panel {
     }
 
     // --------------------------------
-    public void mousePressed (
+    public boolean mousePressed (
         int  x,
         int  y )
     {
@@ -186,7 +186,7 @@ public class Panel {
                     x, y, col, num);
 
         if (null == lvr [num])
-            return;
+            return false;
 
         // turnout
         if (y - y0Panel < iconToHt)  {
@@ -212,9 +212,12 @@ public class Panel {
         }
 
         // code
-        else
+        else {
             codeBut [num] = 5;
+            return true;
+        }
 
+        return false;
     }
 
     // --------------------------------
