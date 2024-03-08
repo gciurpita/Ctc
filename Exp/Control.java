@@ -42,6 +42,7 @@ public class Control
 
     // ---------------------------------------------------------
     public void receive (
+        Track  track,
         Panel  panel )
     {
         if (null == cmd)
@@ -53,6 +54,8 @@ public class Control
         System.out.format (
             " receive: %c %2d %c\n", cmd.type, cmd.id, cmd.state);
 
+        if ('T' == cmd.type || '*' == cmd.type)
+            track.set (cmd.state, Integer.toString (cmd.id));
         panel.response (cmd.type, cmd.id, cmd.state);
         cmd = cmd.next;
     }

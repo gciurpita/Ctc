@@ -94,7 +94,7 @@ public class Interlock extends JPanel
     //   timer task
     private void timerTask ()
     {
-        ctl.receive (panel);
+        ctl.receive (trk, panel);
         panel.timer ();
 
         repaint ();
@@ -202,14 +202,14 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
 
-                if (! trk.check (col, row, 'B', fld [4]))  {
+                if (! trk.check (col, row, 'B', null, null))  {
                     loadPnlErr (line, "invalid block tile");
                     err++;
                     continue;
                 }
 
                 System.out.format (
-                        " loadPnl block: add block ???\n");
+                        "     loadPnl block: add block ???\n");
             }
 
             // -----------------------------------
@@ -249,7 +249,7 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                if (! trk.check (col, row, '*', fld [4]))  {
+                if (! trk.check (col, row, '*', null, fld [4]))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
@@ -265,20 +265,21 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
 
+                Sym sym = symList.add (fld [4], 'x');
+
                 if (! panel.check (ctcCol)) {
                     loadPnlErr (line, "invalid invalid ctc ID");
                     err++;
                     continue;
                 }
 
-                if (! trk.check (col, row, 'x', fld [4]))  {
+                if (! trk.check (col, row, 'x', sym, fld [4]))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
                 }
 
                 System.out.format (" loadPnl turnout: %s\n", fld [4]);
-                Sym sym = symList.add (fld [4], 'x');
             }
 
             // -----------------------------------

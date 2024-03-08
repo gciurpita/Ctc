@@ -42,17 +42,35 @@ public class Track {
 
         ToSig   next;
 
+        byte    tile;
+        int     x;
+        int     y;
+        int     xLbl;
+        int     yLbl;
+
+        Sym     sym;
+
         // -------------------------------------
         public ToSig (
             int     col,
             int     row,
+            byte    tile,
+            Sym     sym,
             String  name,
             ToSig   toSig )
         {
             this.col  = col;
             this.row  = row;
+            this.tile = tile;
+            this.sym  = sym;
             this.name = name;
             next      = toSig;
+
+            this.x    = col * tileWid;
+            this.y    = row * tileHt;
+
+            if (null != sym)
+                this.sym.cond = 'N';
         }
     };
     ToSig     toSigHd = null;
@@ -106,9 +124,10 @@ public class Track {
     }
 
     // ------------------------------------------------------------------------
+    final int TrackH   = 2;
     final int BlockHl  = 5;
 
-    final int AngleDl  = 8;
+    final int AngleDL  = 8;
     final int AngleDR  = 9;
     final int AngleUL  = 10;
     final int AngleUR  = 11;
@@ -120,16 +139,13 @@ public class Track {
         int     col,
         int     row,
         char    type,
+        Sym     sym,
         String  name )
     {
         byte tile = trk [col][row];
 
-        if (false)
-            System.out.format (
-                "  Track.check: %d %2d x %2d, %c\n", tile, col, row, type);
-        
         if ('*' == type)  {
-            if (tile < HsignalR && HsignalL < tile)
+            if (tile < HsignalR || HsignalL < tile)
                 return false;
         }
         else if ('B' == type)  {
@@ -137,11 +153,59 @@ public class Track {
                 return false;
         }
         else if ('x' == type)  {
-            if (tile < AngleDl && AngleUR < tile)
+            if (tile < AngleDL || AngleUR < tile)
                 return false;
+            trk [col][row] = TrackH;
         }
+        else
+                return false;
 
-        toSigHd = new ToSig (col, row, name, toSigHd);
+        if (null == name)
+            return true;
+
+        toSigHd = new ToSig (col, row, tile, sym, name, toSigHd);
+
+        ToSig ts = toSigHd;
+        System.out.format ( "  Track.check: <%2d, %2d> %2d %s\n",
+                ts.col, ts.row, ts.tile, ts.name);
+
+        // set text offsets
+        switch (tile)  {
+        case AngleDL:
+            toSigHd.xLbl =  tileWid * 2/4;
+            toSigHd.yLbl =  tileWid * 7/4;
+            break;
+        case AngleDR:
+            toSigHd.xLbl =  tileWid * 6/4;
+            toSigHd.yLbl =  tileWid * 5/4;
+            break;
+        case AngleUL:
+            toSigHd.xLbl = -tileWid * 7/4;
+            toSigHd.yLbl =  tileWid * 1/4;
+            break;
+        case AngleUR:
+            toSigHd.xLbl =  tileWid * 6/4;
+            toSigHd.yLbl =  tileWid * 1/4;
+            break;
+
+        case HsignalL:
+            toSigHd.xLbl =  tileWid * 5/4;
+            toSigHd.yLbl =  tileWid * 3/4;
+            break;
+
+        case HsignalR:
+            toSigHd.xLbl =  tileWid * 3/4;
+            toSigHd.xLbl =  0;
+            toSigHd.yLbl =  tileWid * 3/4;
+
+        case BlockHl:
+            break;
+
+        default:    // flat
+            System.out.format ( "  Track.check: %d %2d x %2d, '%c' %s\n",
+                tile, col, row, type, name);
+            return false;
+        };
 
         return true;
     }
@@ -202,6 +266,29 @@ public class Track {
     }
 
     // ------------------------------------------------------------------------
+    public void set (
+        char    pos,
+        String  name )
+    {
+        System.out.format (" Track.set: '%c' %s\n", pos, name);
+
+        for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
+            if (ts.name.equals (name))  {
+                byte tile = TrackH;
+                if ('R' == pos)
+                    tile = ts.tile;
+
+                trk [ts.col][ts.row] = tile;
+                ts.sym.cond          = pos;
+
+                System.out.format ( "  Track.check: <%2d, %2d> %2d %s\n",
+                                    ts.col, ts.row, tile, ts.name);
+                break;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     public void paint (
         Graphics2D  g2d )
     {
@@ -225,6 +312,23 @@ public class Track {
                 else
                     g2d.drawImage (tile [idx].img, x0, y0, null);
             }
+        }
+
+        // add labels
+        g2d.setColor (Color.white);
+        for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
+            if (false)  {
+                System.out.format (" Track.paint: %4s", ts.name);
+                System.out.format (" %3d, %3d", ts.x, ts.y);
+                System.out.format (" -- %3d, %3d", ts.xLbl, ts.yLbl);
+                System.out.println ();
+            }
+
+            if (0 == ts.xLbl)  {
+                ts.xLbl = -(5 + g2d.getFontMetrics().stringWidth (ts.name));
+            }
+            g2d.drawString (ts.name, ts.x + ts.xLbl, ts.y + ts.yLbl);
+
         }
 
         // set turnouts -- are by default reversed
