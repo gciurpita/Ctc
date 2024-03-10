@@ -39,6 +39,7 @@ public class Track {
         int     col;
         int     row;
         String  name;
+        int     id;
 
         ToSig   next;
 
@@ -64,7 +65,8 @@ public class Track {
             this.tile = tile;
             this.sym  = sym;
             this.name = name;
-            next      = toSig;
+            this.id   = atoi (name);
+            this.next = toSig;
 
             this.x    = col * tileWid;
             this.y    = row * tileHt;
@@ -121,6 +123,22 @@ public class Track {
 
         tileHt  = tile [0].img.getHeight (null);
         tileWid = tile [0].img.getWidth  (null);
+    }
+
+    // --------------------------------
+    private int atoi (
+        String s )
+    {
+        int  val = 0;
+
+        for (int i = 0; i < s.length(); i++)  {
+            char c = s.charAt (i);
+            if (! Character.isDigit (c))
+                break;
+            val = 10*val + c - '0';
+        }
+
+        return val;
     }
 
     // ------------------------------------------------------------------------
@@ -270,21 +288,30 @@ public class Track {
         char    pos,
         String  name )
     {
-        System.out.format (" Track.set: '%c' %s\n", pos, name);
+        System.out.format ("  Track.set: '%c' \"%s\"\n", pos, name);
+        int id = atoi (name);
 
-        for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
-            if (ts.name.equals (name))  {
-                byte tile = TrackH;
-                if ('R' == pos)
-                    tile = ts.tile;
+        // TO case
+        if (1 == (id % 2))  {
+            for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
+                System.out.format (
+                    "    Track.set: \"%s\" %d\n", ts.name, ts.id);
+                if (ts.id == id)  {
+                    byte tile = TrackH;
+                    if ('R' == pos)         // right/reversed
+                        tile = ts.tile;
 
-                trk [ts.col][ts.row] = tile;
-                ts.sym.cond          = pos;
+                    trk [ts.col][ts.row] = tile;
+                    ts.sym.cond          = pos;
 
-                System.out.format ( "  Track.check: <%2d, %2d> %2d %s\n",
+                    System.out.format ( "   Track.set: <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
-                break;
+                }
             }
+        }
+
+        // signal case
+        else {
         }
     }
 
@@ -330,16 +357,5 @@ public class Track {
             g2d.drawString (ts.name, ts.x + ts.xLbl, ts.y + ts.yLbl);
 
         }
-
-        // set turnouts -- are by default reversed
- //     if (false)  {
- //     for (int i = 0; i < symToSize; i++)  {
- //         final int  TrackH  = 2;
- //         PnlSym to = symTo [i];
- //      // System.out.format (" paintTrack: %c %s\n", to.cond, to.lbl);
- //         if ('N' == to.cond)
- //             g2d.drawImage (imgTile [TrackH].img, to.x, to.y, null);
- //     }
- //     }
     }
 }

@@ -166,7 +166,7 @@ public class Panel {
         char    state )
     {
         System.out.format (
-            " response: %c %2d %c\n", type, id, state);
+            "  Panel.response: %c %2d %c\n", type, id, state);
 
         lvr [id].cond = state;
     }
@@ -246,14 +246,6 @@ public class Panel {
 
         g2d.setColor (Color.white);
 
- //     CtcCol ctc  = ctcCol [col];
- //     PnlSym lvr  = ctcCol [col].symLvr;
- //     PnlSym to   = ctcCol [col].symTo;
-
-        // label turnouts
- //     for ( ; to != null; to = to.nxtSym)
- //         g2d.drawString (to.lbl, to.x + to.xLbl, to.y + to.yLbl);
-
         // plate & lvr
         int pos = ('R' == lvr [lvrId].pos) ? 1 : 0;
         g2d.drawImage (turnout [lvrId/2].img,   x0, y0, null);
@@ -279,33 +271,6 @@ public class Panel {
         int         col,
         int         lvrId )
     {
-//      if (0 != dbg)
-//          System.out.format ("  paintSigPlate: %3d %3d, %d\n", x0, y0, lvrIdx);
-
-//      final int  SigRred = 16;
-//      final int  SigLred = 17;
-//      final int  SigRgr  = 46;
-//      final int  SigLgr  = 47;
-
-//      g2d.setColor (Color.white);
-
-//      CtcCol ctc  = ctcCol [col];
-//      PnlSym lvr  = ctcCol [col].symLvr;
-//      PnlSym symL = ctcCol [col].symSigL;
-//      PnlSym symR = ctcCol [col].symSigR;
-
-//      int    xOff = tileWid * 5/4;
-//      int    yOff = tileWid * 3/4;
-
-//      // signal labels
-//      for (symL = ctcCol [col].symSigL; symL != null; symL = symL.nxtSym)
-//          g2d.drawString (symL.lbl, symL.x + xOff, symL.y + yOff);
-
-//      for (symR = ctcCol [col].symSigR; symR != null; symR = symR.nxtSym)  {
-//          int xOff2 = 5 + g2d.getFontMetrics().stringWidth (symR.lbl);
-//          g2d.drawString (symR.lbl, symR.x - xOff2, symR.y + yOff);
-//      }
-
         // plate & lvr
         char posCh = lvr [lvrId].pos;
         int  pos   = 'R' == posCh ? 1 : 'C' == posCh ? 2 : 0;
