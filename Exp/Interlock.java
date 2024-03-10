@@ -22,7 +22,7 @@ import java.util.TimerTask;
 
 // -----------------------------------------------------------------------------
 public class Interlock extends JPanel
-        implements MouseListener        // , KeyListener
+        implements MouseListener, KeyListener
 {
     JFrame   frame    = new JFrame ();
 
@@ -44,6 +44,7 @@ public class Interlock extends JPanel
         String pnlFile )
             throws FileNotFoundException, IOException, IllegalArgumentException
     {
+        addKeyListener   (this);
         addMouseListener (this);
 
         loadPnl (pnlFile);
@@ -140,6 +141,35 @@ public class Interlock extends JPanel
             intrLck = new Interlock (args [i]);
     }
 
+    // --------------------------------
+    public void keyReleased (KeyEvent e) { }
+    public void keyPressed  (KeyEvent e) { }
+
+    public void keyTyped    (KeyEvent e)
+    {
+        System.out.println ("keyTyped:");
+        char    c = e.getKeyChar();
+        switch (c)  {
+            case 'c':
+                symList.checkRules ();
+                break;
+
+            case 'd':
+                symList.disp ();
+                break;
+
+            case '?':
+                System.out.format ("key commands:\n");
+                System.out.format ("    c - check rules\n");
+                System.out.format ("    d - list syms\n");
+                break;
+
+            default:
+                System.out.format ("keyTyped: %c unexpected\n", c);
+                break;
+        }
+    }
+
     // ------------------------------------------------------------------------
     // process mouse press, search for element closest to mouse location
 
@@ -153,6 +183,7 @@ public class Interlock extends JPanel
                 symList.checkRules ();
         }
 
+        requestFocusInWindow ();
         repaint ();
     }
 
