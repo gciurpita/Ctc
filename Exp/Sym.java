@@ -1,28 +1,37 @@
 public class Sym  {
     String      name;
     char        type;
+    int         id;
     char        cond;
     RuleList    ruleList;
     Sym         next;
+
     int         lock;
     boolean     dbg = false;
 
     // -------------------------------------
     public Sym (
         String  name,
-        char    type )
+        char    type,
+        int     id )
     {
         this.name = name;
+        this.id   = id;
         this.type = type;
         if ('*' == type)
             this.cond = 'S';
         else if ('L' == type)
-            this.cond = 'c';    // center
+            if (0 == (id % 2))
+                this.cond = 'c';    // center
+            else
+                this.cond = 'L';
         else
             this.cond = '_';
 
         ruleList = null;
         next     = null;
+
+     // System.out.format ("   Sym: '%c' %s\n", type, name);
     }
 
     // --------------------------------
@@ -49,7 +58,9 @@ public class Sym  {
     // --------------------------------
     public void disp ()
     {
-        System.out.format (" Sym %4s  %c  %d", name, cond, lock);
+        System.out.format (
+            " Sym %4s '%c' %4d, %c %d", name, type, id, cond, lock);
+
         if (null != ruleList)
             System.out.format (" rules");
         System.out.println ();

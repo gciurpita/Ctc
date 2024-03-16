@@ -19,16 +19,19 @@ import javax.imageio.ImageIO;
 public class Panel {
     private class Lever {
         int     id;
-        char    cond;
+ //     char    cond;
         char    pos;
+        Sym     sym;
 
         // --------------------------------
         public Lever (
-            int  id )
+            int  id,
+            Sym  sym )
         {
-            this.id   = id;
+ //         this.id   = id;
             this.pos  = 0 == (id % 2) ? 'C' : 'L';
-            this.cond = this.pos;
+ //         this.cond = this.pos;
+            this.sym  = sym;
         }
     }
 
@@ -142,21 +145,27 @@ public class Panel {
 
     // --------------------------------
     public void addLever (
-        int  ctcId)
+        int  ctcId,
+        Sym  sym )
     {
         if (lvr.length <= ctcId)  {
             System.err.format ("Error Panel.addLever range %d\n", ctcId);
             System.exit (3);
         }
 
-        lvr [ctcId] = new Lever (ctcId);
+        lvr [ctcId] = new Lever (ctcId, sym);
     }
 
     // --------------------------------
     public boolean check (
-        int  ctcId)
+        int  num,
+        int  id )
     {
-        return (null != lvr [ctcId]);
+        if (null == lvr [num])
+            return false;
+
+        lvr [num].id = id;      // duplicates id in turnout sym
+        return true;
     }
 
     // --------------------------------
@@ -168,7 +177,8 @@ public class Panel {
         System.out.format (
             "  Panel.response: %c %2d %c\n", type, id, state);
 
-        lvr [id].cond = state;
+ //     lvr [id].cond = state;
+        lvr [id].sym.cond = state;
     }
 
     // --------------------------------
@@ -195,18 +205,25 @@ public class Panel {
             else
                 lvr [num].pos = 'R';
 
-            ctl.send ('T', num, lvr [num].pos);
+            System.out.format (
+                " Panel.mousePressed: num %d, id %d  %s\n", 
+                    num, lvr [num].sym.id, lvr [num].sym.name);
+
+ //         ctl.send ('T', lvr [num].sym.id, lvr [num].pos);
+            ctl.send ('T', lvr [num].id, lvr [num].pos);
         }
 
         // signal
         else if (y - y0Panel < (iconToHt + iconSigHt))  {
             num += 1;
             if ((dX < colWid / 3))
-                lvr [num].pos = 'L';
+                lvr [num].pos = 'l';
             else if ((colWid * 2 / 3) < dX)
-                lvr [num].pos = 'R';
+                lvr [num].pos = 'r';
             else
-                lvr [num].pos = 'C';
+                lvr [num].pos = 'c';
+
+            lvr [num].sym.cond = lvr [num].pos;
 
             ctl.send ('*', num, lvr [num].pos);
         }
@@ -255,7 +272,8 @@ public class Panel {
         int lampIdxLeft  = 5;
         int lampIdxRight = 1;
 
-        if ('L' == lvr [lvrId].cond)  {
+ //     if ('L' == lvr [lvrId].cond)  {
+        if ('L' == lvr [lvrId].sym.cond)  {
             lampIdxLeft  = 6;
             lampIdxRight = 0;
         }
@@ -282,9 +300,11 @@ public class Panel {
         int idxCenter = 9;
         int idxRight  = 5;
 
-        if ('L' == lvr [lvrId].cond)
+ //     if ('L' == lvr [lvrId].cond)
+        if ('L' == lvr [lvrId].sym.cond)
             idxLeft   = 6;
-        else if ('R' == lvr [lvrId].cond)
+ //     else if ('R' == lvr [lvrId].cond)
+        else if ('R' == lvr [lvrId].sym.cond)
             idxRight  = 6;
         else        // 'C'
             idxCenter = 10;

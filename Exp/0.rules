@@ -34,18 +34,19 @@ block     2     5    4
 
 ctc    3 4 5 6 7 8
 
-#       ctc   row  col  lbl
-signal    4     0    8  4LB
-signal    4     2   15  4L
-signal    4     4    4  4R
-signal    8     4   15  8L
-signal    6     6    4  6R
-signal    6     6   11  6LB
+#       ctc   row  col  lbl  id
+signal    4     0    8  4LB  41
+signal    4     2   15  4L   42
+signal    4     4    4  4R   43
+signal    8     4   15  8L   80
+signal    6     6    4  6R   61
+signal    6     6   11  6LB  62
 
-turnout   3     3    5  3
-turnout   5     5    8  5
-turnout   7     3   12  7A
-turnout   7     5   14  7B
+#       ctc   row  col  lbl  id
+turnout   3     3    5  3   103
+turnout   5     5    8  5   105
+turnout   7     3   12  7A  107
+turnout   7     5   14  7B  107
 
 rule    4R  rL4  R3
 rule    4R  rL4  N3   N7A

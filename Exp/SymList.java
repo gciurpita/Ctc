@@ -5,7 +5,8 @@ public class SymList  {
     // -------------------------------------
     public Sym add (
         String  name,
-        char    type )
+        char    type,
+        int     id )
     {
      // boolean dbg = false;
 
@@ -16,7 +17,7 @@ public class SymList  {
             return sym;
         }
 
-        sym      = new Sym (name, type);
+        sym      = new Sym (name, type, id);
         sym.next = head;
         head     = sym;
 
@@ -27,13 +28,14 @@ public class SymList  {
     }
 
     // -------------------------------------
-    public void checkRules ()
+    public void checkRules (
+        Control   ctl )
     {
         System.out.println ("symList.checkRule:");
         for (Sym sym = head; null != sym; sym = sym.next) {
             if ('*' != sym.type || null == sym.ruleList)
                 continue;
-            sym.ruleList.checks ();
+            sym.ruleList.checks (ctl);
         }
     }
 

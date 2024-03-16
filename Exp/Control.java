@@ -55,8 +55,7 @@ public class Control
             " receive: %c %2d %c\n", cmd.type, cmd.id, cmd.state);
 
         if ('T' == cmd.type || '*' == cmd.type)
-            track.set (cmd.state, Integer.toString (cmd.id));
-        panel.response (cmd.type, cmd.id, cmd.state);
+            track.update (cmd.state, Integer.toString (cmd.id));
         cmd = cmd.next;
     }
 }

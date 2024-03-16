@@ -26,6 +26,8 @@ public class Track {
     int       nRow     = 0;
     int       maxCol   = 0;
 
+    Panel     panel;
+
     String    cfgFile  = "../Resources/blackScreenTiles.cfg";
 
     // -------------------------------------
@@ -38,8 +40,8 @@ public class Track {
     class ToSig {
         int     col;
         int     row;
+        int     ctcNum;
         String  name;
-        int     id;
 
         ToSig   next;
 
@@ -65,7 +67,6 @@ public class Track {
             this.tile = tile;
             this.sym  = sym;
             this.name = name;
-            this.id   = atoi (name);
             this.next = toSig;
 
             this.x    = col * tileWid;
@@ -86,9 +87,11 @@ public class Track {
     int       dbg      = 0;
 
     // ------------------------------------------------------------------------
-    public Track ()
+    public Track (
+        Panel  panel )
             throws FileNotFoundException, IOException
     {
+        this.panel = panel;
         loadTiles ();
     }
 
@@ -157,6 +160,7 @@ public class Track {
         int     col,
         int     row,
         char    type,
+        int     ctcNum,
         Sym     sym,
         String  name )
     {
@@ -184,8 +188,11 @@ public class Track {
         toSigHd = new ToSig (col, row, tile, sym, name, toSigHd);
 
         ToSig ts = toSigHd;
-        System.out.format ( "  Track.check: <%2d, %2d> %2d %s\n",
+        if (false)
+            System.out.format ( "  Track.check: <%2d, %2d> %2d %s\n",
                 ts.col, ts.row, ts.tile, ts.name);
+
+        toSigHd.ctcNum = ctcNum;
 
         // set text offsets
         switch (tile)  {
@@ -284,7 +291,7 @@ public class Track {
     }
 
     // ------------------------------------------------------------------------
-    public void set (
+    public void update (
         char    pos,
         String  name )
     {
@@ -294,9 +301,11 @@ public class Track {
         // TO case
         if (1 == (id % 2))  {
             for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
-                System.out.format (
-                    "    Track.set: \"%s\" %d\n", ts.name, ts.id);
-                if (ts.id == id)  {
+                if (false)
+                    System.out.format (
+                        "    Track.set: \"%s\" %d\n", ts.name, ts.sym.id);
+
+                if (ts.sym.id == id)  {
                     byte tile = TrackH;
                     if ('R' == pos)         // right/reversed
                         tile = ts.tile;
@@ -306,6 +315,8 @@ public class Track {
 
                     System.out.format ( "   Track.set: <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
+
+                    panel.response ('x', ts.ctcNum, pos);
                 }
             }
         }

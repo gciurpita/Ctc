@@ -88,14 +88,15 @@ public class RuleList  {
                 System.out.format ("  . %c %-4s", c, rule.sym.name);
         }
         if (match)
-            System.out.println (" -- match");
+            System.out.print (" -- match");
         System.out.println ();
 
         return match;
     }
 
     // --------------------------------
-    public void checks ()
+    public void checks (
+        Control  ctl )
     {
         System.out.format (" ruleList.checks:\n");
 
@@ -109,6 +110,9 @@ public class RuleList  {
                 rl.locked = true;
                 sym.cond  = 'c';
                 rl.lock ();
+
+            //  ctl.send ('*', sym.name, sym.cond);
+                System.out.format ("  ruleList.checks: send msg\n");
                 break;
             }
         }
