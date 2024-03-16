@@ -295,34 +295,45 @@ public class Track {
         char    pos,
         String  name )
     {
-        System.out.format ("  Track.set: '%c' \"%s\"\n", pos, name);
+        System.out.format ("  Track.update: '%c' \"%s\"\n", pos, name);
         int id = atoi (name);
 
-        // TO case
-        if (1 == (id % 2))  {
-            for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
-                if (false)
-                    System.out.format (
-                        "    Track.set: \"%s\" %d\n", ts.name, ts.sym.id);
+        for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
+            if (ts.sym.id != id)
+                continue;
 
-                if (ts.sym.id == id)  {
-                    byte tile = TrackH;
-                    if ('R' == pos)         // right/reversed
-                        tile = ts.tile;
+            if (true)
+                System.out.format (
+                    "   Track.update: found \"%s\" %d\n", ts.name, ts.sym.id);
 
-                    trk [ts.col][ts.row] = tile;
-                    ts.sym.cond          = pos;
+            // TO case
+            if (1 == (ts.ctcNum % 2))  {
+                byte tile = TrackH;
+                if ('R' == pos)         // right/reversed
+                    tile = ts.tile;
 
-                    System.out.format ( "   Track.set: <%2d, %2d> %2d %s\n",
+                trk [ts.col][ts.row] = tile;
+                ts.sym.cond          = pos;
+
+                System.out.format ( "    Track.update: <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
-
-                    panel.response ('x', ts.ctcNum, pos);
-                }
             }
-        }
 
-        // signal case
-        else {
+            // signal case
+            else {
+                byte tile = ts.tile;
+                if ('R' == pos || 'L' == pos)
+                    tile += 30;     // hsignalRG or hsignalLG
+
+                trk [ts.col][ts.row] = tile;
+                ts.sym.cond          = pos;
+
+                System.out.format ( "    Track.update: <%2d, %2d> %2d %s\n",
+                                    ts.col, ts.row, tile, ts.name);
+            }
+
+            // notify panel
+            panel.response (ts.ctcNum, pos);
         }
     }
 

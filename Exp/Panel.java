@@ -170,14 +170,12 @@ public class Panel {
 
     // --------------------------------
     public void response (
-        char    type,
         int     id,
         char    state )
     {
         System.out.format (
-            "  Panel.response: %c %2d %c\n", type, id, state);
+            "  Panel.response: %2d %c\n", id, state);
 
- //     lvr [id].cond = state;
         lvr [id].sym.cond = state;
     }
 
@@ -209,7 +207,6 @@ public class Panel {
                 " Panel.mousePressed: num %d, id %d  %s\n", 
                     num, lvr [num].sym.id, lvr [num].sym.name);
 
- //         ctl.send ('T', lvr [num].sym.id, lvr [num].pos);
             ctl.send ('T', lvr [num].id, lvr [num].pos);
         }
 
@@ -217,15 +214,15 @@ public class Panel {
         else if (y - y0Panel < (iconToHt + iconSigHt))  {
             num += 1;
             if ((dX < colWid / 3))
-                lvr [num].pos = 'l';
+                lvr [num].pos = 'L';
             else if ((colWid * 2 / 3) < dX)
-                lvr [num].pos = 'r';
+                lvr [num].pos = 'R';
             else
-                lvr [num].pos = 'c';
+                lvr [num].pos = 'C';
 
-            lvr [num].sym.cond = lvr [num].pos;
+ //         lvr [num].sym.cond = lvr [num].pos;
 
-            ctl.send ('*', num, lvr [num].pos);
+            ctl.send ('S', lvr [num].id, lvr [num].pos);
         }
 
         // code

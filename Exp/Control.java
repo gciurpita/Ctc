@@ -54,7 +54,7 @@ public class Control
         System.out.format (
             " receive: %c %2d %c\n", cmd.type, cmd.id, cmd.state);
 
-        if ('T' == cmd.type || '*' == cmd.type)
+        if ('T' == cmd.type || 'S' == cmd.type)
             track.update (cmd.state, Integer.toString (cmd.id));
         cmd = cmd.next;
     }
