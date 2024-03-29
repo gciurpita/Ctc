@@ -1,0 +1,57 @@
+
+#    2     2  2  trackH.bmp
+#    3     3  3  trackV.bmp
+#    4     4  4  blockHR.bmp
+#    5     5  5  blockHL.bmp
+
+#    6     6  6  diagonalDU.bmp
+#    7     7  7  diagonalUD.bmp
+
+#    8     8  8  angleDL.bmp (/)
+#    9     9  9  angleDR.bmp (\)
+#   10    10  :  angleUL.bmp (\)
+#   11    11  ;  angleUR.bmp (/)
+
+#   12    12  <  angleVUR.bmp (/)
+#   13    13  =  angleVUL.bmp (\)
+#   14    14  >  angleVDR.bmp (\)
+#   15    15  ?  angleVDL.bmp (/)
+
+#   16    16  @  hsignalR.bmp
+#   17    17  A  hsignalL.bmp
+#   46    46  ^  hsignalRG.bmp
+#   47    47  _  hsignalLG.bmp
+#   76    66  |  hsignalRC.bmp
+#   77    67  }  hsignalLC.bmp
+
+row  
+row 2222222222222222222222222222222222222222
+row 2222222222222222222222222222222282222222
+#   01234567890123456789012345678901234567890123456789
+#             1         2         3         4
+row                                6
+row            7                  6
+row 222222292922:222222222822    6
+row         7 :2222222222;222228;
+row          :2222292222228222;
+row                 7    6          6     6
+row            822222:22;2222222222;22222;
+row 2222222222;22222222222222222222222222222
+row 2222222222222222222222222222222222222222
+row   
+
+ctc 1 3 5 7 9 11 13 15 17 19 21 23 25
+
+turnout    1    2   32    1  101
+turnout    3    5    7    3  103
+turnout    5    5    9    5  105
+turnout    7    5   12    7  107
+turnout    9    5   22    9  109
+turnout   11    6   21   11  111
+turnout   13    6   27   13  113
+turnout   15    7   15   15  115
+turnout   17    7   22   17  117
+turnout   19    9   17   19  119
+turnout   21    9   20   21  121
+turnout   23    9   31   23  123
+turnout   25   10   10   25  125
