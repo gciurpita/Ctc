@@ -36,8 +36,8 @@ public class Panel {
     }
 
     // --------------------------------
-    final int Nlvr       = 41;   // 1-40
-    Lever     lvr  []    = new Lever [41];
+    final int Nlvr       = 72;   // 1-30
+    Lever     lvr  []    = new Lever [Nlvr];
     int       codeBut [] = new int [Nlvr /2];
 
     Control   ctl;
@@ -357,8 +357,13 @@ public class Panel {
 
         g2d.setColor (new Color(115, 104, 50));  // #736832
         g2d.fillRect (0, y0, wid, y0+ht);
+
+        if (false)  {
+            System.out.format ("Panel.paint: lvr length %d\n", lvr.length);
+            return;
+        }
  
-        for (int num = 1; num < lvr.length; num += 2)  {
+        for (int num = 1; num < lvr.length-1; num += 2)  {
             if (null == lvr [num] && null == lvr [num+1])
                 continue;
 
@@ -376,4 +381,4 @@ public class Panel {
             g2d.drawImage (code [idx].img, x0 + 15, y2 + 10, null);
         }
     }
-};
+    };
