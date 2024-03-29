@@ -172,12 +172,13 @@ public class CtcPanel extends JPanel
 
     private int     dbg             = 0;
 
-    String[]        pnlRow          = new String[10];
+    String[]        pnlRow          = new String[20];
     int             nPnlRow         = 0;
     int             maxRowLen       = 0;
 
-    final int       CtcColMax       = 20;
+    final int       CtcColMax       = 30;
     CtcCol          ctcCol []       = new CtcCol [CtcColMax];
+    int             nCtcLvr          = 0;
 
     boolean         ctcSw  []       = new boolean [20];
     boolean         ctcSig []       = new boolean [20];
@@ -232,12 +233,13 @@ public class CtcPanel extends JPanel
     int             nCol;
     int             colWid;
 
-    final int       RowOff          = 150;
+    int             RowOff          = 150;
     int             rowHt1;
     int             rowHt2;
 
     final int       TrackH  = 2;
     int             tileWid;
+    int             tileHt;
 
     final int       CodeXoff        = 15;
     final int       CodeYoff        =  5;
@@ -303,17 +305,20 @@ public class CtcPanel extends JPanel
         addMouseListener (this);
 
         loadCfg ("Resources/ctcNumbered");
+        tileHt  = imgTile [0].img.getHeight (null);
         tileWid = imgTile [0].img.getWidth (null);
         loadPnl (pnlFile);
 
         inventory();
 
-        CANVAS_WIDTH  = tileWid * (2 + maxRowLen);
+        CANVAS_WIDTH   = tileWid * (2 + maxRowLen);
 
         // set up screen graphics
         colWid  = imgTo [0].img.getWidth (null);
         colWid  = 4 * tileWid;
         nCol    = CANVAS_WIDTH / colWid;
+
+        RowOff  = tileHt * nPnlRow;
         rowHt1  = RowOff + imgTo  [0].img.getHeight (null);
         rowHt2  = rowHt1 + imgSig [0].img.getHeight (null);
         codeDia = imgCode [0].img.getWidth (null);
@@ -322,6 +327,7 @@ public class CtcPanel extends JPanel
 
         System.out.format ("CtcPanel: tile wid %d", tileWid);
         System.out.format (", CTC col wid %d", colWid);
+        System.out.format (", CANVAS wid %d, ht", colWid);
         System.out.println ();
 
         frame.setContentPane (this);
@@ -332,7 +338,7 @@ public class CtcPanel extends JPanel
 
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
-        frame.setBounds (900, 0, r.width, r.height);
+        frame.setBounds (100, 0, r.width, r.height);
 
         // open socket
         if (null != ip)  {
@@ -407,6 +413,10 @@ public class CtcPanel extends JPanel
                 }
             }
         }
+
+        // check of no ctc levers to avoid exception
+        if (0 == nCtcLvr)
+            return;
 
         // process code button
         for (int col = 1; col <= nCol; col++)  {
@@ -778,6 +788,8 @@ public class CtcPanel extends JPanel
                         System.out.format (" loadPnl: code %d\n", col);
                         symCode [col] = new PnlSym ("C", col);
                     }
+
+                    nCtcLvr++;
                 }
             }
 
