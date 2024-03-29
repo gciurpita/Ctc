@@ -78,7 +78,7 @@ public class Interlock extends JPanel
 
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
-        frame.setBounds (900, 0, r.width, r.height);
+        frame.setBounds (300, 0, r.width, r.height);
 
         // create timer
         TimerTask task = new TimerTask() {
