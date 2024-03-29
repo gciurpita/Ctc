@@ -25,7 +25,8 @@ public class Control
     }
 
     // ---------------------------------------------------------
-    Cmd  cmd = null;
+    Cmd  cmd   = null;
+    Sckt sckt  = null;
 
     // ---------------------------------------------------------
     public void send (
