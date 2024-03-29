@@ -21,7 +21,7 @@ import javax.imageio.ImageIO;
 // -----------------------------------------------------------------------------
 public class Track {
     final int Col      = 100;
-    final int Row      = 10;
+    final int Row      = 30;
     byte      trk [][] = new byte [Col][Row];
     int       nRow     = 0;
     int       maxCol   = 0;
@@ -269,7 +269,8 @@ public class Track {
      // System.out.format ("  Track.newRow: %s\n", s);
 
         if (Row <= nRow)  {
-            System.out.format ("Error Track.newRow: row lime %d %d\n", nRow);
+            System.out.format (
+                "Error Track.newRow: # rows %d > Row %d\n", nRow, Row);
             System.exit (3);
         }
 
