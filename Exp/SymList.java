@@ -6,7 +6,8 @@ public class SymList  {
     public Sym add (
         String  name,
         char    type,
-        int     id )
+        int     num,
+        String  id )        // interface
     {
      // boolean dbg = false;
 
@@ -17,7 +18,7 @@ public class SymList  {
             return sym;
         }
 
-        sym      = new Sym (name, type, id);
+        sym      = new Sym (name, type, num, id);
         sym.next = head;
         head     = sym;
 
@@ -81,6 +82,26 @@ public class SymList  {
             if (sym.name.equals (name))  {
                 if (dbg)
                     System.out.format ("    symlist.find: found\n");
+                return sym;
+            }
+        }
+
+        return null;
+    }
+    // -------------------------------------
+    public Sym findId (
+        String  id )
+    {
+        if (dbg)
+            System.out.format ("  symList.findId: %s\n", id);
+
+        for (Sym sym = head; null != sym; sym = sym.next) {
+            if (dbg)
+                System.out.format ("   symlist.findId: %s\n", sym.id);
+
+            if (sym.id.equals (id))  {
+                if (dbg)
+                    System.out.format ("    symlist.findId: found\n");
                 return sym;
             }
         }

@@ -23,14 +23,14 @@ public class Panel {
         char    pos;
         Sym     sym;
 
+        String  lbl;
+
         // --------------------------------
         public Lever (
             int  id,
             Sym  sym )
         {
- //         this.id   = id;
             this.pos  = 0 == (id % 2) ? 'C' : 'L';
- //         this.cond = this.pos;
             this.sym  = sym;
         }
     }
@@ -157,26 +157,26 @@ public class Panel {
     }
 
     // --------------------------------
-    public boolean check (
-        int  num,
-        int  id )
+    public boolean associate (
+        int     num,
+        String  lbl )
     {
         if (null == lvr [num])
             return false;
 
-        lvr [num].id = id;      // duplicates id in turnout sym
+        lvr [num].lbl = lbl;
         return true;
     }
 
     // --------------------------------
     public void response (
-        int     id,
+        int     num,
         char    state )
     {
         System.out.format (
-            "  Panel.response: %2d %c\n", id, state);
+            "  Panel.response: %2d %c\n", num, state);
 
-        lvr [id].sym.cond = state;
+        lvr [num].sym.cond = state;
     }
 
     // --------------------------------
@@ -204,10 +204,10 @@ public class Panel {
                 lvr [num].pos = 'R';
 
             System.out.format (
-                " Panel.mousePressed: num %d, id %d  %s\n", 
-                    num, lvr [num].sym.id, lvr [num].sym.name);
+                " Panel.mousePressed: num %d, %s  %s\n",
+                    num, lvr [num].lbl, lvr [num].sym.name);
 
-            ctl.send ('T', lvr [num].id, lvr [num].pos);
+            ctl.send ('T', lvr [num].lbl, lvr [num].pos);
         }
 
         // signal
@@ -222,7 +222,7 @@ public class Panel {
 
  //         lvr [num].sym.cond = lvr [num].pos;
 
-            ctl.send ('S', lvr [num].id, lvr [num].pos);
+            ctl.send ('S', lvr [num].lbl, lvr [num].pos);
         }
 
         // code
@@ -362,7 +362,6 @@ public class Panel {
             System.out.format ("Panel.paint: lvr length %d\n", lvr.length);
             return;
         }
- 
         for (int num = 1; num < lvr.length-1; num += 2)  {
             if (null == lvr [num] && null == lvr [num+1])
                 continue;

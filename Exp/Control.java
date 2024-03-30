@@ -4,7 +4,7 @@ public class Control
 {
     private class Cmd   {
         char    type;   // 'T' - turnout, 'S' - signal, '_' - unused
-        int     id;
+        String  id;     // interface, mqtt topic;
         char    state;  // T - 'N'/'R', S - 'S'/'C'
 
         Cmd     next;
@@ -13,11 +13,11 @@ public class Control
         // -------------------------------------
         public Cmd (
         char    type,
-        int     id,
+        String  id,
         char    state )
         {
             this.type  = type;
-            this.id    = id;
+            this.id = id;
             this.state = state;
             next       = null;
             delay      = 5;
@@ -31,14 +31,14 @@ public class Control
     // ---------------------------------------------------------
     public void send (
         char    type,
-        int     id,
+        String  id,
         char    state )
     {
         Cmd cmd  = new Cmd (type, id, state);
         cmd.next = this.cmd;
         this.cmd = cmd;
 
-        System.out.format ("send: %c %2d %c\n", cmd.type, cmd.id, cmd.state);
+        System.out.format ("send: %c %s %c\n", cmd.type, cmd.id, cmd.state);
     }
 
     // ---------------------------------------------------------
@@ -53,10 +53,10 @@ public class Control
             return;
 
         System.out.format (
-            " receive: %c %2d %c\n", cmd.type, cmd.id, cmd.state);
+            " receive: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
 
         if ('T' == cmd.type || 'S' == cmd.type)
-            track.update (cmd.state, Integer.toString (cmd.id));
+            track.update (cmd.state, cmd.id);
         cmd = cmd.next;
     }
 }

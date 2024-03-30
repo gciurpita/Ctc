@@ -20,6 +20,8 @@ import javax.imageio.ImageIO;
 
 // -----------------------------------------------------------------------------
 public class Track {
+    SymList   symList;
+
     final int Col      = 100;
     final int Row      = 30;
     byte      trk [][] = new byte [Col][Row];
@@ -88,10 +90,12 @@ public class Track {
 
     // ------------------------------------------------------------------------
     public Track (
-        Panel  panel )
+        Panel   panel,
+        SymList symList )
             throws FileNotFoundException, IOException
     {
-        this.panel = panel;
+        this.panel   = panel;
+        this.symList = symList;
         loadTiles ();
     }
 
@@ -294,18 +298,17 @@ public class Track {
     // ------------------------------------------------------------------------
     public void update (
         char    pos,
-        String  name )
+        String  id )
     {
-        System.out.format ("  Track.update: '%c' \"%s\"\n", pos, name);
-        int id = atoi (name);
+        System.out.format ("  Track.update: '%c' \"%s\"\n", pos, id);
+
+        Sym sym = symList.findId (id);
+
+        panel.response (sym.num, pos);      // notify panel
 
         for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
             if (ts.sym.id != id)
                 continue;
-
-            if (true)
-                System.out.format (
-                    "   Track.update: found \"%s\" %d\n", ts.name, ts.sym.id);
 
             // TO case
             if (1 == (ts.ctcNum % 2))  {
@@ -332,9 +335,6 @@ public class Track {
                 System.out.format ( "    Track.update: <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
             }
-
-            // notify panel
-            panel.response (ts.ctcNum, pos);
         }
     }
 

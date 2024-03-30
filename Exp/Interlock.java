@@ -29,7 +29,7 @@ public class Interlock extends JPanel
     Control  ctl      = new Control ();
     Panel    panel    = new Panel   (ctl);
     SymList  symList  = new SymList ();
-    Track    trk      = new Track   (panel);
+    Track    trk      = new Track   (panel, symList);
 
     int      canvasHt;
     int      canvasWid;
@@ -250,7 +250,7 @@ public class Interlock extends JPanel
             else if (fld[0].equals("ctc"))  {
                 for (int n = 1; n < fld.length; n++)  {
 
-                    Sym sym = symList.add ("L" + fld [n], 'L', n);
+                    Sym sym = symList.add ("L" + fld [n], 'L', n, null);
                     panel.addLever (Integer.parseInt (fld [n]), sym);
                 }
             }
@@ -288,7 +288,7 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("signal"))  {
-                if (6 > fld.length)  {
+                if (5 > fld.length)  {
                     loadPnlErr (line, "signal requires 5 parameters");
                     err++;
                     continue;
@@ -297,17 +297,17 @@ public class Interlock extends JPanel
                 int ctcNum = Integer.parseInt (fld [1]);
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
-                int id     = Integer.parseInt (fld [5]);
+                String lbl = fld [4];
 
-                if (! panel.check (ctcNum, id)) {
+                Sym sym = symList.add (lbl, '*', ctcNum, lbl);
+
+                if (! panel.associate (ctcNum, lbl)) {
                     loadPnlErr (line, "invalid ctc ID");
                     err++;
                     continue;
                 }
 
-                Sym sym = symList.add (fld [4], '*', id);
-
-                if (! trk.check (col, row, '*', ctcNum, sym, fld [4]))  {
+                if (! trk.check (col, row, '*', ctcNum, sym, lbl))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
@@ -318,26 +318,27 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("turnout"))  {
-                if (6 > fld.length)  {
-                    loadPnlErr (line, "turnout requires 5 parameters");
+                if (4 > fld.length)  {
+                    loadPnlErr (line, "turnout requires 4 parameters");
                     err++;
                     continue;
                 }
 
-                int ctcNum = Integer.parseInt (fld [1]);
-                int row    = Integer.parseInt (fld [2]);
-                int col    = Integer.parseInt (fld [3]);
-                int id     = Integer.parseInt (fld [5]);
+                int ctcNum  = Integer.parseInt (fld [1]);
+                int row     = Integer.parseInt (fld [2]);
+                int col     = Integer.parseInt (fld [3]);
+                String name = fld [4];
+                String id   = fld [5];
 
-                if (! panel.check (ctcNum, id)) {
-                    loadPnlErr (line, "invalid invalid ctc ID");
+                Sym sym = symList.add (name, 'x', ctcNum, id);
+
+                if (! panel.associate (ctcNum, id)) {
+                    loadPnlErr (line, "invalid ctc ID");
                     err++;
                     continue;
                 }
 
-                Sym sym = symList.add (fld [4], 'x', id);
-
-                if (! trk.check (col, row, 'x', ctcNum, sym, fld [4]))  {
+                if (! trk.check (col, row, 'x', ctcNum, sym, name))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
