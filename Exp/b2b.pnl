@@ -1,0 +1,54 @@
+#    2     2  2  trackH.bmp
+#    4     4  4  blockHR.bmp
+#    5     5  5  blockHL.bmp
+#    6     6  6  diagonalDU.bmp /
+#    7     7  7  diagonalUD.bmp \
+
+#    8     8  8  angleDL.bmp
+#    9     9  9  angleDR.bmp
+#   10    10  :  angleUL.bmp
+#   11    11  ;  angleUR.bmp
+
+#   16    16  @  hsignalR.bmp
+#   17    17  A  hsignalL.bmp
+#   46    46  ^  hsignalRG.bmp
+#   47    47  _  hsignalLG.bmp
+#   76    66  |  hsignalRC.bmp
+#   77    67  }  hsignalLC.bmp
+
+#             1         2         3         4
+
+row         A               A
+row        8522249         8522222249
+row       6 A   @ 7 A     6 A      @ 7 A
+row  2224;225222422:52224;225222222222:5222
+#   01234567890123456789012345678901234567890123456789
+row     @       @       @          @
+
+ctc       3 4       7 8      11 12  17 18
+
+#        ctc  row  col  lbl   id
+signal     4    0    8  4LB  102
+signal     4    2    8  4L   102
+signal     4    4    4  4R   102
+
+signal     8    2   12  6RB  104
+signal     8    2   16  6L   106
+signal     8    4   12  8R   104
+
+
+signal    12    0   24 12LB  104
+signal    12    2   24 12L   108
+signal    12    4   20 12R   106
+
+
+signal    18    2   31 14RB  110
+signal    18    2   35 14L   112
+signal    18    4   31 14R   108
+
+
+#        ctc  row  col  lbl   id
+turnout    3    3    5    1 T031
+turnout    7    3   15    3 T071
+turnout   11    3   21    5 T111
+turnout   17    3   34    7 T171
