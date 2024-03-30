@@ -6,7 +6,8 @@
     Targ    = Interlock
 
     Cmd     = -c0.cmd
-    Pnl     = 0.rules
+#   Pnl     = 0.rules
+    Pnl     = md2.pnl
 
 %.class : %.java
 		javac $(LINT_FLAG) $<
@@ -30,4 +31,3 @@ neat :
 
 clean : neat
 		rm -f *.jar *.exe
-		cd ScktC; make clean

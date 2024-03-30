@@ -39,6 +39,9 @@ public class Interlock extends JPanel
     int      trkHt;
     int      lvrHt;
 
+    Sckt     sckt;
+    Mqtt     mqtt;
+
     // --------------------------------
     public Interlock (
         String pnlFile )
@@ -250,6 +253,20 @@ public class Interlock extends JPanel
                     Sym sym = symList.add ("L" + fld [n], 'L', n);
                     panel.addLever (Integer.parseInt (fld [n]), sym);
                 }
+            }
+
+            // -----------------------------------
+            else if (fld[0].equals("mqtt"))  {
+                System.out.format (" loadPnl: %s\n", line);
+                System.out.format (" loadPnl: # fld %d\n", fld.length);
+
+                if (4 > fld.length)  {
+                    loadPnlErr (line, "mqtt ipAddr port node-name");
+                    err++;
+                    continue;
+                }
+
+                mqtt = new Mqtt (fld [1], fld [2], fld [3]);
             }
 
             // -----------------------------------

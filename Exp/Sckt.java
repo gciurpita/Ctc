@@ -79,6 +79,12 @@ class Sckt {
         sendPkt (PKT_STRING, bufTx, bufTx.length);
     }
 
+    // ---------------------------------------------------------
+    public void write (byte[] buf, int bufSize)
+    {
+        out.write (buf, 0, bufSize);
+    }
+
     // -------------------------------------------------------------------
     // Read data from the server
     public  int readPckt (byte buf [], int size)
