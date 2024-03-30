@@ -52,3 +52,5 @@ turnout    3    3    5    1 T031
 turnout    7    3   15    3 T071
 turnout   11    3   21    5 T111
 turnout   17    3   34    7 T171
+
+mqtt 127.0.0.1 1883 CTC-Panel
