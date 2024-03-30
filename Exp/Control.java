@@ -27,6 +27,14 @@ public class Control
     // ---------------------------------------------------------
     Cmd  cmd   = null;
     Sckt sckt  = null;
+    Mqtt mqtt  = null;
+
+    // ---------------------------------------------------------
+    public void set (
+        Mqtt  mqtt )
+    {
+        this.mqtt = mqtt;
+    }
 
     // ---------------------------------------------------------
     public void send (
@@ -39,6 +47,9 @@ public class Control
         this.cmd = cmd;
 
         System.out.format ("send: %c %s %c\n", cmd.type, cmd.id, cmd.state);
+
+        if (null != mqtt)
+            mqtt.publish (id, "/" + state);
     }
 
     // ---------------------------------------------------------

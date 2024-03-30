@@ -39,9 +39,6 @@ public class Interlock extends JPanel
     int      trkHt;
     int      lvrHt;
 
-    Sckt     sckt;
-    Mqtt     mqtt;
-
     // --------------------------------
     public Interlock (
         String pnlFile )
@@ -266,7 +263,7 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                mqtt = new Mqtt (fld [1], fld [2], fld [3]);
+                ctl.set (new Mqtt (fld [1], fld [2], fld [3]));
             }
 
             // -----------------------------------
