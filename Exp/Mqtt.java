@@ -105,6 +105,14 @@ class Mqtt
     }
 
     // ---------------------------------------------------------
+    public void ping ()
+    {
+        byte [] buf = { PingReq, 0 };
+
+        sckt.write (buf, 2);
+    }
+
+    // ---------------------------------------------------------
     public void publish (
         String  topic,
         String  value )

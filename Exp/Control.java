@@ -29,6 +29,8 @@ public class Control
     Sckt sckt  = null;
     Mqtt mqtt  = null;
 
+    int     pingCnt = 0;
+
     // ---------------------------------------------------------
     public void set (
         Mqtt  mqtt )
@@ -57,6 +59,11 @@ public class Control
         Track  track,
         Panel  panel )
     {
+        if (--pingCnt <= 0)  {
+            mqtt.ping ();
+            pingCnt = 200;       // every 100 sec, for 500 msec timer
+        }
+
         if (null == cmd)
             return;
 
