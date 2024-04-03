@@ -33,6 +33,25 @@ class Mqtt
     byte QOS1        = 0x02;
     byte QOS2        = 0x04;
 
+    String MsgName [] = {
+        "Zeroeth",
+        "Connect",
+        "ConnAck",
+        "Publish",
+        "PubAck",
+        "PubRec",
+        "PubRel",
+        "PubComp",
+        "Subscribe",
+        "SubAck",
+        "UnSubscribe",
+        "UnSubAck",
+        "PingReq",
+        "PingResp",
+        "Disconnect",
+        "Reserved",
+    };
+
     // -------------------------------------
     Mqtt (
  //     Sckt    sckt,
@@ -92,11 +111,14 @@ class Mqtt
         int     nByte,
         String  label )
     {
-        System.out.format ("dump: %d %s", nByte, label);
+        if (true)
+            return;
+
+        System.out.format ("  dump: %d %s", nByte, label);
 
         for (int n = 0; n < nByte; n++)  {
             if (0 == (n % 16))
-                System.out.format ("\n %02x:", n);
+                System.out.format ("\n    %02x:", n);
             else if (0 == (n % 4))
                 System.out.format (" ");
             System.out.format (" %02x", buf [n]);
@@ -141,6 +163,20 @@ class Mqtt
         dump (buf, idx, "publish");
 
         sckt.write (buf, idx);
+    }
+
+    // -------------------------------------
+    int receive (
+        byte buf [],
+        int  nByte )
+    {
+        nByte = sckt.readPckt (buf, nByte);
+
+        dump (buf, nByte, "mqtt.receive");
+        byte id = (byte) ((buf [0] >> 4) & 0x0F);
+        System.out.format (
+            "mqtt.receive: 0x%02x %s\n", id, MsgName [id]);
+        return nByte;
     }
 
     // -------------------------------------

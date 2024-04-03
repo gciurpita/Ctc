@@ -59,12 +59,21 @@ public class Control
         Track  track,
         Panel  panel )
     {
-        if (--pingCnt <= 0)  {
+        if (200 <= ++pingCnt)  {
             mqtt.ping ();
-            pingCnt = 200;       // every 100 sec, for 500 msec timer
+            pingCnt = 0;         // every 100 sec, for 500 msec timer
         }
 
-        if (null == cmd)
+        // -------------------------------------
+        final int BufSize = 90;
+        byte      [] buf  = new byte [BufSize];
+        int       nByte = mqtt.receive (buf, BufSize);
+
+        if (0 < nByte)  {
+        }
+
+        // -------------------------------------
+        if (null == cmd)        // check for something on cmd queue
             return;
 
         if (0 < cmd.delay--)

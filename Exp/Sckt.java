@@ -89,34 +89,21 @@ class Sckt {
     // Read data from the server
     public  int readPckt (byte buf [], int size)
     {
-        int nRd;
+        int nRd = 0;
         int len = 0;
 
         try {
-            if (2 > (nRd = in.read (buf, 0, 2)))  {
+            if (1 > (nRd = in.read (buf, 0, 2)))  {
                 System.out.format(" readPckt: nRd %d\n", nRd);
                 if (0 > nRd)
                     System.exit (1);
                 return 0;
             }
-
-            len = buf [1];
-            if (2 > len)  {
-                System.out.format ("client: len too small, %d\n", len);
-                return 0;
-            }
-
-            nRd = in.read (buf, 2, len-2);
-            if (len - 2 > nRd)  {
-                System.out.format(" readPckt: len %d, nRd %d\n", len, nRd);
-                return 0;
-            }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace ();
         }
 
-        return len;
+        return nRd;
     }
 }
