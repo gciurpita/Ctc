@@ -8,6 +8,7 @@
     Cmd     = -c0.cmd
 #   Pnl     = 0.rules
     Pnl     = md2.pnl
+    Pnl     = b2b.pnl
 
 %.class : %.java
 		javac $(LINT_FLAG) $<
