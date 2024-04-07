@@ -38,6 +38,14 @@ public class Track {
     }
     Tile      tile []  = new Tile [90];
 
+    // ---------------------------------------------------------
+    class Blk {
+        int     col;
+        int     row;
+        String  id;
+        char    state;      // 'O'ccupied
+    }
+
     // -------------------------------------
     class ToSig {
         int     col;
@@ -293,6 +301,64 @@ public class Track {
 
         panelHt  = tileHt  * nRow;
         panelWid = tileWid * maxCol;
+    }
+
+    // ------------------------------------------------------------------------
+    public void trace (
+        Graphics2D  g2d,
+        Blk  blk )
+    {
+        final int BlockHR = 4;
+        final int BlockHL = 5;
+
+        int       col     = blk.col;
+        int       row     = blk.row;
+        int       offset  = 0;
+
+        System.out.format ("trace:  col %2d, row %d\n", col, row);
+
+        if ('O' == blk.state)           // occupied, red offset
+            offset = 30;
+        else if ('C' == blk.state)      // cleared, green offset
+            offset = 50;
+
+        int tileIdx = trk [col][row];
+        do  {
+            int idx  = offset + tileIdx;
+            g2d.drawImage (
+                tile [idx].img, col * tileWid, row * tileWid, null);
+
+            switch (tileIdx) {
+            case 7:         // diagonalUD \
+            case 9:         // angleDR -\
+                row++;
+                col++;
+                break;
+
+            case 6:         // diagonalDU /
+            case 11:        // angleUR -/
+                row--;
+                col++;
+                break;
+
+            case 8:         // angleDL /-
+            case 10:        // angleUL \-
+            default:
+                col++;;
+                break;
+            }
+
+            System.out.format (" trace: col %2d, row %d\n", col, row);
+
+            tileIdx = trk [col][row];
+            System.out.format (" trace: tile %2d\n", tileIdx);
+        } while (0 <= tileIdx && BlockHR != tileIdx && BlockHL != tileIdx);
+
+        if (BlockHR == tileIdx)  {
+            int idx  = offset + tileIdx;
+            g2d.drawImage (
+                tile [idx].img, col * tileWid, row * tileWid, null);
+        }
     }
 
     // ------------------------------------------------------------------------
