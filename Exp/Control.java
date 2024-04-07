@@ -50,8 +50,9 @@ public class Control
 
         System.out.format ("send: %c %s %c\n", cmd.type, cmd.id, cmd.state);
 
+        String topic = String.format ("%c/%s/", type, id);
         if (null != mqtt)
-            mqtt.publish (id, "/" + state);
+            mqtt.publish (topic, String.valueOf(state));
     }
 
     // ---------------------------------------------------------

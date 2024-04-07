@@ -10,6 +10,8 @@ import java.util.*;
 
 class Mqtt
 {
+    String  topic;
+
     Sckt    sckt;
     int     nextMsgId;
 
@@ -57,7 +59,9 @@ class Mqtt
  //     Sckt    sckt,
         String  ipAddr,
         String  portStr,
-        String  nodeName )     throws IOException
+        String  nodeName,
+        String  topic )
+                throws IOException
     {
         System.out.format ("Mqtt: %s %s %s\n", ipAddr, portStr, nodeName);
 
@@ -65,6 +69,7 @@ class Mqtt
         sckt = new Sckt (ipAddr, port);
 
         connect (nodeName);
+        this.topic = topic;
     }
 
     // -------------------------------------
@@ -136,10 +141,10 @@ class Mqtt
 
     // ---------------------------------------------------------
     public void publish (
-        String  topic,
+        String  subTopic,
         String  value )
     {
-        System.out.format ("publish: %s %s\n", topic, value);
+        System.out.format ("publish: %s %s\n", subTopic, value);
 
         byte [] buf = new byte [90];
         int  idx = 2;
@@ -147,10 +152,12 @@ class Mqtt
         nextMsgId++;
 
         // topic name
+        subTopic = topic + "/" + subTopic;
+
         buf [idx++] = 0;
-        buf [idx++] = (byte) topic.length ();
-        for (int i = 0; i < topic.length(); i++)
-            buf [idx++] = (byte) topic.charAt (i);
+        buf [idx++] = (byte) subTopic.length ();
+        for (int i = 0; i < subTopic.length(); i++)
+            buf [idx++] = (byte) subTopic.charAt (i);
 
         // value
         for (int i = 0; i < value.length(); i++)

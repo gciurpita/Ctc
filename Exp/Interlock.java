@@ -258,6 +258,12 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("mqtt"))  {
+                if (5 > fld.length)  {
+                    loadPnlErr (line, "mqtt ip port name topic");
+                    err++;
+                    continue;
+                }
+
                 System.out.format (" loadPnl: %s\n", line);
                 System.out.format (" loadPnl: # fld %d\n", fld.length);
 
@@ -267,7 +273,12 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                ctl.set (new Mqtt (fld [1], fld [2], fld [3]));
+                String ip    = fld [1];
+                String port  = fld [2];
+                String name  = fld [3];
+                String topic = fld [4];
+
+                ctl.set (new Mqtt (ip, port, name, topic));
             }
 
             // -----------------------------------
