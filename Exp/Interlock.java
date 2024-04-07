@@ -229,9 +229,13 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("block"))  {
-                int id     = Integer.parseInt (fld [1]);
+                int num    = Integer.parseInt (fld [1]);
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
+                String lbl = fld [4];
+                String id  = fld [5];
+
+                Sym sym = symList.add (lbl, 'B', num, lbl);
 
                 if (! trk.check (col, row, 'B', 0, null, null))  {
                     loadPnlErr (line, "invalid block tile");
@@ -295,8 +299,9 @@ public class Interlock extends JPanel
                 int row    = Integer.parseInt (fld [2]);
                 int col    = Integer.parseInt (fld [3]);
                 String lbl = fld [4];
+                String id  = fld [5];
 
-                Sym sym = symList.add (lbl, '*', ctcNum, lbl);
+                Sym sym = symList.add (lbl, '*', ctcNum, id);
 
                 if (! panel.associate (ctcNum, lbl)) {
                     loadPnlErr (line, "invalid ctc ID");
@@ -324,10 +329,10 @@ public class Interlock extends JPanel
                 int ctcNum  = Integer.parseInt (fld [1]);
                 int row     = Integer.parseInt (fld [2]);
                 int col     = Integer.parseInt (fld [3]);
-                String name = fld [4];
+                String lbl  = fld [4];
                 String id   = fld [5];
 
-                Sym sym = symList.add (name, 'x', ctcNum, id);
+                Sym sym = symList.add (lbl, 'x', ctcNum, id);
 
                 if (! panel.associate (ctcNum, id)) {
                     loadPnlErr (line, "invalid ctc ID");
@@ -335,7 +340,7 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                if (! trk.check (col, row, 'x', ctcNum, sym, name))  {
+                if (! trk.check (col, row, 'x', ctcNum, sym, lbl))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
