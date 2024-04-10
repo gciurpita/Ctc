@@ -31,9 +31,11 @@ class Mqtt
     byte Disconnect  = (byte) 0xE0;  // Client is Disconnecting
     byte Reserved    = (byte) 0xF0;  // Reserved
 
-    byte QOS0        = 0x00;
-    byte QOS1        = 0x02;
-    byte QOS2        = 0x04;
+    byte Qos0        = 0x00;
+    byte Qos1        = 0x02;
+    byte Qos2        = 0x04;
+
+    byte Retain      = 1;
 
     String MsgName [] = {
         "Zeroeth",
@@ -116,7 +118,7 @@ class Mqtt
         int     nByte,
         String  label )
     {
-        if (true)
+        if (false)
             return;
 
         System.out.format ("  dump: %d %s", nByte, label);
@@ -164,7 +166,7 @@ class Mqtt
             buf [idx++] = (byte) value.charAt (i);
 
         // header
-        buf [0] = Publish;
+        buf [0] = (byte)(Publish | Retain);
         buf [1] = (byte) (idx -2);
 
         dump (buf, idx, "publish");
@@ -206,7 +208,7 @@ class Mqtt
             buf [idx++] = (byte) topic.charAt (i);
 
         // header
-        buf [0] = (byte) (Subscribe | QOS1);
+        buf [0] = (byte) (Subscribe | Qos1);
         buf [1] = (byte) (idx -2);
 
         sckt.write (buf, idx);
