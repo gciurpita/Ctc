@@ -47,10 +47,10 @@ signal    18    2   35 14L   112
 signal    18    4   31 14R   108
 
 
-#        ctc  row  col  lbl   id
-turnout    3    3    5    1  031
-turnout    7    3   15    3  071
-turnout   11    3   21    5  111
-turnout   17    3   34    7  171
+#        ctc  row  col  sfx  mqtt
+turnout    3    3    5    _  t3
+turnout    7    3   15    _
+turnout   11    3   21    _  charlotte
+turnout   17    3   34    _
 
 mqtt 127.0.0.1 1883 CTC-Panel layout

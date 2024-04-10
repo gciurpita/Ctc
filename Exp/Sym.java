@@ -2,7 +2,7 @@ public class Sym  {
     String      name;
     char        type;
     int         num;        // ctc num
-    String      id;         // interface, mqtt topic
+    String      mqtt;       // interface, mqtt topic
 
     char        cond;
     RuleList    ruleList;
@@ -16,12 +16,13 @@ public class Sym  {
         String  name,
         char    type,
         int     num,
-        String  id )
+        String  mqtt )
     {
         this.name = name;
         this.num  = num;
         this.type = type;
-        this.id   = id;
+        this.mqtt = mqtt;
+
         if ('*' == type)
             this.cond = 'S';
         else if ('L' == type)
@@ -63,7 +64,7 @@ public class Sym  {
     public void disp ()
     {
         System.out.format (
-            " Sym %4s '%c' %4d, %c %d %6s", name, type, num, cond, lock, id);
+            " Sym %4s '%c' %4d, %c %d %6s", name, type, num, cond, lock, mqtt);
 
         if (null != ruleList)
             System.out.format (" rules");

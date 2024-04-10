@@ -203,7 +203,7 @@ public class RuleList  {
             name = fld.substring (0);
         }
 
-        // switche or signal condition
+        // switch or signal condition
         else if (Character.isDigit (c1))  {
             int id = atoi (fld.substring (1));
 
@@ -215,7 +215,7 @@ public class RuleList  {
                     return false;
                 }
 
-                type = 'x';
+                type = 'T';
                 cond = c0;
                 name = fld.substring (1);
 

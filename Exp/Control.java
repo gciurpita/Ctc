@@ -56,6 +56,21 @@ public class Control
     }
 
     // ---------------------------------------------------------
+    public void send (
+        String  topicName,
+        char    state )
+    {
+        Cmd cmd  = new Cmd (' ', topicName, state);
+        cmd.next = this.cmd;
+        this.cmd = cmd;
+
+        System.out.format ("send: %s %c\n", topicName, cmd.state);
+
+        if (null != mqtt)
+            mqtt.publish (topicName, String.valueOf(state));
+    }
+
+    // ---------------------------------------------------------
     public void receive (
         Track  track,
         Panel  panel )

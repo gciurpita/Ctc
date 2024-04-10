@@ -186,7 +186,7 @@ public class Track {
             if (BlockHl != tile)
                 return false;
         }
-        else if ('x' == type)  {
+        else if ('T' == type)  {
             if (tile < AngleDL || AngleUR < tile)
                 return false;
             trk [col][row] = TrackH;
@@ -364,16 +364,16 @@ public class Track {
     // ------------------------------------------------------------------------
     public void update (
         char    pos,
-        String  id )
+        String  name )
     {
-        System.out.format ("  Track.update: '%c' \"%s\"\n", pos, id);
+        System.out.format ("  Track.update: '%c' \"%s\"\n", pos, name);
 
-        Sym sym = symList.findId (id);
+        Sym sym = symList.findName (name);
 
         panel.response (sym.num, pos);      // notify panel
 
         for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
-            if (ts.sym.id != id)
+            if (ts.sym.name != name)
                 continue;
 
             // TO case

@@ -27,8 +27,8 @@ public class Interlock extends JPanel
     JFrame   frame    = new JFrame ();
 
     Control  ctl      = new Control ();
-    Panel    panel    = new Panel   (ctl);
     SymList  symList  = new SymList ();
+    Panel    panel    = new Panel   (ctl,   symList);
     Track    trk      = new Track   (panel, symList);
 
     int      canvasHt;
@@ -340,24 +340,31 @@ public class Interlock extends JPanel
                 int ctcNum  = Integer.parseInt (fld [1]);
                 int row     = Integer.parseInt (fld [2]);
                 int col     = Integer.parseInt (fld [3]);
-                String lbl  = fld [4];
-                String id   = fld [5];
+                String sfx  = fld [4];
 
-                Sym sym = symList.add (lbl, 'x', ctcNum, id);
+                String mqtt = null;
+                if (5 < fld.length)
+                    mqtt = fld [5];
 
-                if (! panel.associate (ctcNum, id)) {
+                String name = Integer.toString (ctcNum);
+                if (! sfx.equals("_"))
+                    name += sfx;
+
+                Sym sym = symList.add (name, 'T', ctcNum, mqtt);
+
+                if (! panel.associate (ctcNum, name)) {
                     loadPnlErr (line, "invalid ctc ID");
                     err++;
                     continue;
                 }
 
-                if (! trk.check (col, row, 'x', ctcNum, sym, lbl))  {
+                if (! trk.check (col, row, 'T', ctcNum, sym, name))  {
                     loadPnlErr (line, "invalid track tile");
                     err++;
                     continue;
                 }
 
-                System.out.format (" loadPnl turnout: %s\n", fld [4]);
+                System.out.format (" loadPnl turnout: %s\n", name);
             }
 
             // -----------------------------------

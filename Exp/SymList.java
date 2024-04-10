@@ -89,19 +89,19 @@ public class SymList  {
         return null;
     }
     // -------------------------------------
-    public Sym findId (
-        String  id )
+    public Sym findName (
+        String  name )
     {
         if (dbg)
-            System.out.format ("  symList.findId: %s\n", id);
+            System.out.format ("  symList.findName: %s\n", name);
 
         for (Sym sym = head; null != sym; sym = sym.next) {
             if (dbg)
-                System.out.format ("   symlist.findId: %s\n", sym.id);
+                System.out.format ("   symlist.findName: %s\n", sym.name);
 
-            if (sym.id.equals (id))  {
+            if (sym.name.equals (name))  {
                 if (dbg)
-                    System.out.format ("    symlist.findId: found\n");
+                    System.out.format ("    symlist.findName: found\n");
                 return sym;
             }
         }

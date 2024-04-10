@@ -23,7 +23,7 @@ public class Panel {
         char    pos;
         Sym     sym;
 
-        String  lbl;
+        String  name;
 
         // --------------------------------
         public Lever (
@@ -41,6 +41,7 @@ public class Panel {
     int       codeBut [] = new int [Nlvr /2];
 
     Control   ctl;
+    SymList   symList;
 
     String    cfgFile  = "../Resources/ctcNumbered.cfg";
     class Icon   {
@@ -65,10 +66,12 @@ public class Panel {
 
     // --------------------------------
     public Panel (
-        Control  ctl )
+        Control  ctl,
+        SymList  symList )
             throws FileNotFoundException, IOException
     {
-        this.ctl = ctl;
+        this.ctl     = ctl;
+        this.symList = symList;
         loadIcons ();
     }
 
@@ -159,12 +162,12 @@ public class Panel {
     // --------------------------------
     public boolean associate (
         int     num,
-        String  lbl )
+        String  name )
     {
         if (null == lvr [num])
             return false;
 
-        lvr [num].lbl = lbl;
+        lvr [num].name = name;
         return true;
     }
 
@@ -205,9 +208,15 @@ public class Panel {
 
             System.out.format (
                 " Panel.mousePressed: num %d, %s  %s\n",
-                    num, lvr [num].lbl, lvr [num].sym.name);
+                    num, lvr [num].name, lvr [num].sym.name);
 
-            ctl.send ('T', lvr [num].lbl, lvr [num].pos);
+            Sym sym = symList.findName (lvr [num].name);
+            System.out.format ("Panel.mousePressed: name %s\n", sym.name);
+
+            if (null != sym.mqtt)
+                ctl.send (sym.mqtt, lvr [num].pos);
+            else
+                ctl.send ("T/" + sym.name, lvr [num].pos);
         }
 
         // signal
@@ -222,7 +231,7 @@ public class Panel {
 
  //         lvr [num].sym.cond = lvr [num].pos;
 
-            ctl.send ('S', lvr [num].lbl, lvr [num].pos);
+            ctl.send ('S', lvr [num].name, lvr [num].pos);
         }
 
         // code
