@@ -34,7 +34,7 @@ public class SymList  {
     {
         System.out.println ("symList.checkRule:");
         for (Sym sym = head; null != sym; sym = sym.next) {
-            if ('*' != sym.type || null == sym.ruleList)
+            if ('S' != sym.type || null == sym.ruleList)
                 continue;
             sym.ruleList.checks (ctl);
         }
@@ -53,7 +53,7 @@ public class SymList  {
     {
         System.out.println ("symList.dispRule:");
         for (Sym sym = head; null != sym; sym = sym.next) {
-            if ('*' != sym.type)
+            if ('S' != sym.type)
                 continue;
 
             System.out.format (" sym.disp: %c %-4s", sym.cond, sym.name);

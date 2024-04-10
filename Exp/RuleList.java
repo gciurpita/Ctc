@@ -111,7 +111,7 @@ public class RuleList  {
                 sym.cond  = 'c';
                 rl.lock ();
 
-            //  ctl.send ('*', sym.name, sym.cond);
+            //  ctl.send ('S', sym.name, sym.cond);
                 System.out.format ("  ruleList.checks: send msg\n");
                 break;
             }
@@ -191,7 +191,7 @@ public class RuleList  {
                 return false;
             }
 
-            type = '*';
+            type = 'S';
             cond = 'S';
             name = fld;
         }
@@ -228,7 +228,7 @@ public class RuleList  {
                     return false;
                 }
 
-                type = '*';
+                type = 'S';
                 cond = c0;
                 name = fld.substring (1);
 

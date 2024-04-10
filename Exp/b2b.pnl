@@ -27,30 +27,30 @@ row     @       @       @          @
 
 ctc       3 4       7 8      11 12  17 18
 
-#        ctc  row  col  lbl   id
-signal     4    0    8  4LB  041
-signal     4    2    8  4L   042
-signal     4    4    4  4R   043
+#        ctc  row  col  sfx  mqtt
+signal     4    0    8  LB  georgia
+signal     4    2    8  L   042
+signal     4    4    4  R   043
 
-signal     8    2   12  6RB  104
-signal     8    2   16  6L   106
-signal     8    4   12  8R   104
-
-
-signal    12    0   24 12LB  104
-signal    12    2   24 12L   108
-signal    12    4   20 12R   106
+signal     8    2   12  RB
+signal     8    2   16  L
+signal     8    4   12  R
 
 
-signal    18    2   31 14RB  110
-signal    18    2   35 14L   112
-signal    18    4   31 14R   108
+signal    12    0   24  LB
+signal    12    2   24  L
+signal    12    4   20  R
+
+
+signal    18    2   31  RB
+signal    18    2   35  L
+signal    18    4   31  R
 
 
 #        ctc  row  col  sfx  mqtt
 turnout    3    3    5    _  t3
 turnout    7    3   15    _
 turnout   11    3   21    _  charlotte
-turnout   17    3   34    _
+turnout   17    3   34    A
 
 mqtt 127.0.0.1 1883 CTC-Panel layout

@@ -178,7 +178,7 @@ public class Track {
     {
         byte tile = trk [col][row];
 
-        if ('*' == type)  {
+        if ('S' == type)  {
             if (tile < HsignalR || HsignalL < tile)
                 return false;
         }

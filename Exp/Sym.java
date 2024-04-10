@@ -23,7 +23,7 @@ public class Sym  {
         this.type = type;
         this.mqtt = mqtt;
 
-        if ('*' == type)
+        if ('S' == type)
             this.cond = 'S';
         else if ('L' == type)
             if (0 == (num % 2))
@@ -64,7 +64,7 @@ public class Sym  {
     public void disp ()
     {
         System.out.format (
-            " Sym %4s '%c' %4d, %c %d %6s", name, type, num, cond, lock, mqtt);
+            " Sym %-6s '%c' %4d, %c %d %6s", name, type, num, cond, lock, mqtt);
 
         if (null != ruleList)
             System.out.format (" rules");

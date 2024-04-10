@@ -211,8 +211,6 @@ public class Panel {
                     num, lvr [num].name, lvr [num].sym.name);
 
             Sym sym = symList.findName (lvr [num].name);
-            System.out.format ("Panel.mousePressed: name %s\n", sym.name);
-
             if (null != sym.mqtt)
                 ctl.send (sym.mqtt, lvr [num].pos);
             else
@@ -229,9 +227,11 @@ public class Panel {
             else
                 lvr [num].pos = 'C';
 
- //         lvr [num].sym.cond = lvr [num].pos;
-
-            ctl.send ('S', lvr [num].name, lvr [num].pos);
+            Sym sym = symList.findName (lvr [num].name);
+            if (null != sym.mqtt)
+                ctl.send (sym.mqtt, lvr [num].pos);
+            else
+                ctl.send ("S/" + sym.name, lvr [num].pos);
         }
 
         // code
