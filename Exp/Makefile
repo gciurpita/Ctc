@@ -13,6 +13,12 @@
 %.class : %.java
 		javac $(LINT_FLAG) $<
 
+%.pnl :
+		java $(Targ) $@
+
+% :
+		java $(Targ) $@.pnl
+
 # --------------------------------------------------------------------
 all : $(Classes)
 
