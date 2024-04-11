@@ -181,6 +181,9 @@ class Mqtt
     {
         nByte = sckt.readPckt (buf, nByte);
 
+        if (0 == nByte)
+            return 0;
+
         dump (buf, nByte, "mqtt.receive");
         byte id = (byte) ((buf [0] >> 4) & 0x0F);
         System.out.format (

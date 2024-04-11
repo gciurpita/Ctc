@@ -93,6 +93,14 @@ class Sckt {
         int len = 0;
 
         try {
+            if (0 == in.available ())
+                return 0;
+        }
+        catch (Exception e) {
+            e.printStackTrace ();
+        }
+
+        try {
             if (1 > (nRd = in.read (buf, 0, 2)))  {
                 System.out.format(" readPckt: nRd %d\n", nRd);
                 if (0 > nRd)
