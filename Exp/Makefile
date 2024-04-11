@@ -16,14 +16,11 @@
 %.pnl :
 		java $(Targ) $@
 
-% :
-		java $(Targ) $@.pnl
-
 # --------------------------------------------------------------------
 all : $(Classes)
-
-go  : $(Classes)
 		java $(Targ) $(Pnl)
+
+bld : $(Classes)
 
 cmd : $(Classes)
 		java $(Targ) $(Cmd) $(Pnl)
