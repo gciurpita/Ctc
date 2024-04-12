@@ -229,13 +229,20 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("block"))  {
-                int num    = Integer.parseInt (fld [1]);
-                int row    = Integer.parseInt (fld [2]);
-                int col    = Integer.parseInt (fld [3]);
-                String lbl = fld [4];
-                String id  = fld [5];
+                int id      = Integer.parseInt (fld [1]);
+                int row     = Integer.parseInt (fld [2]);
+                int col     = Integer.parseInt (fld [3]);
+                String sfx  = fld [4];
 
-                Sym sym = symList.add (lbl, 'B', num, lbl);
+                String mqtt = null;
+                if (5 < fld.length)
+                    mqtt = fld [5];
+
+                String name = Integer.toString (id);
+                if (! sfx.equals("_"))
+                    name += sfx;
+
+                Sym sym = symList.add (name, 'B', id, mqtt);
 
                 if (! trk.check (col, row, 'B', 0, null, null))  {
                     loadPnlErr (line, "invalid block tile");
