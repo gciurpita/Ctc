@@ -158,6 +158,8 @@ public class Track {
 
     // ------------------------------------------------------------------------
     final int TrackH   = 2;
+
+    final int BlockHr  = 4;
     final int BlockHl  = 5;
 
     final int AngleDL  = 8;
@@ -183,8 +185,10 @@ public class Track {
                 return false;
         }
         else if ('B' == type)  {
-            if (BlockHl != tile)
+            if (BlockHl != tile && BlockHr != tile)  {
+                System.out.format ("Track.check: %c %d\n", type, tile);
                 return false;
+            }
         }
         else if ('T' == type)  {
             if (tile < AngleDL || AngleUR < tile)

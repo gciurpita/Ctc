@@ -1,5 +1,6 @@
 public class SymList  {
     Sym     head = null;
+    Sym     next = null;
     boolean dbg  = false;
 
     // -------------------------------------
@@ -88,6 +89,7 @@ public class SymList  {
 
         return null;
     }
+
     // -------------------------------------
     public Sym findName (
         String  name )
@@ -107,5 +109,15 @@ public class SymList  {
         }
 
         return null;
+    }
+
+    // -------------------------------------
+    public Sym getNext (
+        Sym   sym )
+    {
+        if (null != sym)
+            return sym.next;
+
+        return head;
     }
 }

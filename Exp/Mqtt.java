@@ -101,7 +101,8 @@ class Mqtt
         buf [0] = Connect;
         buf [1] = (byte) (idx -2);
 
-        dump (buf, idx, "connect");
+        if (false)
+            dump (buf, idx, "connect");
 
         if (null == sckt)  {
             System.out.format ("connect: sckt null\n");
@@ -110,6 +111,8 @@ class Mqtt
         sckt.write (buf, idx);
 
         nextMsgId = 2;
+
+        waitFor (ConnAck, false);
     }
 
     // -------------------------------------
@@ -176,26 +179,43 @@ class Mqtt
 
     // -------------------------------------
     int receive (
-        byte buf [],
-        int  nByte )
+        byte    buf [],
+        int     nByte,
+        boolean dbg )
     {
         nByte = sckt.readPckt (buf, nByte);
 
         if (0 == nByte)
             return 0;
 
-        dump (buf, nByte, "mqtt.receive");
+        if (dbg)
+            dump (buf, nByte, "mqtt.receive");
+
         byte id = (byte) ((buf [0] >> 4) & 0x0F);
-        System.out.format (
-            "mqtt.receive: 0x%02x %s\n", id, MsgName [id]);
+
+        if (dbg)
+            System.out.format (
+                "mqtt.receive: 0x%02x %s\n", id, MsgName [id]);
+
         return nByte;
     }
 
     // -------------------------------------
-    void subscribe (
-        String  topic )
+    int receive (
+        byte    buf [],
+        int     nByte )
     {
-        System.out.format ("subscribe: %s\n", topic);
+        return receive (buf, nByte, false);
+    }
+
+    // -------------------------------------
+    void subscribe (
+        String  subTopic )
+    {
+        boolean dbg = false;
+
+        String fullTopic =  topic + "/" + subTopic;
+        System.out.format ("subscribe: %s\n", fullTopic);
 
         byte [] buf = new byte [90];
         int  idx = 2;
@@ -204,16 +224,42 @@ class Mqtt
 
         // nextMsgId
         buf [idx++] = (byte) (nextMsgId >> 8);
-        buf [idx++] = (byte) (nextMsgId & 0x0F);
+        buf [idx++] = (byte)  nextMsgId;
 
-        // topic name
-        for (int i = 0; i < topic.length(); i++)
-            buf [idx++] = (byte) topic.charAt (i);
+        // subscription name
+        int len = fullTopic.length ();
+        buf [idx++] = (byte) (len >> 8);
+        buf [idx++] = (byte)  len;
+        for (int i = 0; i < len; i++)
+            buf [idx++] = (byte) fullTopic.charAt (i);
+        idx++;
 
         // header
         buf [0] = (byte) (Subscribe | Qos1);
         buf [1] = (byte) (idx -2);
 
+        if (dbg)
+            dump (buf, idx, "subscribe");
+
         sckt.write (buf, idx);
+
+        waitFor (SubAck, dbg);
+    }
+
+    // -------------------------------------
+    void waitFor (
+        byte    msgHdr,
+        boolean dbg )
+    {
+        if (dbg)
+            System.out.format ("Mqtt.waitFor: 0x%02x\n", msgHdr);
+        final int BufSize = 90;
+        byte      [] buf  = new byte [BufSize];
+        do {
+            while (0 == receive (buf, BufSize))
+                ;
+        } while (msgHdr != (byte) (buf [0] & 0xF0));
+        if (dbg)
+            System.out.format ("  Mqtt.waitFor:\n\n");
     }
 }

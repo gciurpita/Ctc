@@ -69,5 +69,13 @@ public class Sym  {
         if (null != ruleList)
             System.out.format (" rules");
         System.out.println ();
+     }
+
+    // --------------------------------
+    public String getSubTopic ()
+    {
+        if (null == mqtt)
+            return type + "/" + name + "/";
+        return mqtt;
     }
 }

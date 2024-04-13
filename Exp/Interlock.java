@@ -31,6 +31,8 @@ public class Interlock extends JPanel
     Panel    panel    = new Panel   (ctl,   symList);
     Track    trk      = new Track   (panel, symList);
 
+    Mqtt     mqtt;
+
     int      canvasHt;
     int      canvasWid;
     int      colWid;
@@ -250,8 +252,7 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                System.out.format (
-                        "     loadPnl block: add block ???\n");
+                System.out.format (" loadPnl block:   %s\n", name);
             }
 
             // -----------------------------------
@@ -285,7 +286,21 @@ public class Interlock extends JPanel
                 String name  = fld [3];
                 String topic = fld [4];
 
-                ctl.set (new Mqtt (ip, port, name, topic));
+                mqtt = new Mqtt (ip, port, name, topic);
+                ctl.set (mqtt);
+
+                // genrate subscriptions
+                Sym sym = symList.getNext (null);
+
+                for ( ; null != sym; sym = symList.getNext (sym))  {
+                    switch (sym.type)  {
+                    case 'B':
+                    case 'T':
+                        String subTopic = sym.getSubTopic ();
+                        mqtt.subscribe (subTopic);
+                        break;
+                    }
+                }
             }
 
             // -----------------------------------

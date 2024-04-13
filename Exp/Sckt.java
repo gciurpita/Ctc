@@ -87,7 +87,9 @@ class Sckt {
 
     // -------------------------------------------------------------------
     // Read data from the server
-    public  int readPckt (byte buf [], int size)
+    public  int readPckt (
+        byte buf [],
+        int  size )
     {
         int nRd = 0;
         int len = 0;
@@ -101,7 +103,7 @@ class Sckt {
         }
 
         try {
-            if (1 > (nRd = in.read (buf, 0, 2)))  {
+            if (1 > (nRd = in.read (buf, 0, size)))  {
                 System.out.format(" readPckt: nRd %d\n", nRd);
                 if (0 > nRd)
                     System.exit (1);

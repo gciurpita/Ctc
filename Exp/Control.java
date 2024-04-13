@@ -83,9 +83,10 @@ public class Control
         // -------------------------------------
         final int BufSize = 90;
         byte      [] buf  = new byte [BufSize];
-        int       nByte = mqtt.receive (buf, BufSize);
+        int       nByte = mqtt.receive (buf, BufSize, true);
 
         if (0 < nByte)  {
+            System.out.format ("Control.receive: \n");
         }
 
         // -------------------------------------
@@ -98,8 +99,13 @@ public class Control
         System.out.format (
             " receive: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
 
-        if ('T' == cmd.type || 'S' == cmd.type)
+        switch (cmd.type)  {
+        case 'B':
+        case 'T':
+        case 'S':
             track.update (cmd.state, cmd.id);
+        }
+
         cmd = cmd.next;
     }
 }
