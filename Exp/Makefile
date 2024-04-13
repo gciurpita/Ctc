@@ -9,6 +9,7 @@
 #   Pnl     = 0.rules
     Pnl     = md2.pnl
     Pnl     = b2b.pnl
+    Pnl     = b2b_a.pnl
 
 %.class : %.java
 		javac $(LINT_FLAG) $<
