@@ -178,6 +178,7 @@ public class Track {
         Sym     sym,
         String  name )
     {
+     // System.out.format ("  Track.check: name %s\n", name);
         byte tile = trk [col][row];
 
         if ('S' == type)  {
@@ -373,11 +374,12 @@ public class Track {
         System.out.format ("  Track.update: '%c' \"%s\"\n", pos, name);
 
         Sym sym = symList.findName (name);
+        sym.disp ();
 
         panel.response (sym.num, pos);      // notify panel
 
         for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
-            if (ts.sym.name != name)
+            if (! ts.sym.name.equals(name))
                 continue;
 
             // TO case

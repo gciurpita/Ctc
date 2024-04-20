@@ -275,13 +275,12 @@ public class Panel {
         g2d.drawImage (lever   [pos].img, x0 + 6, y0 + 44, null);
 
         // lamps
-        int lampIdxLeft  = 5;
-        int lampIdxRight = 1;
+        int lampIdxLeft  = 6;
+        int lampIdxRight = 0;
 
- //     if ('L' == lvr [lvrId].cond)  {
-        if ('L' == lvr [lvrId].sym.cond)  {
-            lampIdxLeft  = 6;
-            lampIdxRight = 0;
+        if ('R' == lvr [lvrId].sym.cond)  {
+            lampIdxLeft  = 5;
+            lampIdxRight = 1;
         }
         g2d.drawImage (lamp [lampIdxLeft].img,  x0 +  5, y0 + 3, null);
         g2d.drawImage (lamp [lampIdxRight].img, x0 + 34, y0 + 4, null);

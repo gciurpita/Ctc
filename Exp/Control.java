@@ -63,7 +63,7 @@ public class Control
         Cmd    cmd )
     {
         System.out.format (
-            "Control.process: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
+            " Control.process: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
 
         switch (cmd.type)  {
         case 'B':
