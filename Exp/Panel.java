@@ -50,6 +50,7 @@ public class Panel {
     Icon      code    [] = new Icon [2];
     Icon      lamp    [] = new Icon [15];
     Icon      lever   [] = new Icon [3];
+    Icon      lock    [] = new Icon [2];
     Icon      signal  [] = new Icon [15];
     Icon      turnout [] = new Icon [15];
 
@@ -126,6 +127,11 @@ public class Panel {
                 code [id].img  = ImageIO.read (inFile);
             }
 
+            else if (fields[1].equals("Lock"))  {
+                lock [id]      = new Icon ();
+                lock [id].img  = ImageIO.read (inFile);
+            }
+
          // System.out.format ("  loadIcons: %s\n", fields [3]);
         }
 
@@ -141,9 +147,13 @@ public class Panel {
         int iconCodeWid = code [0].img.getWidth  (null);
         System.out.format ( ", cod wid %d, ht %d", iconCodeWid, iconCodeHt);
 
+        int iconLockHt  = code [0].img.getHeight (null);
+        int iconLockWid = code [0].img.getWidth  (null);
+        System.out.format ( ", cod wid %d, ht %d", iconLockWid, iconLockHt);
+
         System.out.println ();
 
-        colHt = iconToHt + iconSigHt + 2 * iconCodeHt;
+        colHt = iconToHt + iconSigHt + 2 * iconCodeHt + 2 * iconLockHt;
     }
 
     // --------------------------------
@@ -235,9 +245,14 @@ public class Panel {
         }
 
         // code
-        else {
+        else if (y - y0Panel < (iconToHt + iconSigHt + 50))  {
             codeBut [num] = 5;
             return true;
+        }
+
+        // lock
+        else {
+            System.out.format ("Panel.mousePressed: lock col %d\n", col);
         }
 
         return false;
@@ -386,6 +401,11 @@ public class Panel {
             // code button
             int  idx = 0 < codeBut [num] ? 1 : 0;
             g2d.drawImage (code [idx].img, x0 + 15, y2 + 10, null);
+
+            // lock button
+            g2d.drawImage (lock [0].img, x0 + 12, y2 + 50, null);
+            idx = 0 < codeBut [num] ? 10 : 0;
+            g2d.drawImage (lamp [idx].img, x0 + 17, y2 + 76, null);
         }
     }
-    };
+};
