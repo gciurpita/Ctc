@@ -29,13 +29,105 @@ public class Control
     Sckt sckt  = null;
     Mqtt mqtt  = null;
 
-    int     pingCnt = 0;
+    int  pingCnt;
 
     // ---------------------------------------------------------
-    public void set (
-        Mqtt  mqtt )
+    public Cmd getCmd ()
     {
-        this.mqtt = mqtt;
+        if (null == cmd)
+            return null;
+
+        if (0 < cmd.delay--)
+            return null;
+
+        Cmd  cmd = this.cmd;
+        this.cmd = this.cmd.next;
+
+        return cmd;
+    }
+
+    // ---------------------------------------------------------
+    public void heartbeat ()
+    {
+        if (null != mqtt)  {
+            if (200 <= ++pingCnt)  {
+                pingCnt = 0;
+                mqtt.ping ();
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    public void processCmd (
+        Track  track,
+        Cmd    cmd )
+    {
+        System.out.format (
+            "Control.process: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
+
+        switch (cmd.type)  {
+        case 'B':
+        case 'T':
+        case 'S':
+            track.update (cmd.state, cmd.id);
+        }
+    }
+
+    // ---------------------------------------------------------
+    public int receive (
+        Track  track,
+        Panel  panel )
+    {
+        final int BufSize = 90;
+        byte      [] buf  = new byte [BufSize];
+        int       nByte;
+        Cmd       cmd;
+
+        // -------------------------------------
+        if (null != mqtt)  {
+            nByte = mqtt.receive (buf, BufSize, true);
+            if (0 == nByte)
+                return 0;
+
+            byte msgType = (byte)(buf [0] & 0xF0);
+            if (mqtt.Publish != msgType)
+                return msgType;
+
+            // separate and decode topic
+            char [] charBuf = new char [40];
+            for (int i = 0; i < buf [3]; i++)
+                charBuf [i] = (char) buf [i+4];
+            charBuf [buf [3]] = 0;
+
+            String topic = new String(charBuf);
+            String[] fld = topic.split("/");
+
+            cmd = new Cmd (fld [1].charAt (0), fld [2], (char)buf [buf [1]+1]);
+
+            System.out.format ("Control.receive:");
+            System.out.format ("  type %c",  cmd.type);
+            System.out.format (", id %s",    cmd.id);
+            System.out.format (", state %c", cmd.state);
+            System.out.println ();
+
+            processCmd (track, cmd);
+        }
+
+        // -------------------------------------
+        else if (null != (cmd = getCmd()))
+            processCmd (track, cmd);
+
+        return 0;
+    }
+
+    // ---------------------------------------------------------
+    public void receive (
+        Track  track,
+        Panel  panel,
+        int    msgType )
+    {
+        while (msgType != receive (track, panel))
+            ;
     }
 
     // ---------------------------------------------------------
@@ -71,41 +163,9 @@ public class Control
     }
 
     // ---------------------------------------------------------
-    public void receive (
-        Track  track,
-        Panel  panel )
+    public void set (
+        Mqtt  mqtt )
     {
-        if (200 <= ++pingCnt)  {
-            mqtt.ping ();
-            pingCnt = 0;         // every 100 sec, for 500 msec timer
-        }
-
-        // -------------------------------------
-        final int BufSize = 90;
-        byte      [] buf  = new byte [BufSize];
-        int       nByte = mqtt.receive (buf, BufSize, true);
-
-        if (0 < nByte)  {
-            System.out.format ("Control.receive: \n");
-        }
-
-        // -------------------------------------
-        if (null == cmd)        // check for something on cmd queue
-            return;
-
-        if (0 < cmd.delay--)
-            return;
-
-        System.out.format (
-            " receive: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
-
-        switch (cmd.type)  {
-        case 'B':
-        case 'T':
-        case 'S':
-            track.update (cmd.state, cmd.id);
-        }
-
-        cmd = cmd.next;
+        this.mqtt = mqtt;
     }
 }

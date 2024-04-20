@@ -242,8 +242,6 @@ class Mqtt
             dump (buf, idx, "subscribe");
 
         sckt.write (buf, idx);
-
-        waitFor (SubAck, dbg);
     }
 
     // -------------------------------------

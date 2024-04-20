@@ -97,7 +97,8 @@ public class Interlock extends JPanel
     //   timer task
     private void timerTask ()
     {
-        ctl.receive (trk, panel);
+        ctl.heartbeat ();
+        int msgType = ctl.receive (trk, panel);
         panel.timer ();
 
         repaint ();
@@ -272,9 +273,6 @@ public class Interlock extends JPanel
                     continue;
                 }
 
-                System.out.format (" loadPnl: %s\n", line);
-                System.out.format (" loadPnl: # fld %d\n", fld.length);
-
                 if (4 > fld.length)  {
                     loadPnlErr (line, "mqtt ipAddr port node-name");
                     err++;
@@ -289,7 +287,7 @@ public class Interlock extends JPanel
                 mqtt = new Mqtt (ip, port, name, topic);
                 ctl.set (mqtt);
 
-                // genrate subscriptions
+                // generate subscriptions
                 Sym sym = symList.getNext (null);
 
                 for ( ; null != sym; sym = symList.getNext (sym))  {
@@ -297,7 +295,10 @@ public class Interlock extends JPanel
                     case 'B':
                     case 'T':
                         String subTopic = sym.getSubTopic ();
+                        System.out.format (
+                            "\nInterlock mqtt: subscribe %s\n", subTopic);
                         mqtt.subscribe (subTopic);
+                        ctl.receive (trk, panel, mqtt.SubAck);
                         break;
                     }
                 }
