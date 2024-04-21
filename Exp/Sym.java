@@ -23,6 +23,8 @@ public class Sym  {
         this.type = type;
         this.mqtt = mqtt;
 
+     // System.out.format ("   Sym: %c %-6s %4d\n", type, name, num);
+
         if ('S' == type)
             this.cond = 'S';
         else if ('L' == type)

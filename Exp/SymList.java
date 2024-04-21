@@ -12,10 +12,9 @@ public class SymList  {
     {
      // boolean dbg = false;
 
-        Sym sym = find (name);
+        Sym sym = find (name, type);
         if (null != sym)  {
-            if (dbg)
-                System.out.format ("symlist.add: %s exists\n", name);
+            System.out.format ("symlist.add: %s exists\n", name);
             return sym;
         }
 
@@ -71,7 +70,8 @@ public class SymList  {
 
     // -------------------------------------
     public Sym find (
-        String  name )
+        String  name,
+        char    type )
     {
         if (dbg)
             System.out.format ("  symList.find: %s\n", name);
@@ -80,7 +80,7 @@ public class SymList  {
             if (dbg)
                 System.out.format ("   symlist.find: %s\n", sym.name);
 
-            if (sym.name.equals (name))  {
+            if (sym.name.equals (name) && sym.type == type)  {
                 if (dbg)
                     System.out.format ("    symlist.find: found\n");
                 return sym;

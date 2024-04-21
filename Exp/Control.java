@@ -85,7 +85,7 @@ public class Control
 
         // -------------------------------------
         if (null != mqtt)  {
-            nByte = mqtt.receive (buf, BufSize, true);
+            nByte = mqtt.receive (buf, BufSize, false);
             if (0 == nByte)
                 return 0;
 

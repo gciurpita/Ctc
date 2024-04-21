@@ -178,7 +178,10 @@ public class Track {
         Sym     sym,
         String  name )
     {
-     // System.out.format ("  Track.check: name %s\n", name);
+        if (false)
+        System.out.format (
+            "  Track.check: %c %-6s, %4d,\n", type, name, ctcNum);
+
         byte tile = trk [col][row];
 
         if ('S' == type)  {
@@ -197,7 +200,7 @@ public class Track {
             trk [col][row] = TrackH;
         }
         else
-                return false;
+            return false;
 
         if (null == name)
             return true;
@@ -374,7 +377,7 @@ public class Track {
         System.out.format ("  Track.update: '%c' \"%s\"\n", pos, name);
 
         Sym sym = symList.findName (name);
-        sym.disp ();
+     // sym.disp ();
 
         panel.response (sym.num, pos);      // notify panel
 
@@ -391,7 +394,9 @@ public class Track {
                 trk [ts.col][ts.row] = tile;
                 ts.sym.cond          = pos;
 
-                System.out.format ( "    Track.update: <%2d, %2d> %2d %s\n",
+                if (false)
+                    System.out.format (
+                        "    Track.update: <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
             }
 
@@ -404,7 +409,9 @@ public class Track {
                 trk [ts.col][ts.row] = tile;
                 ts.sym.cond          = pos;
 
-                System.out.format ( "    Track.update: <%2d, %2d> %2d %s\n",
+                if (false)
+                    System.out.format (
+                        "    Track.update: <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
             }
         }

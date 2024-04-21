@@ -311,7 +311,7 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
-                Sym sym = symList.find (fld [1]);
+                Sym sym = symList.find (fld [1], 'r');
                 if (null == sym)  {
                     loadPnlErr (line, "unknown sym");
                     err++;
@@ -457,7 +457,7 @@ public class Interlock extends JPanel
                     System.exit (2);
                 }
 
-                Sym sym = symList.find (fld [2]);
+                Sym sym = symList.find (fld [2], '_');
                 if (null == sym)  {
                     System.out.format (
                         "Error - cmdProcess - set not found - %s\n", fld [2]);
