@@ -65,12 +65,7 @@ public class Control
         System.out.format (
             " Control.process: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
 
-        switch (cmd.type)  {
-        case 'B':
-        case 'T':
-        case 'S':
-            track.update (cmd.state, cmd.id);
-        }
+        track.update (cmd.type, cmd.state, cmd.id);
     }
 
     // ---------------------------------------------------------

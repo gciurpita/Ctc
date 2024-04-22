@@ -19,21 +19,25 @@
 #             1         2         3         4
 
 row           A    A              A     A
-row         852222249           8522222249
+row         842222259           8422222259
 #   01234567890123456789012345678901234567890123456789
+#             1         2         3         4
 row        6  @    @ 7         6  @     @ 7
 row       6   A    A  7       6   A     A  7
-row  2224;2225222224222:52224;22252222224222:5222
+row  2225;2224222225222:42225;22242222225222:4222
 row           @    @              @     @
 
 #         id  row  col  lbl  mqtt
 block      3    4    4    _
+block      9    4   20    _
+block     13    4   24    _
+block     19    4   41    _
 
 ctc       3 4       9 10      13 14  19 20
 
 #        ctc  row  col  lbl  mqtt
 signal     4    0   10  LB
-signal     4    2   10  R
+signal     4    2   10  RB
 signal     4    3   10  L
 signal     4    5   10  R
 

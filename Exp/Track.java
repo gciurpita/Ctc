@@ -22,12 +22,13 @@ import javax.imageio.ImageIO;
 public class Track {
     SymList   symList;
 
-    final int Col      = 100;
-    final int Row      = 30;
-    byte      trk [][] = new byte [Col][Row];
+    final int Ncol     = 100;
+    final int Nrow     = 30;
+    byte      trk [][] = new byte [Ncol][Nrow];
     int       nRow     = 0;
     int       maxCol   = 0;
 
+    Blk       blks;
     Panel     panel;
 
     String    cfgFile  = "../Resources/blackScreenTiles.cfg";
@@ -44,6 +45,17 @@ public class Track {
         int     row;
         String  id;
         char    state;      // 'O'ccupied
+        Blk     next;
+
+        public Blk (
+            int    col,
+            int    row,
+            String id )
+        {
+            this.col  = col;
+            this.row  = row;
+            this.id   = id;
+        }
     }
 
     // -------------------------------------
@@ -174,13 +186,13 @@ public class Track {
         int     col,
         int     row,
         char    type,
-        int     ctcNum,
+        int     num,
         Sym     sym,
         String  name )
     {
         if (false)
         System.out.format (
-            "  Track.check: %c %-6s, %4d,\n", type, name, ctcNum);
+            "  Track.check: %c %-6s, %4d,\n", type, name, num);
 
         byte tile = trk [col][row];
 
@@ -193,7 +205,15 @@ public class Track {
                 System.out.format ("Track.check: %c %d\n", type, tile);
                 return false;
             }
+
+            Blk blk   = new Blk (col, row, name);
+            blk.next  = blks;
+            blks      = blk;
+
+            System.out.format ("   Track.check: %c %s\n", type, name);
+            return true;
         }
+
         else if ('T' == type)  {
             if (tile < AngleDL || AngleUR < tile)
                 return false;
@@ -212,7 +232,7 @@ public class Track {
             System.out.format ( "  Track.check: <%2d, %2d> %2d %s\n",
                 ts.col, ts.row, ts.tile, ts.name);
 
-        toSigHd.ctcNum = ctcNum;
+        toSigHd.ctcNum = num;
 
         // set text offsets
         switch (tile)  {
@@ -288,9 +308,9 @@ public class Track {
         char c;
      // System.out.format ("  Track.newRow: %s\n", s);
 
-        if (Row <= nRow)  {
+        if (Nrow <= nRow)  {
             System.out.format (
-                "Error Track.newRow: # rows %d > Row %d\n", nRow, Row);
+                "Error Track.newRow: # rows %d > Row %d\n", nRow, Nrow);
             System.exit (3);
         }
 
@@ -314,63 +334,72 @@ public class Track {
     // ------------------------------------------------------------------------
     public void trace (
         Graphics2D  g2d,
-        Blk  blk )
+        int         col,
+        int         row,
+        int         offset )
     {
         final int BlockHR = 4;
         final int BlockHL = 5;
+        boolean   dbg     = false;
 
-        int       col     = blk.col;
-        int       row     = blk.row;
-        int       offset  = 0;
+        if (dbg)
+            System.out.format (
+                "trace:  col %2d, row %d, off %d\n", col, row, offset);
 
-        System.out.format ("trace:  col %2d, row %d\n", col, row);
-
-        if ('O' == blk.state)           // occupied, red offset
-            offset = 30;
-        else if ('C' == blk.state)      // cleared, green offset
-            offset = 50;
-
+        int dir     = 1;
         int tileIdx = trk [col][row];
+        if (BlockHR == tileIdx)
+            dir = -1;
+        
         do  {
             int idx  = offset + tileIdx;
             g2d.drawImage (
                 tile [idx].img, col * tileWid, row * tileWid, null);
 
-            switch (tileIdx) {
-            case 7:         // diagonalUD \
-            case 9:         // angleDR -\
-                row++;
+            if (1 == dir)  {    // moving right
                 col++;
-                break;
+                switch (tileIdx) {
+                case 7:         // diagonalUD \
+                case 9:         // angleDR -\
+                    row++;
+                    break;
 
-            case 6:         // diagonalDU /
-            case 11:        // angleUR -/
-                row--;
-                col++;
-                break;
+                case 6:         // diagonalDU /
+                case 11:        // angleUR -/
+                    row--;
+                    break;
+                }
+            }
+            else {              // moving left
+                col--;
+                switch (tileIdx) {
+                case 7:         // diagonalUD \
+                case 10:        // angleUL \-
+                    row--;
+                    break;
 
-            case 8:         // angleDL /-
-            case 10:        // angleUL \-
-            default:
-                col++;;
-                break;
+                case 6:         // diagonalDU /
+                case 8:         // angleDL /-
+                    row++;
+                    break;
+                }
             }
 
-            System.out.format (" trace: col %2d, row %d\n", col, row);
+            if (dbg)
+                System.out.format (
+                    " trace: col %2d, row %d, tile %d\n", col, row, tileIdx);
 
             tileIdx = trk [col][row];
-            System.out.format (" trace: tile %2d\n", tileIdx);
         } while (0 <= tileIdx && BlockHR != tileIdx && BlockHL != tileIdx);
 
-        if (BlockHR == tileIdx)  {
-            int idx  = offset + tileIdx;
-            g2d.drawImage (
-                tile [idx].img, col * tileWid, row * tileWid, null);
-        }
+        int idx  = offset + tileIdx;
+        g2d.drawImage (
+            tile [idx].img, col * tileWid, row * tileWid, null);
     }
 
     // ------------------------------------------------------------------------
     public void update (
+        char    type,
         char    pos,
         String  name )
     {
@@ -380,6 +409,13 @@ public class Track {
      // sym.disp ();
 
         panel.response (sym.num, pos);      // notify panel
+
+        if ('B' == type)  {                 // block
+            for (Blk blk = blks ; null != blk; blk = blk.next)
+                if (blk.id.equals(name))
+                    blk.state = pos;
+            return;
+        }
 
         for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
             if (! ts.sym.name.equals(name))
@@ -441,6 +477,17 @@ public class Track {
                 else
                     g2d.drawImage (tile [idx].img, x0, y0, null);
             }
+        }
+
+        // blocks
+        for (Blk blk = blks ; null != blk; blk = blk.next)  {
+            int idx = 0;
+            if ('o' == blk.state)
+                idx = 30;               // red
+            else if ('c' == blk.state)
+                idx = 60;               // green
+
+            trace (g2d, blk.col, blk.row, idx);
         }
 
         // add labels
