@@ -14,6 +14,7 @@ class Mqtt
 
     Sckt    sckt;
     int     nextMsgId;
+    boolean dbg = false;
 
     byte Connect     = (byte) 0x10;  // Client request to connect to Server
     byte ConnAck     = (byte) 0x20;  // Connect ACK
@@ -121,7 +122,7 @@ class Mqtt
         int     nByte,
         String  label )
     {
-        if (false)
+        if (! dbg)
             return;
 
         System.out.format ("  dump: %d %s", nByte, label);
@@ -149,7 +150,7 @@ class Mqtt
         String  subTopic,
         String  value )
     {
-        System.out.format ("publish: %s %s\n", subTopic, value);
+        System.out.format ("  publish: %s %s\n", subTopic, value);
 
         byte [] buf = new byte [90];
         int  idx = 2;
@@ -188,8 +189,7 @@ class Mqtt
         if (0 == nByte)
             return 0;
 
-        if (dbg)
-            dump (buf, nByte, "mqtt.receive");
+        dump (buf, nByte, "mqtt.receive");
 
         byte id = (byte) ((buf [0] >> 4) & 0x0F);
 
@@ -238,8 +238,7 @@ class Mqtt
         buf [0] = (byte) (Subscribe | Qos1);
         buf [1] = (byte) (idx -2);
 
-        if (dbg)
-            dump (buf, idx, "subscribe");
+        dump (buf, idx, "subscribe");
 
         sckt.write (buf, idx);
     }

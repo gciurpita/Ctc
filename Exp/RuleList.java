@@ -4,7 +4,7 @@ public class RuleList  {
     Sym         sym;
     boolean     locked;
 
-    private boolean dbg = true;
+    private boolean dbg = false;
 
     // globals from id()
     private String name = "?";
@@ -72,8 +72,9 @@ public class RuleList  {
     public boolean check (
         RuleList  rl )
     {
-        System.out.format (
-            "  RuleList.check:  %c %-4s", rl.sym.cond, rl.sym.name);
+        if (dbg)
+            System.out.format (
+                "  RuleList.check:  %c %-4s", rl.sym.cond, rl.sym.name);
      // rl.disp (rl.sym.name);
 
         boolean match = true;
@@ -87,14 +88,19 @@ public class RuleList  {
 
             if (d != c)  {
                 match = false;
-                System.out.format ("  %c %c %-4s", d, c, rule.sym.name);
+                if (dbg)
+                    System.out.format ("  %c %c %-4s", d, c, rule.sym.name);
             }
             else
-                System.out.format ("  . %c %-4s", c, rule.sym.name);
+                if (dbg)
+                    System.out.format ("  . %c %-4s", c, rule.sym.name);
         }
-        if (match)
-            System.out.print (" -- match");
-        System.out.println ();
+
+        if (dbg) {
+            if (match)
+                System.out.print (" -- match");
+            System.out.println ();
+        }
 
         return match;
     }
@@ -105,7 +111,8 @@ public class RuleList  {
         int      ctcNum,
         Control  ctl )
     {
-        System.out.format (" RuleList.checks: ctcNum %d\n", ctcNum);
+        if (dbg)
+            System.out.format (" RuleList.checks: ctcNum %d\n", ctcNum);
 
         if ('C' == sym.cond) {
             uncheck ();
@@ -119,8 +126,9 @@ public class RuleList  {
                 rl.lock ();
 
                 ctl.send ('S', sym.name, sym.cond);
-                System.out.format (
-                    "  ruleList.checks: send msg, %s\n", sym.name);
+                if (dbg)
+                    System.out.format (
+                        "  ruleList.checks: send msg, %s\n", sym.name);
                 return;
             }
         }

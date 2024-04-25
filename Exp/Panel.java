@@ -251,10 +251,7 @@ public class Panel {
             // send turnout request if not locked
             Sym sym = symList.findName (lvr [num].name);
             if (0 == sym.lock)  {
-                if (null != sym.mqtt)
-                    ctl.send (sym.mqtt, lvr [num].pos);
-                else
-                    ctl.send ("T/" + sym.name, lvr [num].pos);
+                 ctl.send ('T', sym.name, lvr [num].pos);
             }
 
             // send signal request based on rules

@@ -403,10 +403,10 @@ public class Track {
         char    pos,
         String  name )
     {
-        System.out.format ("  Track.update: '%c' \"%s\"\n", pos, name);
+        System.out.format ("  Track.update: %c %-5s %c\n", type, name, pos);
 
         Sym sym = symList.findName (name);
-     // sym.disp ();
+        sym.disp ();
 
         panel.response (sym.num, pos);      // notify panel
 
@@ -420,6 +420,8 @@ public class Track {
         for (ToSig ts = toSigHd; null != ts; ts = ts.next)  {
             if (! ts.sym.name.equals(name))
                 continue;
+
+            ts.sym.disp ();
 
             // TO case
             if (1 == (ts.ctcNum % 2))  {

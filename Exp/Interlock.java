@@ -92,7 +92,7 @@ public class Interlock extends JPanel
         };
 
         Timer timer = new Timer("Timer");
-        timer.scheduleAtFixedRate (task, 0, 500);
+        timer.scheduleAtFixedRate (task, 0, 1000);
     }
 
     // --------------------------------

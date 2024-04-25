@@ -63,9 +63,48 @@ public class Control
         Cmd    cmd )
     {
         System.out.format (
-            " Control.process: %c %5s %c\n", cmd.type, cmd.id, cmd.state);
+            " Control.process: %c %-5s %c\n", cmd.type, cmd.id, cmd.state);
 
         track.update (cmd.type, cmd.state, cmd.id);
+    }
+
+    // ---------------------------------------------------------
+    public int receiveMqtt (
+        Track  track,
+        Panel  panel )
+    {
+        final int BufSize = 90;
+        byte      [] buf  = new byte [BufSize];
+        int       nByte;
+
+        nByte = mqtt.receive (buf, BufSize, false);
+        if (0 == nByte)
+            return 0;
+
+        byte msgType = (byte)(buf [0] & 0xF0);
+        if (mqtt.Publish != msgType)
+            return msgType;
+
+        // separate and decode topic
+        char [] charBuf = new char [40];
+        for (int i = 0; i < buf [3]; i++)
+            charBuf [i] = (char) buf [i+4];
+        charBuf [buf [3]] = 0;
+
+        String topic = new String(charBuf);
+        String[] fld = topic.split("/");
+
+        cmd = new Cmd (fld [1].charAt (0), fld [2], (char)buf [buf [1]+1]);
+
+        System.out.format ("Control.receive:");
+        System.out.format ("  type %c",  cmd.type);
+        System.out.format (", id %s",    cmd.id);
+        System.out.format (", state %c", cmd.state);
+        System.out.println ();
+
+        processCmd (track, cmd);
+
+        return 0;
     }
 
     // ---------------------------------------------------------
@@ -73,44 +112,15 @@ public class Control
         Track  track,
         Panel  panel )
     {
-        final int BufSize = 90;
-        byte      [] buf  = new byte [BufSize];
-        int       nByte;
+        // -------------------------------------
         Cmd       cmd;
+        if (null != (cmd = getCmd()))
+            processCmd (track, cmd);
 
         // -------------------------------------
         if (null != mqtt)  {
-            nByte = mqtt.receive (buf, BufSize, false);
-            if (0 == nByte)
-                return 0;
-
-            byte msgType = (byte)(buf [0] & 0xF0);
-            if (mqtt.Publish != msgType)
-                return msgType;
-
-            // separate and decode topic
-            char [] charBuf = new char [40];
-            for (int i = 0; i < buf [3]; i++)
-                charBuf [i] = (char) buf [i+4];
-            charBuf [buf [3]] = 0;
-
-            String topic = new String(charBuf);
-            String[] fld = topic.split("/");
-
-            cmd = new Cmd (fld [1].charAt (0), fld [2], (char)buf [buf [1]+1]);
-
-            System.out.format ("Control.receive:");
-            System.out.format ("  type %c",  cmd.type);
-            System.out.format (", id %s",    cmd.id);
-            System.out.format (", state %c", cmd.state);
-            System.out.println ();
-
-            processCmd (track, cmd);
+            return receiveMqtt (track, panel);
         }
-
-        // -------------------------------------
-        else if (null != (cmd = getCmd()))
-            processCmd (track, cmd);
 
         return 0;
     }
@@ -137,25 +147,26 @@ public class Control
 
         System.out.format ("send: %c %s %c\n", cmd.type, cmd.id, cmd.state);
 
-        String topic = String.format ("%c/%s/", type, id);
-        if (null != mqtt)
+        if (null != mqtt)  {
+            String topic = String.format ("%c/%s/", type, id);
             mqtt.publish (topic, String.valueOf(state));
+        }
     }
 
     // ---------------------------------------------------------
-    public void send (
-        String  topicName,
-        char    state )
-    {
-        Cmd cmd  = new Cmd (' ', topicName, state);
-        cmd.next = this.cmd;
-        this.cmd = cmd;
+ // public void send (
+ //     String  topicName,
+ //     char    state )
+ // {
+ //     Cmd cmd  = new Cmd (' ', topicName, state);
+ //     cmd.next = this.cmd;
+ //     this.cmd = cmd;
 
-        System.out.format ("send: %s %c\n", topicName, cmd.state);
+ //     System.out.format ("send: %s %c\n", topicName, cmd.state);
 
-        if (null != mqtt)
-            mqtt.publish (topicName, String.valueOf(state));
-    }
+ //     if (null != mqtt)
+ //         mqtt.publish (topicName, String.valueOf(state));
+ // }
 
     // ---------------------------------------------------------
     public void set (
