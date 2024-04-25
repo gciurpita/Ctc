@@ -41,6 +41,8 @@ public class Interlock extends JPanel
     int      trkHt;
     int      lvrHt;
 
+    String   title;
+
     // --------------------------------
     public Interlock (
         String pnlFile )
@@ -76,7 +78,7 @@ public class Interlock extends JPanel
         frame.pack ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.setVisible (true);
-        frame.setTitle   ("Interlock Panel");
+        frame.setTitle   (title);
 
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
@@ -352,6 +354,11 @@ public class Interlock extends JPanel
                 }
 
                 System.out.format (" loadPnl signal:  %s\n", name);
+            }
+
+            // -----------------------------------
+            else if (fld[0].equals("title"))  {
+                title = line.substring (6);
             }
 
             // -----------------------------------
