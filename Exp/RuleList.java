@@ -4,7 +4,7 @@ public class RuleList  {
     Sym         sym;
     boolean     locked;
 
-    private boolean dbg = false;
+    private boolean dbg = true;
 
     // globals from id()
     private String name = "?";
@@ -31,7 +31,7 @@ public class RuleList  {
                 continue;
             }
 
-            Sym sym   = symList.find (name);
+            Sym sym   = symList.findName (name);
             if (null == sym)  {
                 System.out.format (
                     " RuleList: unknown sym %s\n", name);
@@ -73,12 +73,17 @@ public class RuleList  {
         RuleList  rl )
     {
         System.out.format (
-            "    %c %-4s", rl.sym.cond, rl.sym.name);
+            "  RuleList.check:  %c %-4s", rl.sym.cond, rl.sym.name);
+     // rl.disp (rl.sym.name);
 
         boolean match = true;
         for (Rule rule = rl.head; null != rule; rule = rule.next) {
-            char d = rule.sym.cond;
             char c = rule.cond;
+
+         // char d = rule.sym.cond;
+            char d = rule.sym.pos;
+            if ('S' == rule.sym.type)   // turnout cond, but signal pos
+                d = rule.sym.pos;
 
             if (d != c)  {
                 match = false;
@@ -95,25 +100,28 @@ public class RuleList  {
     }
 
     // --------------------------------
+    // for each rule for a particular signal
     public void checks (
+        int      ctcNum,
         Control  ctl )
     {
-        System.out.format (" ruleList.checks:\n");
+        System.out.format (" RuleList.checks: ctcNum %d\n", ctcNum);
 
-        if ('c' == sym.cond) {
+        if ('C' == sym.cond) {
             uncheck ();
             return;
         }
 
         for (RuleList rl = this; null != rl; rl = rl.next)  {
-            if (check (rl) && 'S' == sym.cond)  {
+            if (check (rl) && 'S' == sym.type)  {
                 rl.locked = true;
-                sym.cond  = 'c';
+                sym.cond  = 'C';        // clear
                 rl.lock ();
 
-            //  ctl.send ('S', sym.name, sym.cond);
-                System.out.format ("  ruleList.checks: send msg\n");
-                break;
+                ctl.send ('S', sym.name, sym.cond);
+                System.out.format (
+                    "  ruleList.checks: send msg, %s\n", sym.name);
+                return;
             }
         }
     }
@@ -199,7 +207,7 @@ public class RuleList  {
         // block prefixed with 'B'
         else if ('B' == c0)  {
             type = 'B';
-            cond = 'u';
+            cond = 'U';
             name = fld.substring (0);
         }
 
@@ -222,7 +230,7 @@ public class RuleList  {
                 return true;
             }
             else {
-                if ('S' != c0 && 'c' != c0)  {
+                if ('S' != c0 && 'C' != c0)  {
                     System.out.format (
                         "Error: id invalid signal cond - %s, %d\n", fld, id);
                     return false;
@@ -245,7 +253,7 @@ public class RuleList  {
                 return false;
             }
 
-            if ('l' != c0 && 'c' != c0 && 'r' != c0)  {
+            if ('L' != c0 && 'C' != c0 && 'R' != c0)  {
                 System.out.format (
                     "Error - ruleNew invalid lever cond - %c\n", c0);
                 return false;

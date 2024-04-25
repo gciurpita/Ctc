@@ -30,13 +30,14 @@ public class SymList  {
 
     // -------------------------------------
     public void checkRules (
+        int       ctcNum,
         Control   ctl )
     {
-        System.out.println ("symList.checkRule:");
+        System.out.format ("symList.checkRules: ctcNum %d\n", ctcNum);
         for (Sym sym = head; null != sym; sym = sym.next) {
-            if ('S' != sym.type || null == sym.ruleList)
+            if ('S' != sym.type || ctcNum != sym.num || null == sym.ruleList)
                 continue;
-            sym.ruleList.checks (ctl);
+            sym.ruleList.checks (ctcNum, ctl);
         }
     }
 
@@ -51,7 +52,7 @@ public class SymList  {
     // -------------------------------------
     public void dispRules ()
     {
-        System.out.println ("symList.dispRule:");
+        System.out.println ("symList.dispRules:");
         for (Sym sym = head; null != sym; sym = sym.next) {
             if ('S' != sym.type)
                 continue;

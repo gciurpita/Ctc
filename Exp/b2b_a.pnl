@@ -65,4 +65,9 @@ turnout    9    4   19    _
 turnout   13    4   25    _
 turnout   19    4   40    _
 
+rule  4LB  LL4 RL3
+rule  4L   LL4 LL3
+rule  4RB  RL4 RL3
+rule  4R   RL4 LL3
+
 mqtt 127.0.0.1 1883 CTC-Panel layout

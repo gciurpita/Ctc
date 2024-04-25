@@ -4,6 +4,7 @@ public class Sym  {
     int         num;        // ctc num
     String      mqtt;       // interface, mqtt topic
 
+    char        pos;        // needed for signal lvr
     char        cond;
     RuleList    ruleList;
     Sym         next;
@@ -25,15 +26,16 @@ public class Sym  {
 
      // System.out.format ("   Sym: %c %-6s %4d\n", type, name, num);
 
-        if ('S' == type)
-            this.cond = 'S';
-        else if ('L' == type)
+        if ('L' == type)  {
             if (0 == (num % 2))
-                this.cond = 'c';    // center
+                this.cond = 'C';    // center signal
             else
-                this.cond = 'L';
+                this.cond = 'L';    // set turnout left
+        }
         else
             this.cond = '_';
+
+        this.pos = this.cond;
 
         ruleList = null;
         next     = null;
@@ -55,18 +57,20 @@ public class Sym  {
         ruleList.next      = ruleList0;
         ruleList.sym       = this;
 
-        if (false)
+        if (true) {
             for (RuleList rl = ruleList; null != rl; rl = rl.next)
                 System.out.format (" sym.addRule: ruleList\n");
+            ruleList.disp (fld [0]);
+        }
 
-     // ruleList.disp (name);
      }
 
     // --------------------------------
     public void disp ()
     {
         System.out.format (
-            " Sym %-6s '%c' %4d, %c %d %6s", name, type, num, cond, lock, mqtt);
+            " Sym %-6s '%c' %4d, %c %c %d %6s",
+                name, type, num, pos, cond, lock, mqtt);
 
         if (null != ruleList)
             System.out.format (" rules");

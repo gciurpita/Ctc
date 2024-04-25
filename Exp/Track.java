@@ -44,7 +44,7 @@ public class Track {
         int     col;
         int     row;
         String  id;
-        char    state;      // 'O'ccupied
+        char    state;      // 'O' occupied
         Blk     next;
 
         public Blk (
@@ -482,9 +482,9 @@ public class Track {
         // blocks
         for (Blk blk = blks ; null != blk; blk = blk.next)  {
             int idx = 0;
-            if ('o' == blk.state)
+            if ('O' == blk.state)
                 idx = 30;               // red
-            else if ('c' == blk.state)
+            else if ('C' == blk.state)
                 idx = 60;               // green
 
             trace (g2d, blk.col, blk.row, idx);

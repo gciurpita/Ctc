@@ -216,37 +216,49 @@ public class Panel {
             else
                 lvr [num].pos = 'R';
 
-            System.out.format (
-                " Panel.mousePressed: num %d, %s  %s\n",
-                    num, lvr [num].name, lvr [num].sym.name);
-
-            Sym sym = symList.findName (lvr [num].name);
-            if (null != sym.mqtt)
-                ctl.send (sym.mqtt, lvr [num].pos);
-            else
-                ctl.send ("T/" + sym.name, lvr [num].pos);
+            if (false)
+                System.out.format (
+                    " Panel.mousePressed: num %d, %s  %s\n",
+                        num, lvr [num].name, lvr [num].sym.name);
         }
 
         // signal
         else if (y - y0Panel < (iconToHt + iconSigHt))  {
             num += 1;
-            if ((dX < colWid / 3))
+            if ((dX < colWid * 0.4))
                 lvr [num].pos = 'L';
-            else if ((colWid * 2 / 3) < dX)
+            else if ((colWid * 0.6) < dX)
                 lvr [num].pos = 'R';
             else
                 lvr [num].pos = 'C';
 
-            Sym sym = symList.findName (lvr [num].name);
-            if (null != sym.mqtt)
-                ctl.send (sym.mqtt, lvr [num].pos);
-            else
-                ctl.send ("S/" + sym.name, lvr [num].pos);
+            lvr [num].sym.pos = lvr [num].pos;
+
+            System.out.format (
+                " Panel.mousePressed: sig %d  %c\n", num, lvr [num].sym.pos);
+
+ //         Sym sym = symList.findName (lvr [num].name);
+ //         if (null != sym.mqtt)
+ //             ctl.send (sym.mqtt, lvr [num].pos);
+ //         else
+ //             ctl.send ("S/" + sym.name, lvr [num].pos);
         }
 
         // code
         else if (y - y0Panel < (iconToHt + iconSigHt + 50))  {
-            codeBut [num] = 5;
+            codeBut [num] = 3;
+
+            // send turnout request if not locked
+            Sym sym = symList.findName (lvr [num].name);
+            if (0 == sym.lock)  {
+                if (null != sym.mqtt)
+                    ctl.send (sym.mqtt, lvr [num].pos);
+                else
+                    ctl.send ("T/" + sym.name, lvr [num].pos);
+            }
+
+            // send signal request based on rules
+            symList.checkRules (num+1, ctl);
             return true;
         }
 

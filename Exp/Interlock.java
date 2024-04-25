@@ -153,10 +153,6 @@ public class Interlock extends JPanel
         System.out.println ("keyTyped:");
         char    c = e.getKeyChar();
         switch (c)  {
-            case 'c':
-                symList.checkRules (ctl);
-                break;
-
             case 'd':
                 symList.disp ();
                 break;
@@ -182,8 +178,7 @@ public class Interlock extends JPanel
         if (e.getY() < trkHt)
             trk.mousePressed (e.getX(), e.getY());
         else  {
-            if (panel.mousePressed (e.getX(), e.getY()))
-                symList.checkRules (ctl);
+            panel.mousePressed (e.getX(), e.getY());
         }
 
         requestFocusInWindow ();
@@ -311,7 +306,7 @@ public class Interlock extends JPanel
 
             // -----------------------------------
             else if (fld[0].equals("rule"))  {
-                Sym sym = symList.find (fld [1], 'r');
+                Sym sym = symList.find (fld [1], 'S');
                 if (null == sym)  {
                     loadPnlErr (line, "unknown sym");
                     err++;
