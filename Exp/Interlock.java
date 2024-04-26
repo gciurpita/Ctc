@@ -152,9 +152,13 @@ public class Interlock extends JPanel
 
     public void keyTyped    (KeyEvent e)
     {
-        System.out.println ("keyTyped:");
+     // System.out.println ("keyTyped:");
         char    c = e.getKeyChar();
         switch (c)  {
+            case 'b':
+                System.out.println ("--------------------");
+                break;
+
             case 'd':
                 symList.disp ();
                 break;
