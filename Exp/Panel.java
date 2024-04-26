@@ -186,10 +186,20 @@ public class Panel {
         int     num,
         char    state )
     {
-        System.out.format (
-            "  Panel.response: %2d %c\n", num, state);
+        if (0 == num % 2)  {    // signal
+            if ('C' == state)   // clear
+                lvr [num].sym.cond = lvr [num].pos;
+            else
+                lvr [num].sym.cond = 'C';   // centered
 
-        lvr [num].sym.cond = state;
+            System.out.format (
+                "  Panel.response: signal %2d %c\n", num, lvr [num].sym.cond);
+        }
+        else {
+            System.out.format (
+                "  Panel.response: turnout %2d %c\n", num, state);
+        }
+
     }
 
     // --------------------------------
