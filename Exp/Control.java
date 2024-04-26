@@ -20,7 +20,7 @@ public class Control
             this.id = id;
             this.state = state;
             next       = null;
-            delay      = 5;
+            delay      = 3;
         }
     }
 
@@ -30,6 +30,22 @@ public class Control
     Mqtt mqtt  = null;
 
     int  pingCnt;
+
+    // ---------------------------------------------------------
+    public void cmdDisp (
+        String  label,
+        Cmd     cmd )
+    {
+        System.out.format (
+            "%s: %c %s %c\n", label, cmd.type, cmd.id, cmd.state);
+    }
+
+    // -------------------------------------
+    public void cmdDisps ()
+    {
+        for (Cmd c = cmd; null != c; c = c.next)
+            cmdDisp (" cmdDisps", c);
+    }
 
     // ---------------------------------------------------------
     public Cmd getCmd ()
@@ -43,6 +59,7 @@ public class Control
         Cmd  cmd = this.cmd;
         this.cmd = this.cmd.next;
 
+        cmdDisp ("getCmd ", cmd);
         return cmd;
     }
 
@@ -62,9 +79,7 @@ public class Control
         Track  track,
         Cmd    cmd )
     {
-        System.out.format (
-            " Control.process: %c %-5s %c\n", cmd.type, cmd.id, cmd.state);
-
+        cmdDisp (" Control.processCmd", cmd);
         track.update (cmd.type, cmd.state, cmd.id);
     }
 
@@ -96,11 +111,7 @@ public class Control
 
         cmd = new Cmd (fld [1].charAt (0), fld [2], (char)buf [buf [1]+1]);
 
-        System.out.format ("Control.receive:");
-        System.out.format ("  type %c",  cmd.type);
-        System.out.format (", id %s",    cmd.id);
-        System.out.format (", state %c", cmd.state);
-        System.out.println ();
+        cmdDisp ("Control.receiveMqtt:", cmd);
 
         processCmd (track, cmd);
 
@@ -114,7 +125,7 @@ public class Control
     {
         // -------------------------------------
         Cmd       cmd;
-        if (null != (cmd = getCmd()))
+        while (null != (cmd = getCmd()))
             processCmd (track, cmd);
 
         // -------------------------------------
@@ -145,7 +156,8 @@ public class Control
         cmd.next = this.cmd;
         this.cmd = cmd;
 
-        System.out.format ("send: %c %s %c\n", cmd.type, cmd.id, cmd.state);
+        cmdDisp ("send", cmd);
+        cmdDisps ();
 
         if (null != mqtt)  {
             String topic = String.format ("%c/%s/", type, id);
