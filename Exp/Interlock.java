@@ -261,7 +261,8 @@ public class Interlock extends JPanel
             else if (fld[0].equals("ctc"))  {
                 for (int n = 1; n < fld.length; n++)  {
 
-                    Sym sym = symList.add ("L" + fld [n], 'L', n, null);
+                    int num = Integer.valueOf (fld [n]);
+                    Sym sym = symList.add ("L" + fld [n], 'L', num, null);
                     panel.addLever (Integer.parseInt (fld [n]), sym);
                 }
             }
