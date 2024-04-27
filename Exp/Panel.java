@@ -196,6 +196,7 @@ public class Panel {
                 "  Panel.response: signal %2d %c\n", num, lvr [num].sym.cond);
         }
         else {
+            lvr [num].sym.cond = state;
             System.out.format (
                 "  Panel.response: turnout %2d %c\n", num, state);
         }
