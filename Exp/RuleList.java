@@ -59,7 +59,7 @@ public class RuleList  {
             if ( ! rl.locked)
                 continue;
 
-            if ( ! check (rl))  {
+            if ( ! match (rl))  {
                 rl.locked = false;
                 sym.cond  = 'S';
                 rl.unlock ();
@@ -69,12 +69,12 @@ public class RuleList  {
     }
 
     // --------------------------------
-    public boolean check (
+    public boolean match (
         RuleList  rl )
     {
         if (dbg)
             System.out.format (
-                "  RuleList.check:  %c %-4s", rl.sym.cond, rl.sym.name);
+                "  RuleList.match:  %c %-4s", rl.sym.cond, rl.sym.name);
      // rl.disp (rl.sym.name);
 
         boolean match = true;
@@ -114,16 +114,11 @@ public class RuleList  {
         if (dbg)
             System.out.format (" RuleList.checks: ctcNum %d\n", ctcNum);
 
-        if ('C' == sym.cond) {
-            uncheck ();
-            return;
-        }
-
         for (RuleList rl = this; null != rl; rl = rl.next)  {
             if ('S' != sym.type)
                 continue;
 
-            if (check (rl))  {
+            if (match (rl))  {
                 rl.locked = true;
                 rl.lock ();
 

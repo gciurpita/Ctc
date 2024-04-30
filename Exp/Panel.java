@@ -19,8 +19,6 @@ import javax.imageio.ImageIO;
 public class Panel {
     private class Lever {
         int     id;
- //     char    cond;
-        char    pos;
         Sym     sym;
         Sym     symCtl;     // turnout/signal
 
@@ -29,8 +27,8 @@ public class Panel {
             int  id,
             Sym  sym )
         {
-            this.pos  = 0 == (id % 2) ? 'C' : 'L';
-            this.sym  = sym;
+            this.sym     = sym;
+            this.sym.pos = 0 == (id % 2) ? 'C' : 'L';
         }
     }
 
@@ -185,21 +183,20 @@ public class Panel {
         int     num,
         char    state )
     {
+        Sym sym = lvr [num].sym;
+
         if (0 == num % 2)  {    // signal
             if ('C' == state)   // clear
-                lvr [num].sym.cond = lvr [num].pos;
+                sym.cond = lvr [num].sym.pos;
             else
-                lvr [num].sym.cond = 'C';   // centered
-
-            System.out.format (
-                "  Panel.response: signal %2d %c\n", num, lvr [num].sym.cond);
+                sym.cond = 'C';   // centered
         }
-        else {
-            lvr [num].sym.cond = state;
-            System.out.format (
-                "  Panel.response: turnout %2d %c\n", num, state);
-        }
+        else
+            sym.cond = ('N' == state ? 'L' : 'R');
 
+        System.out.format (
+            "  Panel.response: num %2d, state %c, pos %c, cond %c\n",
+                    num, state, sym.pos,  sym.cond);
     }
 
     // --------------------------------
@@ -221,31 +218,35 @@ public class Panel {
 
         // turnout
         if (y - y0Panel < iconToHt)  {
-            if ((dX < colWid / 2))
-                lvr [num].pos = 'L';
-            else
-                lvr [num].pos = 'R';
+            Sym sym = lvr [num].sym;
 
-            if (false)
+            if ((dX < colWid / 2))
+                sym.pos = 'L';
+            else
+                sym.pos = 'R';
+
+            if (true)
                 System.out.format (
-                    " Panel.mousePressed: num %d, %s  %s\n",
-                        num, lvr [num].sym.name, lvr [num].sym.name);
+                    " Panel.mousePressed: num %d, %s - %c %c\n",
+                        num, sym.name, sym.pos, sym.cond);
         }
 
         // signal
         else if (y - y0Panel < (iconToHt + iconSigHt))  {
             num += 1;
-            if ((dX < colWid * 0.4))
-                lvr [num].pos = 'L';
-            else if ((colWid * 0.6) < dX)
-                lvr [num].pos = 'R';
-            else
-                lvr [num].pos = 'C';
+            Sym sym = lvr [num].sym;
 
-            lvr [num].sym.pos = lvr [num].pos;
+            if ((dX < colWid * 0.4))
+                sym.pos = 'L';
+            else if ((colWid * 0.6) < dX)
+                sym.pos = 'R';
+            else
+                sym.pos = 'C';
+
+            sym.pos = sym.pos;
 
             System.out.format (
-                " Panel.mousePressed: sig %d  %c\n", num, lvr [num].sym.pos);
+                " Panel.mousePressed: sig %d - %c\n", num, sym.pos);
 
  //         Sym sym = symList.findName (lvr [num].name);
  //         if (null != sym.mqtt)
@@ -256,34 +257,45 @@ public class Panel {
 
         // code button
         else if (y - y0Panel < (iconToHt + iconSigHt + 50))  {
+            boolean dbg = false;
+
+            if (dbg)
+                System.out.format ( "Panel.mousePressed: code num %d\n", num);
             codeBut [num] = 3;
 
             // send turnout request if not locked
-            Sym symLvr = lvr [num].symCtl;
-            if (symLvr.pos != symLvr.cond)
-                System.out.format (
-                    "Panel.mousePressed: lvr %s mis-match\n", symLvr.name);
-
+            Sym symLvr = lvr [num].sym;
             Sym symTo  = lvr [num].symCtl;
+
+            if (symLvr.pos != symLvr.cond)  {
+                if (dbg)
+                    System.out.format (
+                    "Panel.mousePressed: lvr %s mis-match - %c, %c\n",
+                        symLvr.name, symLvr.pos, symLvr.cond);
+
          // System.out.format (
          //   "Panel.mousePressed: lvr %s, lPos %c, sym %s cond %c, lock %d\n",
          //         symLvr.name, lvr [num].pos,
          //             symTo.name, symTo.cond, symTo.lock);
 
-            if (0 == symTo.lock)  {
-                if (lvr[num].pos == 'L' && 'R' == symTo.cond)
-                    ctl.send ('T', symTo.name, 'N');
-                else if (lvr[num].pos == 'R' && 'N' == symTo.cond)
-                    ctl.send ('T', symTo.name, 'R');
+                if (0 == symTo.lock)  {
+                    if (lvr[num].sym.pos == 'L' && 'R' == symTo.cond)
+                        ctl.send ('T', symTo.name, 'N');
+                    else if (lvr[num].sym.pos == 'R' && 'N' == symTo.cond)
+                        ctl.send ('T', symTo.name, 'R');
+                }
             }
 
             // send signal request based on rules
-            symLvr = lvr [num+1].symCtl;
-            if (symLvr.pos != symLvr.cond)
-                System.out.format (
+            symLvr = lvr [num+1].sym;
+            if (symLvr.pos != symLvr.cond)  {
+                if (dbg)
+                    System.out.format (
                     "Panel.mousePressed: lvr %s mis-match\n", symLvr.name);
 
-            symList.checkRules (num+1, ctl);
+                symList.checkRules (num+1, ctl);
+            }
+
             return true;
         }
 
@@ -322,7 +334,7 @@ public class Panel {
         g2d.setColor (Color.white);
 
         // plate & lvr
-        int pos = ('R' == lvr [lvrId].pos) ? 1 : 0;
+        int pos = ('R' == lvr [lvrId].sym.pos) ? 1 : 0;
         g2d.drawImage (turnout [lvrId/2].img,   x0, y0, null);
         g2d.drawImage (lever   [pos].img, x0 + 6, y0 + 44, null);
 
@@ -347,7 +359,7 @@ public class Panel {
         int         lvrId )
     {
         // plate & lvr
-        char posCh = lvr [lvrId].pos;
+        char posCh = lvr [lvrId].sym.pos;
         int  pos   = 'R' == posCh ? 1 : 'C' == posCh ? 2 : 0;
         g2d.drawImage (signal [lvrId/2].img,   x0, y0, null);
         g2d.drawImage (lever  [pos].img,       x0 + 5, y0 + 57, null);
