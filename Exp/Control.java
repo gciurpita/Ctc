@@ -20,7 +20,7 @@ public class Control
             this.id = id;
             this.state = state;
             next       = null;
-            delay      = 3;
+         // delay      = 3;
         }
     }
 
@@ -29,6 +29,7 @@ public class Control
     Sckt sckt  = null;
     Mqtt mqtt  = null;
 
+    int  delay;
     int  pingCnt;
 
     // ---------------------------------------------------------
@@ -53,7 +54,7 @@ public class Control
         if (null == cmd)
             return null;
 
-        if (0 < cmd.delay--)
+        if (0 < delay--)
             return null;
 
         Cmd  cmd = this.cmd;
@@ -155,6 +156,8 @@ public class Control
         Cmd cmd  = new Cmd (type, id, state);
         cmd.next = this.cmd;
         this.cmd = cmd;
+
+        delay    = 2;
 
         cmdDisp ("send", cmd);
         cmdDisps ();
