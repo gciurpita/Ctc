@@ -3,49 +3,32 @@
 
     Classes = $(patsubst %.java, %.class, $(Srcs))
     Srcs    = $(shell echo *java)
-    Targ    = CtcPanel
+    Targ    = Interlock
 
-    Jar     = $(Targ).jar
-    Opt     = -p0
-    Opt     = -p3 -fc0.cmd
+    Cmd     = -c0.cmd
+#   Pnl     = 0.rules
+    Pnl     = md2.pnl
+    Pnl     = b2b.pnl
+    Pnl     = b2b_a.pnl
 
-    Sopt    = cyc1:50,psi1,TE,mph,lbs1:10
-    Topt    = Tsec=1
-
-# --------------------------------------------------------------------
 %.class : %.java
 		javac $(LINT_FLAG) $<
 
-% : %.class
-		java $@ $(Args)
-
-%.exe : %.cpp
-		$(CXX) -o $@  $^
+%.pnl :
+		java $(Targ) $@
 
 # --------------------------------------------------------------------
-run : $(Classes)
-		java $(Targ)  7.pnl
-
-8L : $(Classes)
-		java $(Targ)  5.pnl
-
 all : $(Classes)
+		java $(Targ) $(Pnl)
+
+bld : $(Classes)
 
 cmd : $(Classes)
-		java $(Targ) $(Opt) | tee $(Targ).out
+		java $(Targ) $(Cmd) $(Pnl)
 
-jar : all
-		jar cmvf          MANIFEST.MF $(Targ).jar *.class
-#		jar cmvf META-INF/MANIFEST.MF $(Targ).jar *.class
-
-runJar : jar
-		java -jar $(Targ).jar
-
-view : $(Jar)
-		appletviewer driver.html
-
-ids : tileIds.exe
-		$^ Resources/blackScreenTiles.cfg | tee $@
+check :
+		@ echo  $(Srcs)
+		@ echo  $(Classes)
 
 # --------------------------------------------------------------------
 neat :
@@ -53,4 +36,3 @@ neat :
 
 clean : neat
 		rm -f *.jar *.exe
-		cd ScktC; make clean
