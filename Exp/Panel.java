@@ -60,7 +60,7 @@ public class Panel {
     int       colWid     = 64;
     int       colHt;
 
-    int       dbg        = 0;
+    boolean   dbg        = false;
 
     // --------------------------------
     public Panel (
@@ -84,7 +84,7 @@ public class Panel {
 
         while ((line = br.readLine()) != null)  {
             String[]    fields = line.split("  *");
-            if (0 != dbg)
+            if (dbg)
                 System.out.format (" loadIcon: %s - %s\n", line, fields [0]);
 
             if (! fields[0].equals("icon"))
@@ -194,9 +194,10 @@ public class Panel {
         else
             sym.cond = ('N' == state ? 'L' : 'R');
 
-        System.out.format (
-            "  Panel.response: num %2d, state %c, pos %c, cond %c\n",
-                    num, state, sym.pos,  sym.cond);
+        if (false)
+            System.out.format (
+                "  Panel.response: num %2d, state %c, pos %c, cond %c\n",
+                        num, state, sym.pos,  sym.cond);
     }
 
     // --------------------------------
@@ -208,7 +209,7 @@ public class Panel {
         int dX    = x % colWid;
         int num   = 1 + (2 * col);
 
-        if (false)
+        if (dbg)
             System.out.format (
                 "Panel.mousePressed: %d %d, col %d, num %d\n",
                     x, y, col, num);
@@ -225,7 +226,7 @@ public class Panel {
             else
                 sym.pos = 'R';
 
-            if (true)
+            if (dbg)
                 System.out.format (
                     " Panel.mousePressed: num %d, %s - %c %c\n",
                         num, sym.name, sym.pos, sym.cond);
@@ -245,8 +246,9 @@ public class Panel {
 
             sym.pos = sym.pos;
 
-            System.out.format (
-                " Panel.mousePressed: sig %d - %c\n", num, sym.pos);
+            if (dbg)
+                System.out.format (
+                    " Panel.mousePressed: sig %d - %c\n", num, sym.pos);
 
  //         Sym sym = symList.findName (lvr [num].name);
  //         if (null != sym.mqtt)
@@ -328,7 +330,7 @@ public class Panel {
         int         col,
         int         lvrId )
     {
-        if (0 != dbg)
+        if (dbg)
             System.out.format ("  paintToPlate: %3d %3d, %d\n", x0, y0, lvrId);
 
         g2d.setColor (Color.white);

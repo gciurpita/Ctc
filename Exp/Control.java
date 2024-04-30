@@ -37,8 +37,9 @@ public class Control
         String  label,
         Cmd     cmd )
     {
-        System.out.format (
-            "%s: %c %s %c\n", label, cmd.type, cmd.id, cmd.state);
+        if (false)
+            System.out.format (
+                "%s: %c %s %c\n", label, cmd.type, cmd.id, cmd.state);
     }
 
     // -------------------------------------
@@ -80,6 +81,8 @@ public class Control
         Track  track,
         Cmd    cmd )
     {
+        if (false)
+            System.out.println ("Control.processCmd");
         cmdDisp (" Control.processCmd", cmd);
         track.update (cmd.type, cmd.state, cmd.id);
     }

@@ -403,7 +403,8 @@ public class Track {
     {
         boolean dbg = false;
 
-        System.out.format ("  Track.update: %c %-5s %c\n", type, name, pos);
+        if (false)
+            System.out.format ("  Track.update: %c %-5s %c\n", type, name, pos);
 
         Sym sym = symList.findName (name);
         panel.response (sym.num, pos);      // notify panel

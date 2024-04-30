@@ -33,7 +33,9 @@ public class SymList  {
         int       ctcNum,
         Control   ctl )
     {
-        System.out.format ("symList.checkRules: ctcNum %d\n", ctcNum);
+        if (false)
+            System.out.format ("symList.checkRules: ctcNum %d\n", ctcNum);
+
         for (Sym sym = head; null != sym; sym = sym.next) {
             if ('S' != sym.type || ctcNum != sym.num || null == sym.ruleList)
                 continue;
