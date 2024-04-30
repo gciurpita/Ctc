@@ -4,7 +4,7 @@ public class RuleList  {
     Sym         sym;
     boolean     locked;
 
-    private boolean dbg = false;
+    private boolean dbg = true;
 
     // globals from id()
     private String name = "?";
@@ -82,18 +82,18 @@ public class RuleList  {
             char c = rule.cond;
 
          // char d = rule.sym.cond;
-            char d = rule.sym.pos;
-            if ('S' == rule.sym.type)   // turnout cond, but signal pos
+            char d = rule.sym.cond;
+            if (0 == rule.sym.num % 2)   // turnout cond, but signal pos
                 d = rule.sym.pos;
 
             if (d != c)  {
                 match = false;
                 if (dbg)
-                    System.out.format ("  %c %c %-4s", d, c, rule.sym.name);
+                    System.out.format (" %c %c %-4s", d, c, rule.sym.name);
             }
             else
                 if (dbg)
-                    System.out.format ("  . %c %-4s", c, rule.sym.name);
+                    System.out.format (", . %c %-4s", c, rule.sym.name);
         }
 
         if (dbg) {
@@ -120,17 +120,36 @@ public class RuleList  {
         }
 
         for (RuleList rl = this; null != rl; rl = rl.next)  {
-            if (check (rl) && 'S' == sym.type)  {
+            if ('S' != sym.type)
+                continue;
+
+            if (check (rl))  {
                 rl.locked = true;
-                sym.cond  = 'C';        // clear
                 rl.lock ();
 
-                ctl.send ('S', sym.name, sym.cond);
                 if (dbg)
                     System.out.format (
-                        "  ruleList.checks: send msg, %s\n", sym.name);
-                return;
+                        "  ruleList.checks: match, %s\n", sym.name);
+
+                sym.pos   = 'C';        // clear
+                if (sym.cond != sym.pos)
+                    ctl.send ('S', sym.name, sym.pos);
             }
+            else  {
+                rl.locked = false;
+            //  rl.unlock ();
+
+                if (dbg)
+                    System.out.format (
+                        "  ruleList.checks: no match, %s\n", sym.name);
+
+                sym.pos  = 'S';        // stop
+                if (sym.cond != sym.pos)
+                    ctl.send ('S', sym.name, sym.pos);
+            }
+
+            if (dbg)
+                System.out.println ();
         }
     }
 

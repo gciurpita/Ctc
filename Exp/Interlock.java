@@ -346,7 +346,7 @@ public class Interlock extends JPanel
 
                 Sym sym = symList.add (name, 'S', ctcNum, mqtt);
 
-                if (! panel.associate (ctcNum, name)) {
+                if (! panel.associate (ctcNum, sym)) {
                     loadPnlErr (line, "invalid ctc ID");
                     err++;
                     continue;
@@ -389,7 +389,7 @@ public class Interlock extends JPanel
 
                 Sym sym = symList.add (name, 'T', ctcNum, mqtt);
 
-                if (! panel.associate (ctcNum, name)) {
+                if (! panel.associate (ctcNum, sym)) {
                     loadPnlErr (line, "invalid ctc ID");
                     err++;
                     continue;

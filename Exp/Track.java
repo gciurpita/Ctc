@@ -94,8 +94,8 @@ public class Track {
             this.x    = col * tileWid;
             this.y    = row * tileHt;
 
-            if (null != sym)
-                this.sym.cond = 'N';
+         // if (null != sym)
+         //     this.sym.cond = 'N';
         }
     };
     ToSig     toSigHd = null;
@@ -201,10 +201,8 @@ public class Track {
                 return false;
         }
         else if ('B' == type)  {
-            if (BlockHl != tile && BlockHr != tile)  {
-                System.out.format ("Track.check: %c %d\n", type, tile);
+            if (BlockHl != tile && BlockHr != tile)
                 return false;
-            }
 
             Blk blk   = new Blk (col, row, name);
             blk.next  = blks;
@@ -403,11 +401,11 @@ public class Track {
         char    pos,
         String  name )
     {
+        boolean dbg = false;
+
         System.out.format ("  Track.update: %c %-5s %c\n", type, name, pos);
 
         Sym sym = symList.findName (name);
-        sym.disp ();
-
         panel.response (sym.num, pos);      // notify panel
 
         if ('B' == type)  {                 // block
@@ -421,7 +419,8 @@ public class Track {
             if (! ts.sym.name.equals(name))
                 continue;
 
-            ts.sym.disp ();
+            if (dbg)
+                ts.sym.disp ();
 
             // TO case
             if (1 == (ts.ctcNum % 2))  {
@@ -432,24 +431,24 @@ public class Track {
                 trk [ts.col][ts.row] = tile;
                 ts.sym.cond          = pos;
 
-                if (false)
+                if (dbg)
                     System.out.format (
-                        "    Track.update: <%2d, %2d> %2d %s\n",
+                        "    Track.update: to  <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
             }
 
             // signal case
             else {
                 byte tile = ts.tile;
-                if ('R' == pos || 'L' == pos)
+                if ('C' == pos)
                     tile += 30;     // hsignalRG or hsignalLG
 
                 trk [ts.col][ts.row] = tile;
                 ts.sym.cond          = pos;
 
-                if (false)
+                if (dbg)
                     System.out.format (
-                        "    Track.update: <%2d, %2d> %2d %s\n",
+                        "    Track.update: sig <%2d, %2d> %2d %s\n",
                                     ts.col, ts.row, tile, ts.name);
             }
         }

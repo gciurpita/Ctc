@@ -22,8 +22,7 @@ public class Panel {
  //     char    cond;
         char    pos;
         Sym     sym;
-
-        String  name;
+        Sym     symCtl;     // turnout/signal
 
         // --------------------------------
         public Lever (
@@ -172,12 +171,12 @@ public class Panel {
     // --------------------------------
     public boolean associate (
         int     num,
-        String  name )
+        Sym     sym )
     {
         if (null == lvr [num])
             return false;
 
-        lvr [num].name = name;
+        lvr [num].symCtl = sym;
         return true;
     }
 
@@ -230,7 +229,7 @@ public class Panel {
             if (false)
                 System.out.format (
                     " Panel.mousePressed: num %d, %s  %s\n",
-                        num, lvr [num].name, lvr [num].sym.name);
+                        num, lvr [num].sym.name, lvr [num].sym.name);
         }
 
         // signal
@@ -255,17 +254,35 @@ public class Panel {
  //             ctl.send ("S/" + sym.name, lvr [num].pos);
         }
 
-        // code
+        // code button
         else if (y - y0Panel < (iconToHt + iconSigHt + 50))  {
             codeBut [num] = 3;
 
             // send turnout request if not locked
-            Sym sym = symList.findName (lvr [num].name);
-            if (0 == sym.lock)  {
-                 ctl.send ('T', sym.name, lvr [num].pos);
+            Sym symLvr = lvr [num].symCtl;
+            if (symLvr.pos != symLvr.cond)
+                System.out.format (
+                    "Panel.mousePressed: lvr %s mis-match\n", symLvr.name);
+
+            Sym symTo  = lvr [num].symCtl;
+         // System.out.format (
+         //   "Panel.mousePressed: lvr %s, lPos %c, sym %s cond %c, lock %d\n",
+         //         symLvr.name, lvr [num].pos,
+         //             symTo.name, symTo.cond, symTo.lock);
+
+            if (0 == symTo.lock)  {
+                if (lvr[num].pos == 'L' && 'R' == symTo.cond)
+                    ctl.send ('T', symTo.name, 'N');
+                else if (lvr[num].pos == 'R' && 'N' == symTo.cond)
+                    ctl.send ('T', symTo.name, 'R');
             }
 
             // send signal request based on rules
+            symLvr = lvr [num+1].symCtl;
+            if (symLvr.pos != symLvr.cond)
+                System.out.format (
+                    "Panel.mousePressed: lvr %s mis-match\n", symLvr.name);
+
             symList.checkRules (num+1, ctl);
             return true;
         }
