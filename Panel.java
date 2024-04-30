@@ -40,7 +40,7 @@ public class Panel {
     Control   ctl;
     SymList   symList;
 
-    String    cfgFile  = "../Resources/ctcNumbered.cfg";
+    String    cfgFile  = "./Resources/ctcNumbered.cfg";
     class Icon   {
         Image   img;
     }
@@ -97,7 +97,7 @@ public class Panel {
             }
 
             int    id      = Integer.parseInt (fields [2]);
-            File   inFile  = new File ("../" + fields [3]);
+            File   inFile  = new File (fields [3]);
 
             if (fields[1].equals("Lever"))  {
                 lever [id]     = new Icon ();

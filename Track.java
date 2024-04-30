@@ -31,7 +31,7 @@ public class Track {
     Blk       blks;
     Panel     panel;
 
-    String    cfgFile  = "../Resources/blackScreenTiles.cfg";
+    String    cfgFile  = "./Resources/blackScreenTiles.cfg";
 
     // -------------------------------------
     class Tile   {
@@ -140,7 +140,7 @@ public class Track {
                 }
 
                 int    id      = Integer.parseInt (fields [2]);
-                File   inFile  = new File ("../" + fields [3]);
+                File   inFile  = new File (fields [3]);
                 tile [id]      = new Tile ();
                 tile [id].img  = ImageIO.read (inFile);
 
