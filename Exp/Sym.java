@@ -26,14 +26,27 @@ public class Sym  {
 
      // System.out.format ("   Sym: %c %-6s %4d\n", type, name, num);
 
-        if ('L' == type)  {
+        switch (type)  {
+        case 'B':
+            this.cond = 'U';        // Un/Occupied
+            break;
+
+        case 'L':
             if (0 == (num % 2))
                 this.cond = 'C';    // center signal
             else
                 this.cond = 'L';    // set turnout left
+            break;
+
+        case 'S':
+            this.cond = 'S';        // Stop/Clear
+            break;
+
+        case 'T':
+            this.cond = 'N';        // Normal/Reverse
+            break;
+
         }
-        else
-            this.cond = '_';
 
         this.pos = this.cond;
 
