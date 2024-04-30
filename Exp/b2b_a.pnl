@@ -67,8 +67,20 @@ turnout   19    4   40    _
 
 rule  4LB  LL4 RL3
 rule  4L   LL4 LL3
-rule  4RB  RL4 RL3
-rule  4R   RL4 LL3
+rule  4RB  RL4 RL3   10LB
+rule  4R   RL4 LL3   10L
+
+rule  10LB LL10 RL9  4RB
+rule  10L  LL10 LL9  4R
+rule  10RB RL10 RL9  S14L   LL13
+rule  10RB RL10 RL9  S14LB  RL13
+rule  10R  RL10 LL9  S14L   LL13
+rule  10R  RL10 LL9  S14LB  RL13
+
+rule  14LB LL14 RL13
+rule  14L  LL14 LL13
+rule  14RB RL14 RL13
+rule  14R  RL14 LL13
 
 title back-to-back signals
 
