@@ -242,7 +242,7 @@ public class Interlock extends JPanel
                 if (5 < fld.length)
                     mqtt = fld [5];
 
-                String name = Integer.toString (id);
+                String name = "B" + Integer.toString (id);
                 if (! sfx.equals("_"))
                     name += sfx;
 
@@ -297,8 +297,9 @@ public class Interlock extends JPanel
                     case 'B':
                     case 'T':
                         String subTopic = sym.getSubTopic ();
-                        System.out.format (
-                            "\nInterlock mqtt: subscribe %s\n", subTopic);
+                        if (false)
+                            System.out.format (
+                                "\nInterlock mqtt: subscribe %s\n", subTopic);
                         mqtt.subscribe (subTopic);
                         ctl.receive (trk, panel, mqtt.SubAck);
                         break;
@@ -319,7 +320,7 @@ public class Interlock extends JPanel
                     err++;
                     continue;
                 }
-                System.out.format (" loadPnl addrule: %s\n", fld [1]);
+             // System.out.format (" loadPnl addrule: %s\n", fld [1]);
                 sym.addRule (fld, symList);
             }
 
