@@ -18,10 +18,11 @@
 
 #             1         2         3         4
 
-row           A    A              A     A
-row         842222259           8422222259
 #   01234567890123456789012345678901234567890123456789
 #             1         2         3         4
+
+row           A    A              A     A
+row         842222259           8422222259
 row        6  @    @ 7         6  @     @ 7
 row       6   A    A  7       6   A     A  7
 row  2225;2224222225222:42225;22242222225222:4222
@@ -66,22 +67,22 @@ turnout   13    4   25    _
 turnout   19    4   40    _
 
 rule  4LB  LL4 RL3
-rule  4L   LL4 LL3
-rule  4RB  RL4 RL3   10LB
-rule  4R   RL4 LL3   10L
+rule  4L   LL4 NL3   UB3
+rule  4RB  RL4 RL3   S10LB
+rule  4R   RL4 NL3   S10L   UB3
 
-rule  10LB LL10 RL9  4RB
-rule  10L  LL10 LL9  4R
-rule  10RB RL10 RL9  S14L   LL13
+rule  10LB LL10 RL9  S4RB
+rule  10L  LL10 NL9  4R
+rule  10RB RL10 RL9  S14L   NL13
 rule  10RB RL10 RL9  S14LB  RL13
-rule  10R  RL10 LL9  S14L   LL13
-rule  10R  RL10 LL9  S14LB  RL13
+rule  10R  RL10 NL9  S14L   NL13
+rule  10R  RL10 NL9  S14LB  RL13
 
-rule  14LB LL14 RL13
+rule  14LB LL14 NL13
 rule  14L  LL14 LL13
-rule  14RB RL14 RL13
+rule  14RB RL14 NL13
 rule  14R  RL14 LL13
 
 title back-to-back signals
 
-# mqtt 127.0.0.1 1883 CTC-Panel layout
+mqtt 127.0.0.1 1883 CTC-Panel layout

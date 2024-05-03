@@ -28,7 +28,7 @@ public class Panel {
             Sym  sym )
         {
             this.sym     = sym;
-            this.sym.pos = 0 == (id % 2) ? 'C' : 'L';
+            this.sym.pos = 0 == (id % 2) ? 'C' : 'N';
         }
     }
 
@@ -191,8 +191,6 @@ public class Panel {
             else
                 sym.cond = 'C';   // centered
         }
-        else
-            sym.cond = ('N' == state ? 'L' : 'R');
 
         if (false)
             System.out.format (
@@ -222,7 +220,7 @@ public class Panel {
             Sym sym = lvr [num].sym;
 
             if ((dX < colWid / 2))
-                sym.pos = 'L';
+                sym.pos = 'N';
             else
                 sym.pos = 'R';
 
@@ -281,7 +279,7 @@ public class Panel {
          //             symTo.name, symTo.cond, symTo.lock);
 
                 if (0 == symTo.lock)  {
-                    if (lvr[num].sym.pos == 'L' && 'R' == symTo.cond)
+                    if (lvr[num].sym.pos == 'N' && 'R' == symTo.cond)
                         ctl.send ('T', symTo.name, 'N');
                     else if (lvr[num].sym.pos == 'R' && 'N' == symTo.cond)
                         ctl.send ('T', symTo.name, 'R');
@@ -371,10 +369,8 @@ public class Panel {
         int idxCenter = 9;
         int idxRight  = 5;
 
- //     if ('L' == lvr [lvrId].cond)
         if ('L' == lvr [lvrId].sym.cond)
             idxLeft   = 6;
- //     else if ('R' == lvr [lvrId].cond)
         else if ('R' == lvr [lvrId].sym.cond)
             idxRight  = 6;
         else        // 'C'

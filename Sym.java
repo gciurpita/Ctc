@@ -31,14 +31,14 @@ public class Sym  {
             this.cond = 'U';        // Un/Occupied
             break;
 
-        case 'L':
+        case 'L':                   // lever
             if (0 == (num % 2))
                 this.cond = 'C';    // center signal
             else
-                this.cond = 'L';    // set turnout left
+                this.cond = 'N';    // set turnout normal
             break;
 
-        case 'S':
+        case 'S':                   // signal
             this.cond = 'S';        // Stop/Clear
             break;
 
