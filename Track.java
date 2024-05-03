@@ -43,24 +43,24 @@ public class Track {
     class Blk {
         int     col;
         int     row;
-        String  id;
-        char    state;      // 'O' occupied
+        Sym     sym;
         Blk     next;
 
         public Blk (
             int    col,
             int    row,
-            String id )
+            Sym    sym )
         {
             this.col  = col;
             this.row  = row;
-            this.id   = id;
+            this.sym  = sym;
         }
 
         public void disp ()
         {
             System.out.format (
-                " Track.Blk.disp: %3d %3d %c %s\n", col, row, state, id);
+                " Track.Blk.disp: %3d %3d %c %s\n",
+                    col, row, sym.cond, sym.name);
         }
     }
 
@@ -210,7 +210,7 @@ public class Track {
             if (BlockHl != tile && BlockHr != tile)
                 return false;
 
-            Blk blk   = new Blk (col, row, name);
+            Blk blk   = new Blk (col, row, sym);
             blk.next  = blks;
             blks      = blk;
 
@@ -416,11 +416,10 @@ public class Track {
         panel.response (sym.num, pos);      // notify panel
 
         if ('B' == type)  {                 // block
-            name = name.substring(1);
             for (Blk blk = blks ; null != blk; blk = blk.next)  {
              // blk.disp ();
-                if (blk.id.equals(name))
-                    blk.state = pos;
+                if (blk.sym.name.equals(name))
+                    blk.sym.cond = pos;
             }
             return;
         }
@@ -493,9 +492,9 @@ public class Track {
         // blocks
         for (Blk blk = blks ; null != blk; blk = blk.next)  {
             int idx = 0;
-            if ('O' == blk.state)
+            if ('O' == blk.sym.cond)
                 idx = 30;               // red
-            else if ('C' == blk.state)
+            else if ('C' == blk.sym.cond)
                 idx = 60;               // green
 
             trace (g2d, blk.col, blk.row, idx);

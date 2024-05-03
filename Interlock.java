@@ -248,7 +248,7 @@ public class Interlock extends JPanel
 
                 Sym sym = symList.add (name, 'B', id, mqtt);
 
-                if (! trk.check (col, row, 'B', id, null, fld [1]))  {
+                if (! trk.check (col, row, 'B', id, sym, fld [1]))  {
                     loadPnlErr (line, "invalid block tile");
                     err++;
                     continue;
