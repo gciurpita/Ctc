@@ -56,6 +56,12 @@ public class Track {
             this.row  = row;
             this.id   = id;
         }
+
+        public void disp ()
+        {
+            System.out.format (
+                " Track.Blk.disp: %3d %3d %c %s\n", col, row, state, id);
+        }
     }
 
     // -------------------------------------
@@ -208,7 +214,7 @@ public class Track {
             blk.next  = blks;
             blks      = blk;
 
-            System.out.format ("   Track.check: %c %s\n", type, name);
+         // System.out.format ("   Track.check: %c %s\n", type, name);
             return true;
         }
 
@@ -410,9 +416,12 @@ public class Track {
         panel.response (sym.num, pos);      // notify panel
 
         if ('B' == type)  {                 // block
-            for (Blk blk = blks ; null != blk; blk = blk.next)
+            name = name.substring(1);
+            for (Blk blk = blks ; null != blk; blk = blk.next)  {
+             // blk.disp ();
                 if (blk.id.equals(name))
                     blk.state = pos;
+            }
             return;
         }
 

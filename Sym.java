@@ -70,19 +70,18 @@ public class Sym  {
         ruleList.next      = ruleList0;
         ruleList.sym       = this;
 
-        if (true) {
+        if (dbg) {
             for (RuleList rl = ruleList; null != rl; rl = rl.next)
                 System.out.format (" sym.addRule: ruleList\n");
             ruleList.disp (fld [0]);
         }
-
      }
 
     // --------------------------------
     public void disp ()
     {
         System.out.format (
-            " Sym %-6s '%c' %4d, %c %c %d %6s",
+            "   Sym %-6s '%c' %4d, %c %c %d %6s",
                 name, type, num, pos, cond, lock, mqtt);
 
         if (null != ruleList)

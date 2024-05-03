@@ -215,7 +215,7 @@ class Mqtt
         boolean dbg = false;
 
         String fullTopic =  topic + "/" + subTopic;
-        System.out.format ("subscribe: %s\n", fullTopic);
+        System.out.format ("  subscribe: %s\n", fullTopic);
 
         byte [] buf = new byte [90];
         int  idx = 2;
@@ -238,7 +238,7 @@ class Mqtt
         buf [0] = (byte) (Subscribe | Qos1);
         buf [1] = (byte) (idx -2);
 
-        dump (buf, idx, "subscribe");
+     // dump (buf, idx, "subscribe");
 
         sckt.write (buf, idx);
     }

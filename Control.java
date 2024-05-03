@@ -37,7 +37,7 @@ public class Control
         String  label,
         Cmd     cmd )
     {
-        if (false)
+        if (true)
             System.out.format (
                 "%s: %c %s %c\n", label, cmd.type, cmd.id, cmd.state);
     }
