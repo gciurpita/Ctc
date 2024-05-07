@@ -4,7 +4,7 @@ public class RuleList  {
     Sym         sym;
     boolean     locked;
 
-    private boolean dbg = true;
+    private boolean dbg = false;
 
     // globals from id()
     private String name = "?";
@@ -34,7 +34,7 @@ public class RuleList  {
             Sym sym   = symList.findName (name);
             if (null == sym)  {
                 System.out.format (
-                    " RuleList: unknown sym %s\n", name);
+                    " RuleList: unknown sym %c %s\n", type, name);
                 err++;
                 continue;
             }
@@ -46,6 +46,7 @@ public class RuleList  {
 
         if (0 < err)  {
             System.out.format ("RuleList: %d errors\n", err);
+            System.exit (1);
         }
 
         head = rule;
@@ -72,6 +73,8 @@ public class RuleList  {
     public boolean match (
         RuleList  rl )
     {
+        boolean dbg = true;
+
         if (dbg)
             System.out.format (
                 "  RuleList.match:  %c %-4s", rl.sym.cond, rl.sym.name);
@@ -213,6 +216,9 @@ public class RuleList  {
         char   c0   = fld.charAt (0);
         char   c1   = fld.charAt (1);
 
+        if (dbg)
+            System.out.format ("RuleList.id: %c %c %s\n", c0, c1, fld);
+
         // signals start with a digit
         if (Character.isDigit (c0))  {
             if (0 != (atoi (fld) % 2)) {
@@ -227,10 +233,13 @@ public class RuleList  {
         }
 
         // block prefixed with 'B'
-        else if ('B' == c0)  {
+        else if ('B' == c1)  {
             type = 'B';
             cond = 'U';
-            name = fld.substring (0);
+            name = fld.substring (1);
+            if (dbg)
+                System.out.format (
+                    " RuleList.id: B - %c %c %s\n", cond, type, name);
         }
 
         // switch or signal condition
@@ -275,7 +284,7 @@ public class RuleList  {
                 return false;
             }
 
-            if ('L' != c0 && 'C' != c0 && 'R' != c0)  {
+            if ('L' != c0 && 'C' != c0 && 'R' != c0 && 'N' != c0)  {
                 System.out.format (
                     "Error - ruleNew invalid lever cond - %c\n", c0);
                 return false;
