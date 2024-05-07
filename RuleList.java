@@ -1,4 +1,21 @@
 public class RuleList  {
+    public class Rule  {
+        Sym     sym;
+        char    cond;
+        boolean lock;
+    
+        Rule    listNext;
+        Rule    next;
+    
+        public Rule (
+            Sym     sym,
+            char    cond )
+        {
+            this.sym  = sym;
+            this.cond = cond;
+        }
+    }
+
     RuleList    next;
     Rule        head = null;
     Sym         sym;
