@@ -56,7 +56,7 @@ The '5' represents a left-handed block boundary.
 The switch tile, ':' or ';', is replaced with a horizontal track tile, '2',
 to represent normal.
 
-<img src=ctc2.PNG align=right width=400>
+<img src=Img/ctc2.PNG align=right width=400>
 <pre>
 row                       A
 row   2222249            85222222
@@ -109,7 +109,7 @@ rule   12R  rL12
 
 A more elaborate interlocking is described by the following.
 
-<img src=ctc.PNG align=right width=300>
+<img src=Img/ctc.PNG align=right width=300>
 <pre>
 row        A
 row       8522222

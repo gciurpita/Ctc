@@ -1,0 +1,40 @@
+
+#    2     2  2  trackH.bmp
+#    3     3  3  trackV.bmp
+#    4     4  4  blockHR.bmp
+#    5     5  5  blockHL.bmp
+
+#    6     6  6  diagonalDU.bmp
+#    7     7  7  diagonalUD.bmp
+
+#    8     8  8  angleDL.bmp (/)
+#    9     9  9  angleDR.bmp (\)
+#   10    10  :  angleUL.bmp (\)
+#   11    11  ;  angleUR.bmp (/)
+
+#   12    12  <  angleVUR.bmp (_/)
+#   13    13  =  angleVUL.bmp (\_)
+#   14    14  >  angleVDR.bmp (\)
+#   15    15  ?  angleVDL.bmp (/)
+
+#   16    16  @  hsignalR.bmp
+#   17    17  A  hsignalL.bmp
+#   46    46  ^  hsignalRG.bmp
+#   47    47  _  hsignalLG.bmp
+#   76    66  |  hsignalRC.bmp
+#   77    67  }  hsignalLC.bmp
+
+#   01234567890123456789012345678901234567890123456789
+#             1         2         3         4
+
+row  
+row            222229
+row                  7
+row 222222222222222222:22229
+row                         7
+row 2222222222222222222222222:29
+row                             7
+row 22222222222222222222222228222:222
+row                         6
+row 22222222222222222222222;
+row   
