@@ -61,7 +61,7 @@ public class Control
         Cmd  cmd = this.cmd;
         this.cmd = this.cmd.next;
 
-        cmdDisp ("getCmd ", cmd);
+        cmdDisp ("  getCmd ", cmd);
         return cmd;
     }
 
