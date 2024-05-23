@@ -15,20 +15,6 @@ public class Sym  {
     SigList     sigList;    // signal syms dropped when blk occupied
 
     // -------------------------------------
-    class SigList  {
-        Sym     sym;
-        SigList next;
-
-        public SigList (
-            Sym     sym,
-            SigList sigList )
-        {
-            this.sym  = sym;
-            this.next = sigList;
-        }
-    }
-
-    // -------------------------------------
     public Sym (
         String  name,
         char    type,

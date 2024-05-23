@@ -25,12 +25,20 @@ public class Control
     }
 
     // ---------------------------------------------------------
-    Cmd  cmd   = null;
-    Sckt sckt  = null;
-    Mqtt mqtt  = null;
+    Cmd     cmd   = null;
+    Mqtt    mqtt  = null;
+    Sckt    sckt  = null;
+    SymList symList;
 
     int  delay;
     int  pingCnt;
+
+    // ---------------------------------------------------------
+    Control (
+        SymList symList )
+    {
+        this.symList = symList;
+    }
 
     // ---------------------------------------------------------
     public void cmdDisp (
@@ -83,8 +91,25 @@ public class Control
     {
         if (false)
             System.out.println ("Control.processCmd");
-        cmdDisp (" Control.processCmd", cmd);
+        cmdDisp ("   processCmd", cmd);
         track.update (cmd.type, cmd.state, cmd.id);
+
+        // check if block "knocks down" signal
+        if ('B' == cmd.type)  {
+            Sym symBlk = symList.findName (cmd.id);
+
+            if (null != symBlk.sigList)  {
+                for (SigList sl = symBlk.sigList; null != sl; sl = sl.next)  {
+                    Sym symSig  = sl.sym;
+
+                    send ('S', symSig.name, 'S');   // set sig Stop
+
+                    System.out.format (
+                        "    processCmd: blk %s, sig %s, cond %c\n",
+                            symBlk.name, symSig.name, symSig.cond);
+                }
+            }
+        }
     }
 
     // ---------------------------------------------------------
@@ -115,9 +140,9 @@ public class Control
 
         cmd = new Cmd (fld [1].charAt (0), fld [2], (char)buf [buf [1]+1]);
 
-        cmdDisp ("Control.receiveMqtt:", cmd);
+        cmdDisp (" Control.receiveMqtt:", cmd);
 
-        processCmd (track, cmd);
+     // processCmd (track, cmd);
 
         return 0;
     }
@@ -127,15 +152,17 @@ public class Control
         Track  track,
         Panel  panel )
     {
+        if (false)
+            System.out.format ("Control.receive:\n");
+
         // -------------------------------------
         Cmd       cmd;
         while (null != (cmd = getCmd()))
             processCmd (track, cmd);
 
         // -------------------------------------
-        if (null != mqtt)  {
+        if (null != mqtt)
             return receiveMqtt (track, panel);
-        }
 
         return 0;
     }

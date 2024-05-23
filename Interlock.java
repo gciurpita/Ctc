@@ -26,8 +26,8 @@ public class Interlock extends JPanel
 {
     JFrame   frame    = new JFrame ();
 
-    Control  ctl      = new Control ();
     SymList  symList  = new SymList ();
+    Control  ctl      = new Control (symList);
     Panel    panel    = new Panel   (ctl,   symList);
     Track    trk      = new Track   (panel, symList);
 
