@@ -99,15 +99,8 @@ public class Control
             Sym symBlk = symList.findName (cmd.id);
 
             if (null != symBlk.sigList)  {
-                for (SigList sl = symBlk.sigList; null != sl; sl = sl.next)  {
-                    Sym symSig  = sl.sym;
-
-                    send ('S', symSig.name, 'S');   // set sig Stop
-
-                    System.out.format (
-                        "    processCmd: blk %s, sig %s, cond %c\n",
-                            symBlk.name, symSig.name, symSig.cond);
-                }
+                for (SigList sl = symBlk.sigList; null != sl; sl = sl.next)
+                    track.update (sl.sym.type, 'S', sl.sym.name);
             }
         }
     }
