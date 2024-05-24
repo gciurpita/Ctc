@@ -36,6 +36,7 @@ public class Panel {
     final int Nlvr       = 72;   // 1-30
     Lever     lvr  []    = new Lever [Nlvr];
     int       codeBut [] = new int [Nlvr /2];
+    Sym       symLock [] = new Sym [Nlvr /2];
 
     Control   ctl;
     SymList   symList;
@@ -171,6 +172,13 @@ public class Panel {
         int     num,
         Sym     sym )
     {
+        if ('K' == sym.type)  {
+            symLock [num] = sym;
+            System.out.format (
+                "  Panel associate: %-4s %d\n", symLock [num].name, num);
+            return true;
+        }
+
         if (null == lvr [num])
             return false;
 
@@ -450,9 +458,11 @@ public class Panel {
             g2d.drawImage (code [idx].img, x0 + 15, y2 + 10, null);
 
             // lock button
-            g2d.drawImage (lock [0].img, x0 + 12, y2 + 50, null);
-            idx = 0 < codeBut [num] ? 10 : 0;
-            g2d.drawImage (lamp [idx].img, x0 + 17, y2 + 76, null);
+            if (null != symLock [num])  {
+                g2d.drawImage (lock [0].img, x0 + 12, y2 + 50, null);
+                idx = 0 < codeBut [num] ? 10 : 0;
+                g2d.drawImage (lamp [idx].img, x0 + 17, y2 + 76, null);
+            }
         }
     }
 };

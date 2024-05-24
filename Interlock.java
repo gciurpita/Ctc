@@ -260,11 +260,37 @@ public class Interlock extends JPanel
             // -----------------------------------
             else if (fld[0].equals("ctc"))  {
                 for (int n = 1; n < fld.length; n++)  {
-
                     int num = Integer.valueOf (fld [n]);
                     Sym sym = symList.add ("L" + fld [n], 'L', num, null);
                     panel.addLever (Integer.parseInt (fld [n]), sym);
                 }
+            }
+
+            // -----------------------------------
+            // lock for manual turnout
+            else if (fld[0].equals("lock"))  {
+                for (int n = 1; n < fld.length; n++)  {
+                    int num = Integer.valueOf (fld [n]);
+                    if (0 == num % 2)  {
+                        loadPnlErr (line, "invalid lock, must be odd");
+                        err++;
+                        continue;
+                    }
+
+                    Sym symCtc = symList.findName ("L" + fld [n]);
+                    if (null == symCtc)  {
+                        loadPnlErr (line, "invalid lock id");
+                        err++;
+                        continue;
+                    }
+
+                    Sym sym = symList.add ("K" + fld [n], 'K', num, null);
+                    panel.associate (num, sym);
+
+                    System.out.format (
+                        " loadPnl lock:    %-4s %2d\n", sym.name, ctcNum);
+                }
+
             }
 
             // -----------------------------------

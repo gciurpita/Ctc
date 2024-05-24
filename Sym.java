@@ -33,6 +33,10 @@ public class Sym  {
             this.cond = 'U';        // Un/Occupied
             break;
 
+        case 'K':                   // manual turnout lock
+            this.cond = 'U';        // Un/locked
+            break;
+
         case 'L':                   // lever
             if (0 == (num % 2))
                 this.cond = 'C';    // center signal
