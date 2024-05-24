@@ -34,7 +34,7 @@ public class Sym  {
             break;
 
         case 'K':                   // manual turnout lock
-            this.cond = 'U';        // Un/locked
+            this.cond = 'u';        // Un/locked
             break;
 
         case 'L':                   // lever

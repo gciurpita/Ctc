@@ -288,7 +288,7 @@ public class Interlock extends JPanel
                     panel.associate (num, sym);
 
                     System.out.format (
-                        " loadPnl lock:    %-4s %2d\n", sym.name, ctcNum);
+                        " loadPnl lock:    %-4s %2d\n", sym.name, num);
                 }
 
             }

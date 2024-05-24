@@ -308,8 +308,13 @@ public class Panel {
         }
 
         // lock
-        else {
-            System.out.format ("Panel.mousePressed: lock col %d\n", col);
+        else if (y - y0Panel > (iconToHt + iconSigHt + 50))  {
+            if (null != symLock [num] && 0 == symLock [num].lock)  {
+                if ('u' == symLock [num].cond)
+                    symLock [num].cond = 'l';
+                else
+                    symLock [num].cond = 'u';
+            }
         }
 
         return false;
@@ -440,6 +445,10 @@ public class Panel {
             System.out.format ("Panel.paint: lvr length %d\n", lvr.length);
             return;
         }
+
+        // lamp colors: amber 1, blue 3, dark 4, green 6, purple 8
+        //              red 10, white 12 ... off -1
+
         for (int num = 1; num < lvr.length-1; num += 2)  {
             if (null == lvr [num] && null == lvr [num+1])
                 continue;
@@ -460,7 +469,7 @@ public class Panel {
             // lock button
             if (null != symLock [num])  {
                 g2d.drawImage (lock [0].img, x0 + 12, y2 + 50, null);
-                idx = 0 < codeBut [num] ? 10 : 0;
+                idx = 'l' == symLock [num].cond ? 1 : 4;
                 g2d.drawImage (lamp [idx].img, x0 + 17, y2 + 76, null);
             }
         }
