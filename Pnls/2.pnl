@@ -24,6 +24,8 @@ row   2422292222:5     4;          :5  255  4;
 row    @    7 A        @                    @
 row          :529
 
+ctc    1 2   5 6
+
 #       ctc   row  col  lbl
 signal    1     0    7  4LB
 signal    1     2   13  4L
@@ -53,9 +55,6 @@ turnout   4     3   24  20B
 turnout   5     3   22  12
 turnout   8     3   29  17
 turnout   11    3   43  21
-
-ctcTo  1,2,3,5,8,11
-ctcSig 1,2,3,5,8,11
 
 rule    4R  Sr4  Tr3
 rule    4R  Sr4  Tn3  Tn7A
