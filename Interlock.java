@@ -277,11 +277,13 @@ public class Interlock extends JPanel
                         continue;
                     }
 
+                    if (false)  {
                     Sym symCtc = symList.findName ("L" + fld [n]);
                     if (null == symCtc)  {
                         loadPnlErr (line, "invalid lock id");
                         err++;
                         continue;
+                    }
                     }
 
                     Sym sym = symList.add ("K" + fld [n], 'K', num, null);

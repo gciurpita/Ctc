@@ -36,7 +36,7 @@ public class Panel {
     final int Nlvr       = 72;   // 1-30
     Lever     lvr  []    = new Lever [Nlvr];
     int       codeBut [] = new int [Nlvr /2];
-    Sym       symLock [] = new Sym [Nlvr /2];
+    Sym       symLock [] = new Sym [Nlvr];
 
     Control   ctl;
     SymList   symList;
@@ -450,11 +450,19 @@ public class Panel {
         //              red 10, white 12 ... off -1
 
         for (int num = 1; num < lvr.length-1; num += 2)  {
-            if (null == lvr [num] && null == lvr [num+1])
-                continue;
-
             int col = 1 + (num-1) / 2;
             int x0  = colWid * ((num-1) / 2);
+            int idx;
+
+            // lock button
+            if (null != symLock [num])  {
+                g2d.drawImage (lock [0].img, x0 + 12, y2 + 50, null);
+                idx = 'l' == symLock [num].cond ? 1 : 4;
+                g2d.drawImage (lamp [idx].img, x0 + 17, y2 + 76, null);
+            }
+
+            if (null == lvr [num] && null == lvr [num+1])
+                continue;
 
             if (null != lvr [num])
                 paintToPlate  (g2d, x0, y0, col, num);
@@ -463,15 +471,8 @@ public class Panel {
                 paintSigPlate (g2d, x0, y1, col, num+1);
 
             // code button
-            int  idx = 0 < codeBut [num] ? 1 : 0;
+            idx = 0 < codeBut [num] ? 1 : 0;
             g2d.drawImage (code [idx].img, x0 + 15, y2 + 10, null);
-
-            // lock button
-            if (null != symLock [num])  {
-                g2d.drawImage (lock [0].img, x0 + 12, y2 + 50, null);
-                idx = 'l' == symLock [num].cond ? 1 : 4;
-                g2d.drawImage (lamp [idx].img, x0 + 17, y2 + 76, null);
-            }
         }
     }
 };
