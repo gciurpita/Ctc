@@ -16,33 +16,35 @@
 #   76    66  |  hsignalRC.bmp
 #   77    67  }  hsignalLC.bmp
 
-
-row                    A
-row   2222249         85222222
-row        @ 7 A     6 A
-row   22222422:52224;225222222
+row                        A
+row   2222249      82     85222222
+row        @ 7 A  6      6 A
+row   22222422:52;222224;225222222
 #   01234567890123456789012345678901234567890123456789
 #             1         2         3         4
-row        @       @
 
-ctc    5,6,9,10
+row        @           @
+
+ctc    5 6     7     11 12
+lock           7
 
 #       ctc   row  col  lbl
-signal   10     0   19  10LB
-signal   10     2   19  10L
-signal   10     4   15  10R
+signal   12     0   23  LB
+signal   12     2   23  L
+signal   12     4   19  R
 
-signal    6     2    7  6RB
-signal    6     4    7  6R
-signal    6     2   11  6L
+signal    6     2    7  RB
+signal    6     4    7  R
+signal    6     2   11  L
 
-turnout   5     3   10  5
-turnout   9     3   16  9
+turnout   5     3   10  _
+turnout   7     3   13  _
+turnout  11     3   20  _
 
-rule    6L  lL6
-rule    6R  rL6  N5 cL10
-rule    6RB rL6  R5 cL10
+rule    6L  NL6
+rule    6R  RL6  N5 CL12
+rule    6RB RL6  R5 CL12
 
-rule   10LB lL10 R9  cL6
-rule   10L  lL10 N9  cL6
-rule   10R  rL10
+rule   12LB LL12 R11 CL6
+rule   12L  LL12 N11 CL6
+rule   12R  RL12
