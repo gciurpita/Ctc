@@ -252,7 +252,17 @@ public class RuleList  {
         // block prefixed with 'B'
         else if ('B' == c1)  {
             type = 'B';
-            cond = 'U';
+            cond = c0;
+            name = fld.substring (1);
+            if (dbg)
+                System.out.format (
+                    " RuleList.id: B - %c %c %s\n", cond, type, name);
+        }
+
+        // switch-lock prefixed with 'K'
+        else if ('K' == c1)  {
+            type = 'K';
+            cond = c0;
             name = fld.substring (1);
             if (dbg)
                 System.out.format (
