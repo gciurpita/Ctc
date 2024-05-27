@@ -226,12 +226,14 @@ public class Panel {
                     x, y, col, num);
 
         // lock
-        if (null != symLock [num] &&  0 == symLock [num].lock)  {
-            if (y - y0Panel > (iconToHt + iconSigHt + 50))  {
-                if ('u' == symLock [num].cond)
-                    symLock [num].cond = 'l';
-                else
-                    symLock [num].cond = 'u';
+        if (y - y0Panel > (iconToHt + iconSigHt + 50))  {
+            if (null != symLock [num])  {
+                if (0 == symLock [num].lock)  {
+                    if ('u' == symLock [num].cond)
+                        symLock [num].cond = 'l';
+                    else
+                        symLock [num].cond = 'u';
+                }
             }
         }
 
