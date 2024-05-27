@@ -200,15 +200,20 @@ public class Track {
         System.out.format (
             "  Track.check: %c %-6s, %4d,\n", type, name, num);
 
-        byte tile = trk [col][row];
+        byte tile  = trk [col][row];
+        byte tileL = 0;
+        if (0 < col)
+            tileL =  trk [col-1][row];
 
         if ('S' == type)  {
             if (tile < HsignalR || HsignalL < tile)
                 return false;
         }
         else if ('B' == type)  {
-            if (BlockHl != tile && BlockHr != tile)
-                return false;
+            if (BlockHl != tile && BlockHr != tile)  {
+                if (TrackH == tile && BlockHr != tileL)
+                    return false;
+            }
 
             Blk blk   = new Blk (col, row, sym);
             blk.next  = blks;
@@ -352,13 +357,18 @@ public class Track {
 
         int dir     = 1;
         int tileIdx = trk [col][row];
-        if (BlockHR == tileIdx)
+        if (BlockHR == tileIdx)             // -|
             dir = -1;
-        
+
         do  {
             int idx  = offset + tileIdx;
             g2d.drawImage (
                 tile [idx].img, col * tileWid, row * tileWid, null);
+
+            if (dbg)
+                System.out.format (
+                    " trace:  col %2d, row %d, tile %2d %2d\n",
+                        col, row, tileIdx, idx);
 
             if (1 == dir)  {    // moving right
                 col++;
@@ -389,16 +399,33 @@ public class Track {
                 }
             }
 
-            if (dbg)
-                System.out.format (
-                    " trace: col %2d, row %d, tile %d\n", col, row, tileIdx);
+            if (0 > col)
+                return;
 
             tileIdx = trk [col][row];
-        } while (0 <= tileIdx && BlockHR != tileIdx && BlockHL != tileIdx);
+            if (dbg)
+                System.out.format (
+                    "  trace: col %2d, row %d, tile %2d\n", col, row, tileIdx);
 
-        int idx  = offset + tileIdx;
-        g2d.drawImage (
-            tile [idx].img, col * tileWid, row * tileWid, null);
+        } while (0 < tileIdx && ! (BlockHR == tileIdx || BlockHL == tileIdx));
+
+        // last icon, possibly
+        if (0 < tileIdx &&
+                (( 1 == dir && BlockHR == tileIdx)
+                    || (-1 == dir && BlockHL == tileIdx)) )  {
+            int idx  = offset + tileIdx;
+            g2d.drawImage (
+                tile [idx].img, col * tileWid, row * tileWid, null);
+
+                if (dbg)
+                    System.out.format (
+                        "   trace: col %2d, row %d, tile %2d, dir %2d\n",
+                            col, row, tileIdx, dir);
+
+        }
+
+        if (dbg)
+            System.out.println  (" trace: ");
     }
 
     // ------------------------------------------------------------------------
@@ -418,8 +445,10 @@ public class Track {
         if ('B' == type)  {                 // block
             for (Blk blk = blks ; null != blk; blk = blk.next)  {
              // blk.disp ();
-                if (blk.sym.name.equals(name))
+                if (blk.sym.name.equals(name))  {
                     blk.sym.cond = pos;
+                 // blk.disp ();
+                }
             }
             return;
         }
