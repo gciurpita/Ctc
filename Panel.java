@@ -191,6 +191,9 @@ public class Panel {
         int     num,
         char    state )
     {
+        if (null == lvr [num])  // not a lever lamp update
+            return;
+
         Sym sym = lvr [num].sym;
 
         if (0 == num % 2)  {    // signal
@@ -220,6 +223,17 @@ public class Panel {
                 "Panel.mousePressed: %d %d, col %d, num %d\n",
                     x, y, col, num);
 
+        // lock
+        if (null != symLock [num] &&  0 == symLock [num].lock)  {
+            if (y - y0Panel > (iconToHt + iconSigHt + 50))  {
+                if ('u' == symLock [num].cond)
+                    symLock [num].cond = 'l';
+                else
+                    symLock [num].cond = 'u';
+            }
+        }
+
+        // skip if no levers
         if (null == lvr [num])
             return false;
 
@@ -307,15 +321,6 @@ public class Panel {
             return true;
         }
 
-        // lock
-        else if (y - y0Panel > (iconToHt + iconSigHt + 50))  {
-            if (null != symLock [num] && 0 == symLock [num].lock)  {
-                if ('u' == symLock [num].cond)
-                    symLock [num].cond = 'l';
-                else
-                    symLock [num].cond = 'u';
-            }
-        }
 
         return false;
     }
@@ -457,7 +462,7 @@ public class Panel {
             // lock button
             if (null != symLock [num])  {
                 g2d.drawImage (lock [0].img, x0 + 12, y2 + 50, null);
-                idx = 'l' == symLock [num].cond ? 1 : 4;
+                idx = 'l' == symLock [num].cond ? 3 : 4;
                 g2d.drawImage (lamp [idx].img, x0 + 17, y2 + 76, null);
             }
 
