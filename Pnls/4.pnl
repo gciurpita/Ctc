@@ -1,6 +1,8 @@
+title back-to-back sidings
+
 #    2     2  2  trackH.bmp
-#    4     4  4  blockHR.bmp
-#    5     5  5  blockHL.bmp
+#    4     4  4  blockHR.bmp -|
+#    5     5  5  blockHL.bmp |-
 #    6     6  6  diagonalDU.bmp /
 #    7     7  7  diagonalUD.bmp \
 
@@ -16,34 +18,49 @@
 #   76    66  |  hsignalRC.bmp
 #   77    67  }  hsignalLC.bmp
 
-row                        A
-row   2222249      82     85222222
-row        @ 7 A  6      6 A
-row   22222422:52;222224;225222222
-#   01234567890123456789012345678901234567890123456789
 #             1         2         3         4
 
-row        @           @
+row                    A
+row 22229             84222222
+row    @ 7 A  82     6 A
+row 222522:422222225;224222222
+#   01234567890123456789012345678901234567890123456789
+row    @           @
 
-ctc    5 6          11 12
-lock       7
+ctc    3 4          9 10
+lock       5
+
+#        id   row  col  lbl
+block     3     3    7    _
+block     5     3    8    _
+block     9     3   15    _
 
 #       ctc   row  col  lbl
-signal   12     0   23  LB
-signal   12     2   23  L
-signal   12     4   19  R
+signal   10     0   19  LB
+signal   10     2   19  L
+signal   10     4   15  R
 
-signal    6     2    7  RB
-signal    6     4    7  R
-signal    6     2   11  L
+signal    4     2    3  RB
+signal    4     4    3  R
+signal    4     2    7  L
 
-turnout   5     3   10  _
-turnout  11     3   20  _
+turnout   3     3    6  _
+turnout   9     3   16  _
 
-rule    6L  NL6
-rule    6R  RL6  N5 CL12
-rule    6RB RL6  R5 CL12
+rule    4RB RL4  R3  UB3 UB5 uK5 R9 S10LB
+rule    4RB RL4  R3  UB3 UB5 uK5 N9 S10L
 
-rule   12LB LL12 R11 CL6
-rule   12L  LL12 N11 CL6
-rule   12R  RL12
+rule    4R  RL4  N3  UB3 UB5 uK5 R9 S10LB
+rule    4R  RL4  N3  UB3 UB5 uK5 N9 S10L
+
+rule    4L  LL4  UB3
+
+rule   10LB LL10 R9  UB9 UB5 uK5 R3 S4RB
+rule   10LB LL10 R9  UB9 UB5 uK5 N3 S4R
+
+rule   10L  LL10 N9  UB9 UB5 uK5 R3 S4RB
+rule   10L  LL10 N9  UB9 UB5 uK5 N3 S4R
+
+rule   10R  RL10 UB9
+
+mqtt 127.0.0.1 1883 CTC-Panel layout

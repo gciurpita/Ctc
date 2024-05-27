@@ -10,6 +10,7 @@
     Pnl     = Pnls/md2.pnl
     Pnl     = Pnls/b2b.pnl
     Pnl     = Pnls/b2b_a.pnl
+    Pnl     = Pnls/4.pnl
 
 %.class : %.java
 		javac $(LINT_FLAG) $<
