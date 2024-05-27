@@ -100,20 +100,20 @@ public class RuleList  {
         boolean match = true;
         for (Rule rule = rl.head; null != rule; rule = rule.next) {
             char c = rule.cond;
-
-         // char d = rule.sym.cond;
             char d = rule.sym.cond;
-            if (0 == rule.sym.num % 2)   // turnout cond, but signal pos
+
+            // turnout-lever cond, but signal pos
+            if ('L' == rule.sym.type && 0 == rule.sym.num % 2)
                 d = rule.sym.pos;
 
             if (d != c)  {
                 match = false;
                 if (dbg)
-                    System.out.format (" %c %c %-4s", d, c, rule.sym.name);
+                    System.out.format (" %c%c %-4s", d, c, rule.sym.name);
             }
             else
                 if (dbg)
-                    System.out.format (", . %c %-4s", c, rule.sym.name);
+                    System.out.format (" .%c %-4s", c, rule.sym.name);
         }
 
         if (dbg) {
