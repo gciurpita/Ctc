@@ -202,6 +202,8 @@ public class Panel {
             else
                 sym.cond = 'C';   // centered
         }
+        else                    // turnout
+            sym.cond = state;
 
         if (false)
             System.out.format (
