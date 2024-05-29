@@ -6,7 +6,7 @@
 
 <h3>CTC Panel without using JMRI</h3>
 
-<img src=Img/4pnlBlk.png align=right height=300>
+<img src=Img/4pnlBlk.PNG align=right height=300>
 
 JMRI is many things and can provide a CTC panel for control of a layout
 but describing both the trackage and panel using JMRI is tedious.
