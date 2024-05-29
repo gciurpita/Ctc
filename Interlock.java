@@ -163,10 +163,14 @@ public class Interlock extends JPanel
                 symList.disp ();
                 break;
 
+            case 'u':
+                symList.unlock ();
+                break;
+
             case '?':
                 System.out.format ("key commands:\n");
-                System.out.format ("    c - check rules\n");
                 System.out.format ("    d - list syms\n");
+                System.out.format ("    u - unlock all syms\n");
                 break;
 
             default:

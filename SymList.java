@@ -123,4 +123,12 @@ public class SymList  {
 
         return head;
     }
+
+    // -------------------------------------
+    public void unlock ()
+    {
+        System.out.println ("symList.unlock:");
+        for (Sym sym = head; null != sym; sym = sym.next)
+            sym.lock = 0;
+    }
 }
