@@ -1,4 +1,6 @@
 #    2     2  2  trackH.bmp
+#    4     4  4  blockHR.bmp
+#    5     5  5  blockHL.bmp
 
 #    8     8  8  angleDL.bmp
 #    9     9  9  angleDR.bmp
@@ -12,47 +14,50 @@
 #   76    66  |  hsignalRC.bmp
 #   77    67  }  hsignalLC.bmp
 
+title 4-track
 
 row        A
-row       8522222
-row      6       A
+row       8422222
+row      6         A
+row   25;222522292242
+row    @         7 A
+row   252229222522:42
 #   01234567890123456789012345678901234567890123456789
 #             1         2         3         4
-row   24;222229225
-row    @       7 A
-row   2422292222:5
 row    @    7 A
-row          :529
+row          :429
+
+ctc    3 4 5 6 7 8
+
+#        id   row  col  
+block     3     3    3  _
+block     7     3    8  A
+block     5     5    3  _
+block     7     5   11  B
 
 #       ctc   row  col  lbl
-signal    4     0    7  4LB
-signal    4     2   13  4L
-signal    4     4    3  4R
-signal    8     4   13  8L
-signal    6     6    3  6R
-signal    6     6   10  6LB
+signal    4     0    7  LB
+signal    4     2   15  L
+signal    4     4    3  R
+signal    8     4   15  L
+signal    6     6    3  R
+signal    6     6   10  LB
 
-turnout   3     3    4  3
-turnout   5     5    7  5
-turnout   7     3   10  7A
-turnout   7     5   12  7B
+turnout   3     3    4  _
+turnout   5     5    7  _
+turnout   7     3   12  A
+turnout   7     5   14  B
 
-ctc    3,4,5,6,7,8
+rule    4R  RL4  R3
+rule    4R  RL4  N3   N7A
+rule    4R  RL4  N3   R7A  CL8
 
-# rule    3   n3   n7A s4R s4L
-# rule    3   r3   s4R s4LB
-# rule    3   s4R  n7A s4L
+rule    4LB LL4  R3
+rule    4L  LL4  N3   N7A
 
-rule    4R  rL4  R3
-rule    4R  rL4  N3   N7A
-rule    4R  rL4  N3   R7A  cL8
+rule    6LB LL6  R5
+rule    6R  RL6  R5
+rule    6R  RL6  CL8  N5   N7A
 
-rule    4LB lL4  R3
-rule    4L  lL4  N3   N7A
-
-rule    6LB lL6  R5
-rule    6R  rL6  R5
-rule    6R  rL6  cL8  N5   N7A
-
-rule    8L  lL8  cL4  N3   R7A
-rule    8L  lL8  cL6  N7A
+rule    8L  LL8  CL4  N3   R7A
+rule    8L  LL8  CL6  N7A
