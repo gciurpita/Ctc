@@ -395,6 +395,17 @@ public class Interlock extends JPanel
             }
 
             // -----------------------------------
+            else if (fld[0].equals("text"))  {
+             // int col     = Integer.parseInt (fld [1]);
+             // int row     = Integer.parseInt (fld [2]);
+                float col   = Float.parseFloat (fld [1]);
+                float row   = Float.parseFloat (fld [2]);
+
+             // trk.addText (col, row, fld [3]);
+                trk.addText (col, row, line.substring (line.indexOf (fld [3])));
+            }
+
+            // -----------------------------------
             else if (fld[0].equals("title"))  {
                 title = line.substring (6);
             }

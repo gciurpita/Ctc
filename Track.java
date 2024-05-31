@@ -30,6 +30,7 @@ public class Track {
 
     Blk       blks;
     Panel     panel;
+    Text      text;
 
     String    cfgFile  = "./Resources/blackScreenTiles.cfg";
 
@@ -61,6 +62,29 @@ public class Track {
             System.out.format (
                 " Track.Blk.disp: %3d %3d %c %s\n",
                     col, row, sym.cond, sym.name);
+        }
+    }
+
+    // -------------------------------------
+    class Text {
+        int     x;
+        int     y;
+        String  str;
+        Text    next;
+
+        Text (
+            float   row,
+            float   col,
+            String  str,
+            Text    text )
+        {
+            this.x    = (int) (tileWid * col);
+            this.y    = (int) (tileWid * row);
+            this.str  = str;
+            this.next = text;
+
+            System.out.format (
+                "Track.paint: %6.2f, %6.2f,  text %s\n", col, row, this.str);
         }
     }
 
@@ -156,6 +180,15 @@ public class Track {
 
         tileHt  = tile [0].img.getHeight (null);
         tileWid = tile [0].img.getWidth  (null);
+    }
+
+    // --------------------------------
+    public void addText (
+        float  col,
+        float  row,
+        String str )
+    {
+        text = new Text (col, row, str, text);
     }
 
     // --------------------------------
@@ -543,7 +576,13 @@ public class Track {
                 ts.xLbl = -(5 + g2d.getFontMetrics().stringWidth (ts.name));
             }
             g2d.drawString (ts.name, ts.x + ts.xLbl, ts.y + ts.yLbl);
+        }
 
+        // add text
+        for (Text txt = text; null != txt; txt = txt.next)  {
+         // g2d.drawString (txt.str, tileWid * txt.col, tileWid * txt.row);
+            g2d.drawString (txt.str, txt.x, txt.y);
+         // System.out.format ("Track.paint: text %s\n", txt.str);
         }
     }
 }
