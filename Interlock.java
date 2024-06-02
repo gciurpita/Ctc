@@ -33,6 +33,8 @@ public class Interlock extends JPanel
 
     Mqtt     mqtt;
 
+    int      xPos     = 500;
+    int      yPos     = 0;
     int      canvasHt;
     int      canvasWid;
     int      colWid;
@@ -82,7 +84,7 @@ public class Interlock extends JPanel
 
         // position app near top center of screen
         Rectangle r = frame.getBounds();        // window size
-        frame.setBounds (300, 0, r.width, r.height);
+        frame.setBounds (xPos, yPos, r.width, r.height);
 
         // create timer
         TimerTask task = new TimerTask() {
@@ -337,6 +339,12 @@ public class Interlock extends JPanel
                         break;
                     }
                 }
+            }
+
+            // -----------------------------------
+            else if (fld[0].equals("pos"))  {
+                xPos = Integer.valueOf (fld [1]);
+                yPos = Integer.valueOf (fld [2]);
             }
 
             // -----------------------------------

@@ -22,7 +22,7 @@ import javax.imageio.ImageIO;
 public class Track {
     SymList   symList;
 
-    final int Ncol     = 100;
+    final int Ncol     = 200;
     final int Nrow     = 30;
     byte      trk [][] = new byte [Ncol][Nrow];
     int       nRow     = 0;
