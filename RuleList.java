@@ -80,29 +80,11 @@ public class RuleList  {
     }
 
     // ------------------------------------------------------------------------
-    private void __uncheck ()
-    {
-        System.out.format ("  ruleList.uncheck: %s\n", sym.name);
-        for (RuleList rl = this; null != rl; rl = rl.next)  {
-            if ( ! rl.locked)
-                continue;
-
-            if ( ! match (rl))  {
-                rl.locked = false;
-                sym.cond  = 'S';
-                rl.unlock ();
-            }
-        }
-        System.out.println ();
-    }
-
-    // --------------------------------
     public void uncheck ()
     {
         disp ("uncheck:");
 
-     // if ( ! match (this))  {
-        if (true)
+        if (1 == sym.lock)
             unlock ();
     }
 
@@ -172,7 +154,6 @@ public class RuleList  {
             }
             else  {
                 rl.locked = false;
-            //  rl.unlock ();
 
                 if (dbg)
                     System.out.format (
@@ -208,7 +189,7 @@ public class RuleList  {
         for (Rule rule = head; null != rule; rule = rule.next)  {
             if ('B' != rule.sym.type && 0 == rule.sym.lock)  {
                 System.out.format (
-                    "Error - ruleLost.unlock - %s rule element not locked\n",
+                    "Error - ruleList.unlock - %s rule element not locked\n",
                         sym.name);
                 System.exit (1);
             }
