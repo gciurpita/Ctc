@@ -80,7 +80,7 @@ public class RuleList  {
     }
 
     // ------------------------------------------------------------------------
-    private void uncheck ()
+    private void __uncheck ()
     {
         System.out.format ("  ruleList.uncheck: %s\n", sym.name);
         for (RuleList rl = this; null != rl; rl = rl.next)  {
@@ -94,6 +94,16 @@ public class RuleList  {
             }
         }
         System.out.println ();
+    }
+
+    // --------------------------------
+    public void uncheck ()
+    {
+        disp ("uncheck:");
+
+     // if ( ! match (this))  {
+        if (true)
+            unlock ();
     }
 
     // --------------------------------
@@ -176,12 +186,6 @@ public class RuleList  {
             if (dbg)
                 System.out.println ();
         }
-    }
-
-    // --------------------------------
-    public Sym getHead ()
-    {
-        return head.sym;
     }
 
     // --------------------------------

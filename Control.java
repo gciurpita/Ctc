@@ -97,11 +97,12 @@ public class Control
 
         // check if block "knocks down" signal
         if ('B' == cmd.type)  {
-            Sym sym = symList.findName (cmd.id);
+            Sym      sym = symList.findName (cmd.id);
+            RuleList rL  = sym.ruleList;
 
             if (null != sym.ruleList)  {
                 if ('O' == cmd.state)  {
-                    Sym symSig = sym.ruleList.sym;
+                    Sym symSig = rL.sym;
 
                     System.out.format (
                         "   processCmd: blk %s occupied, sig %s\n",
@@ -109,21 +110,23 @@ public class Control
 
                     track.update (symSig.type, 'S', symSig.name);
                 }
-                else
+                else  {
                     System.out.format (
                         "   processCmd: blk %s unoccupied\n", sym.name);
-            }
-
-            if (null != sym.sigList)  {
-                for (SigList sl = sym.sigList; null != sl; sl = sl.next)  {
-                    System.out.format (
-                        "   processCmd: blk %s - %s\n", sym.name, sl.sym.name);
-                    track.update (sl.sym.type, 'S', sl.sym.name);
+                    rL.uncheck ();
                 }
             }
-            else
-                System.out.format (
-                    "   processCmd: blk %s - no RuleList\n", sym.name);
+
+ //         if (null != sym.sigList)  {
+ //             for (SigList sl = sym.sigList; null != sl; sl = sl.next)  {
+ //                 System.out.format (
+ //                     "   processCmd: blk %s - %s\n", sym.name, sl.sym.name);
+ //                 track.update (sl.sym.type, 'S', sl.sym.name);
+ //             }
+ //         }
+ //         else
+ //             System.out.format (
+ //                 "   processCmd: blk %s - no RuleList\n", sym.name);
         }
     }
 
