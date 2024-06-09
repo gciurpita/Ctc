@@ -360,7 +360,7 @@ public class Interlock extends JPanel
                     err++;
                     continue;
                 }
-             // System.out.format (" loadPnl addrule: %s\n", fld [1]);
+                System.out.format (" loadPnl addrule: %s\n", fld [1]);
                 sym.addRule (fld, symList);
             }
 

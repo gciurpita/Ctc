@@ -89,19 +89,35 @@ public class Control
         Track  track,
         Cmd    cmd )
     {
-        if (false)
+        if (true)
             System.out.println ("Control.processCmd");
+
         cmdDisp ("   processCmd", cmd);
         track.update (cmd.type, cmd.state, cmd.id);
 
         // check if block "knocks down" signal
         if ('B' == cmd.type)  {
-            Sym symBlk = symList.findName (cmd.id);
+            Sym sym = symList.findName (cmd.id);
 
-            if (null != symBlk.sigList)  {
-                for (SigList sl = symBlk.sigList; null != sl; sl = sl.next)
-                    track.update (sl.sym.type, 'S', sl.sym.name);
+            if (null != sym.ruleList)  {
+                if ('O' == cmd.state)
+                    System.out.format (
+                        "   processCmd: blk %s occupied\n", sym.name);
+                else
+                    System.out.format (
+                        "   processCmd: blk %s unoccupied\n", sym.name);
             }
+
+            if (null != sym.sigList)  {
+                for (SigList sl = sym.sigList; null != sl; sl = sl.next)  {
+                    System.out.format (
+                        "   processCmd: blk %s - %s\n", sym.name, sl.sym.name);
+                    track.update (sl.sym.type, 'S', sl.sym.name);
+                }
+            }
+            else
+                System.out.format (
+                    "   processCmd: blk %s - no RuleList\n", sym.name);
         }
     }
 

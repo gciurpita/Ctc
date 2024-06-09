@@ -83,24 +83,26 @@ public class Sym  {
         }
 
         // add sym to block
-        for (int i = 2; i < fld.length; i++)  {
-            if ('B' == fld [i].charAt(1)) {
-                String blkName = fld [i].substring (1);
-                Sym    symBlk  = symList.findName (blkName);
+ //   if (false) {
+ //     for (int i = 2; i < fld.length; i++)  {
+ //         if ('B' == fld [i].charAt(1)) {
+ //             String blkName = fld [i].substring (1);
+ //             Sym    symBlk  = symList.findName (blkName);
 
-                if (null == symBlk)  {
-                    System.err.format ("Error blkSym not found %s\n", blkName);
-                    System.exit (2);
-                }
+ //             if (null == symBlk)  {
+ //                 System.err.format ("Error blkSym not found %s\n", blkName);
+ //                 System.exit (2);
+ //             }
 
-                System.out.format (
-                    "  sym.addRule: add rule %s includes blk %s\n",
-                        fld [1], symBlk.name);
+ //             System.out.format (
+ //                 "  sym.addRule: add rule %s includes blk %s\n",
+ //                     fld [1], symBlk.name);
 
-                // append this to blk sigList
-                symBlk.sigList = new SigList (this, symBlk.sigList);
-            }
-        }
+ //             // append this to blk sigList
+ //             symBlk.sigList = new SigList (this, symBlk.sigList);
+ //         }
+ //     }
+ // }
      }
 
     // --------------------------------
@@ -110,8 +112,15 @@ public class Sym  {
             "   Sym %-6s '%c' %4d, %c %c %d %6s",
                 name, type, num, pos, cond, lock, mqtt);
 
-        if (null != ruleList)
+        if (null != ruleList)  {
             System.out.format (" rules");
+ //         System.out.println ();
+
+ //         if ('B' == type)  {
+ //             for (RuleList rL = ruleList; null != rL; rL = rL.next)
+ //                 rL.disp (name);
+ //         }
+        }
 
         if (null != sigList)  {
             System.out.format (" sigList");

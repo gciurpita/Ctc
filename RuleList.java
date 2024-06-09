@@ -30,6 +30,13 @@ public class RuleList  {
 
     // --------------------------------
     public RuleList (
+        Rule  rule )
+    {
+        head = rule;
+    }
+
+    // --------------------------------
+    public RuleList (
         String  fld [],
         SymList symList )
     {
@@ -171,9 +178,12 @@ public class RuleList  {
     // --------------------------------
     private void lock ()
     {
-        for (Rule rule = head; null != rule; rule = rule.next)
-            if ('B' != rule.sym.type)
-                rule.sym.lock++;
+        for (Rule rule = head; null != rule; rule = rule.next)  {
+            rule.sym.lock++;
+
+            if ('B' == rule.sym.type)
+                rule.sym.ruleList = new RuleList (head);
+        }
     }
 
     // --------------------------------
