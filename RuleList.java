@@ -40,8 +40,11 @@ public class RuleList  {
         String  fld [],
         SymList symList )
     {
-        if (dbg)
-            System.out.format (" RuleList: %s\n", fld [1]);
+        // add sym name associated with rule to ruleList
+        sym   = symList.findName (fld [1]);
+
+        if (true)
+            System.out.format (" RuleList: %s - %s\n", fld [1], sym.name);
 
         Rule rule   = null;
         Rule rule0  = head;
@@ -176,13 +179,21 @@ public class RuleList  {
     }
 
     // --------------------------------
+    public Sym getHead ()
+    {
+        return head.sym;
+    }
+
+    // --------------------------------
     private void lock ()
     {
         for (Rule rule = head; null != rule; rule = rule.next)  {
             rule.sym.lock++;
 
-            if ('B' == rule.sym.type)
-                rule.sym.ruleList = new RuleList (head);
+            if ('B' == rule.sym.type)  {
+                rule.sym.ruleList     = new RuleList (head);
+                rule.sym.ruleList.sym = sym;
+            }
         }
     }
 
@@ -205,10 +216,10 @@ public class RuleList  {
     public void disp (
         String name )
     {
-        System.out.format ("  ruleList.disp:\n");
+     // System.out.format ("  ruleList.disp:\n");
         for (RuleList rl = this; null != rl; rl = rl.next)  {
          // System.out.format ("  ruleList.disp: %-4s", rl.head.sym.name);
-            System.out.format ("    %-4s", name);
+            System.out.format ("    rL.disp: %-4s - %-4s", name, sym.name);
 
             for (Rule rule = rl.head; null != rule; rule = rule.next) {
                 char c = rule.cond;

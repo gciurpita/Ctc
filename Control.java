@@ -100,9 +100,15 @@ public class Control
             Sym sym = symList.findName (cmd.id);
 
             if (null != sym.ruleList)  {
-                if ('O' == cmd.state)
+                if ('O' == cmd.state)  {
+                    Sym symSig = sym.ruleList.sym;
+
                     System.out.format (
-                        "   processCmd: blk %s occupied\n", sym.name);
+                        "   processCmd: blk %s occupied, sig %s\n",
+                                sym.name, symSig.name );
+
+                    track.update (symSig.type, 'S', symSig.name);
+                }
                 else
                     System.out.format (
                         "   processCmd: blk %s unoccupied\n", sym.name);

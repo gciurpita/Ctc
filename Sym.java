@@ -114,12 +114,13 @@ public class Sym  {
 
         if (null != ruleList)  {
             System.out.format (" rules");
- //         System.out.println ();
-
- //         if ('B' == type)  {
- //             for (RuleList rL = ruleList; null != rL; rL = rL.next)
- //                 rL.disp (name);
- //         }
+            if (true) {
+                if ('B' == type)  {
+                    System.out.println ();
+                    for (RuleList rL = ruleList; null != rL; rL = rL.next)
+                        rL.disp (name);
+                }
+            }
         }
 
         if (null != sigList)  {

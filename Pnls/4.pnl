@@ -47,19 +47,19 @@ signal    4     2    7  L
 turnout   3     3    6  _
 turnout   9     3   16  _
 
-rule    4RB RL4  R3  UB3 UB5 uK5 R9 S10LB
-rule    4RB RL4  R3  UB3 UB5 uK5 N9 S10L
+rule    4RB RL4  R3  UB3 UB5 UB9 uK5 R9 S10LB
+rule    4RB RL4  R3  UB3 UB5 UB9 uK5 N9 S10L
 
-rule    4R  RL4  N3  UB3 UB5 uK5 R9 S10LB
-rule    4R  RL4  N3  UB3 UB5 uK5 N9 S10L
+rule    4R  RL4  N3  UB3 UB5 UB9 uK5 R9 S10LB
+rule    4R  RL4  N3  UB3 UB5 UB9 uK5 N9 S10L
 
 rule    4L  LL4  UB3
 
-rule   10LB LL10 R9  UB9 UB5 uK5 R3 S4RB
-rule   10LB LL10 R9  UB9 UB5 uK5 N3 S4R
+rule   10LB LL10 R9  UB9 UB5 UB3 uK5 R3 S4RB
+rule   10LB LL10 R9  UB9 UB5 UB3 uK5 N3 S4R
 
-rule   10L  LL10 N9  UB9 UB5 uK5 R3 S4RB
-rule   10L  LL10 N9  UB9 UB5 uK5 N3 S4R
+rule   10L  LL10 N9  UB9 UB5 UB3 uK5 R3 S4RB
+rule   10L  LL10 N9  UB9 UB5 UB3 uK5 N3 S4R
 
 rule   10R  RL10 UB9
 
