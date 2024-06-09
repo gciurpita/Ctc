@@ -116,17 +116,6 @@ public class Control
                     rL.uncheck ();
                 }
             }
-
- //         if (null != sym.sigList)  {
- //             for (SigList sl = sym.sigList; null != sl; sl = sl.next)  {
- //                 System.out.format (
- //                     "   processCmd: blk %s - %s\n", sym.name, sl.sym.name);
- //                 track.update (sl.sym.type, 'S', sl.sym.name);
- //             }
- //         }
- //         else
- //             System.out.format (
- //                 "   processCmd: blk %s - no RuleList\n", sym.name);
         }
     }
 
@@ -215,21 +204,6 @@ public class Control
             mqtt.publish (topic, String.valueOf(state));
         }
     }
-
-    // ---------------------------------------------------------
- // public void send (
- //     String  topicName,
- //     char    state )
- // {
- //     Cmd cmd  = new Cmd (' ', topicName, state);
- //     cmd.next = this.cmd;
- //     this.cmd = cmd;
-
- //     System.out.format ("send: %s %c\n", topicName, cmd.state);
-
- //     if (null != mqtt)
- //         mqtt.publish (topicName, String.valueOf(state));
- // }
 
     // ---------------------------------------------------------
     public void set (

@@ -12,8 +12,6 @@ public class Sym  {
     int         lock;
     boolean     dbg = false;
 
-    SigList     sigList;    // signal syms dropped when blk occupied
-
     // -------------------------------------
     public Sym (
         String  name,
@@ -81,28 +79,6 @@ public class Sym  {
                 System.out.format (" sym.addRule: ruleList\n");
             ruleList.disp (fld [0]);
         }
-
-        // add sym to block
- //   if (false) {
- //     for (int i = 2; i < fld.length; i++)  {
- //         if ('B' == fld [i].charAt(1)) {
- //             String blkName = fld [i].substring (1);
- //             Sym    symBlk  = symList.findName (blkName);
-
- //             if (null == symBlk)  {
- //                 System.err.format ("Error blkSym not found %s\n", blkName);
- //                 System.exit (2);
- //             }
-
- //             System.out.format (
- //                 "  sym.addRule: add rule %s includes blk %s\n",
- //                     fld [1], symBlk.name);
-
- //             // append this to blk sigList
- //             symBlk.sigList = new SigList (this, symBlk.sigList);
- //         }
- //     }
- // }
      }
 
     // --------------------------------
@@ -121,12 +97,6 @@ public class Sym  {
                         rL.disp (name);
                 }
             }
-        }
-
-        if (null != sigList)  {
-            System.out.format (" sigList");
-            for (SigList sl = sigList; null != sl; sl = sl.next)
-                System.out.format (" %s", sl.sym.name);
         }
 
         System.out.println ();

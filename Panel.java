@@ -1,18 +1,9 @@
 
 import java.awt.*;
 import java.io.*;
-// import java.net.*;
 import javax.swing.*;
 import java.util.*;
 
-// import java.awt.image.BufferedImage;
-// import java.awt.image.ImageFilter;
-// import java.awt.image.ImageProducer;
-// import java.awt.image.RGBImageFilter;
-// import java.awt.image.FilteredImageSource;
-
-// import java.awt.event.*;
-// import java.awt.geom.AffineTransform;
 import javax.imageio.ImageIO;
 
 // -----------------------------------------------------------------------------
@@ -273,12 +264,6 @@ public class Panel {
             if (dbg)
                 System.out.format (
                     " Panel.mousePressed: sig %d - %c\n", num, sym.pos);
-
- //         Sym sym = symList.findName (lvr [num].name);
- //         if (null != sym.mqtt)
- //             ctl.send (sym.mqtt, lvr [num].pos);
- //         else
- //             ctl.send ("S/" + sym.name, lvr [num].pos);
         }
 
         // code button
@@ -324,7 +309,6 @@ public class Panel {
 
             return true;
         }
-
 
         return false;
     }
@@ -402,36 +386,6 @@ public class Panel {
         g2d.drawImage (lamp [idxCenter].img, x0 + 18, y0 +  6, null);
         g2d.drawImage (lamp [idxRight].img,  x0 + 34, y0 + 18, null);
     }
-
-//  // ------------------------------------------------------------------------
-//  private void paintSigLamps (
-//      Graphics2D  g2d )
-//  {
-//      // all stop
-//      for (int i = 0; i < symSigSize; i++)  {
-//          PnlSym sym               = symSig [i];
-//          int    imgIdx            = sym.imgIdx;
-//          ctcCol [sym.ctcNum].lamp = ' ';
-//          g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
-//      }
-
-//      // clear one
-//      for (int i = 0; i < symSigSize; i++)  {
-//          PnlSym sym               = symSig [i];
-//          int    imgIdx            = sym.imgIdx;
-
-//          if ('C' == sym.cond)  {
-//              ctcCol [sym.ctcNum].lamp = sym.type;
-
-//              if (true)
-//                  System.out.format ("paintSigLamps: num %d, %c, %s\n",
-//                      sym.ctcNum, ctcCol [sym.ctcNum].lamp, sym.lbl);
-
-//              imgIdx += 30;
-//              g2d.drawImage (imgTile [imgIdx].img, sym.x, sym.y, this);
-//          }
-//      }
-//  }
 
     // ------------------------------------------------------------------------
     public void paint (
