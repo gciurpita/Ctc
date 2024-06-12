@@ -113,7 +113,8 @@ public class Control
                 else  {
                     System.out.format (
                         "   processCmd: blk %s unoccupied\n", sym.name);
-                    rL.uncheck ();
+                    if (0 < sym.lock)
+                        rL.uncheck ();
                 }
             }
         }

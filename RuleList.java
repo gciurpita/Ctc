@@ -82,10 +82,8 @@ public class RuleList  {
     // ------------------------------------------------------------------------
     public void uncheck ()
     {
-        disp ("uncheck:");
-
-        if (1 == sym.lock)
-            unlock ();
+        System.out.format ("uncheck: %s, lock %d\n", sym.name, sym.lock);
+        unlock ();
     }
 
     // --------------------------------
