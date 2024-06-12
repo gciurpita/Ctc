@@ -165,6 +165,10 @@ public class Interlock extends JPanel
                 symList.disp ();
                 break;
 
+            case 'l':
+                symList.locked ();
+                break;
+
             case 'u':
                 symList.unlock ();
                 break;

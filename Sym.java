@@ -88,7 +88,7 @@ public class Sym  {
             "   Sym %-6s '%c' %4d, %c %c %d %6s",
                 name, type, num, pos, cond, lock, mqtt);
 
-        if (null != ruleList)  {
+        if (false && null != ruleList)  {
             System.out.format (" rules");
             if (true) {
                 if ('B' == type)  {

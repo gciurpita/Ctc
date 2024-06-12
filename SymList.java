@@ -125,6 +125,17 @@ public class SymList  {
     }
 
     // -------------------------------------
+    public void locked ()
+    {
+        System.out.println ("symList.locked:");
+        for (Sym sym = head; null != sym; sym = sym.next)  {
+            if (0 == sym.lock)
+                continue;
+            sym.disp ();
+        }
+    }
+
+    // -------------------------------------
     public void unlock ()
     {
         System.out.println ("symList.unlock:");
