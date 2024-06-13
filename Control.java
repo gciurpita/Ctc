@@ -77,7 +77,7 @@ public class Control
     public void heartbeat ()
     {
         if (null != mqtt)  {
-            if (200 <= ++pingCnt)  {
+            if (100 <= ++pingCnt)  {        // seconds
                 pingCnt = 0;
                 mqtt.ping ();
             }
