@@ -32,7 +32,6 @@ where the top row of odd numbered levers is for turnouts and
 the lower row with even numbered levers is for signals.
 Levers are checked when the <i>code-button</i>
 below the signal lever is pressed.
-
 If the request is accepted,
 the lamp above the lever position will be turned on and
 the corresponding turnout or signal icon on the track diagram modified.
@@ -43,6 +42,23 @@ A switch-lock lamp will be blue
 when the switch-lock is active allowing manual control and
 when properly used in a rule,
 preventing a signal clearing that route.
+
+<!-- -----------------------------------------------------  ---------------- -->
+<p align=right> June 2024, Greg Ciurpita
+<h4>Features</h4>
+
+<ul>
+ <li> at a minimum, an interface to turnouts and signals
+ <li> <i>rules</i> identify panel element positions and conditions, and
+        block occupancy status, to request a signal be cleared
+ <li> a locking mechanism that prevents panel elements being changed
+        once signal depending on those elements has be <i>set</i>
+ <li> a signal is set to Stop (i.e. <i>knocked down</i>)
+        when a block becomes the signal depends on (is in its rule)
+ <li> a mecanism to clear the lock status of elements in a <i>rule</i>
+        when a block becomes un-occupied.
+</ul>
+
 
 
 <!-- -----------------------------------------------------  ---------------- -->
