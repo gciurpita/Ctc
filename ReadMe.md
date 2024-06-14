@@ -177,21 +177,21 @@ or the specified CTC lever number.
 <tr><td width=30> &nbsp; </td>
 <td width=350>
  <table cellspacing=0> <tr><td> <pre>
-rule    4RB RL4  R3  UB3 UB5 uK5 R9 S10LB
-rule    4RB RL4  R3  UB3 UB5 uK5 N9 S10L
+rule    4RB rL4  r3  uB3 uB5 uB9 uK5 r9 s10LB
+rule    4RB rL4  r3  uB3 uB5 uB9 uK5 n9 s10L
 
-rule    4R  RL4  N3  UB3 UB5 uK5 R9 S10LB
-rule    4R  RL4  N3  UB3 UB5 uK5 N9 S10L
+rule    4R  rL4  n3  uB3 uB5 uB9 uK5 r9 s10LB
+rule    4R  rL4  n3  uB3 uB5 uB9 uK5 n9 s10L
 
-rule    4L  LL4  UB3
+rule    4L  lL4  uB3
 
-rule   10LB LL10 R9  UB9 UB5 uK5 R3 S4RB
-rule   10LB LL10 R9  UB9 UB5 uK5 N3 S4R
+rule   10LB lL10 r9  uB9 uB5 uB3 uK5 r3 s4RB
+rule   10LB lL10 r9  uB9 uB5 uB3 uK5 n3 s4R
 
-rule   10L  LL10 N9  UB9 UB5 uK5 R3 S4RB
-rule   10L  LL10 N9  UB9 UB5 uK5 N3 S4R
+rule   10L  lL10 n9  uB9 uB5 uB3 uK5 r3 s4RB
+rule   10L  lL10 n9  uB9 uB5 uB3 uK5 n3 s4R
 
-rule   10R  RL10 UB9
+rule   10R  rL10 uB9
  </table>
 </td></tr>
 </table>
@@ -214,7 +214,7 @@ the CTC machine relies on other control element to display
 the appropriate aspect (CLEAR, APPROACH, MEDIUM-APPROACH).
 
 <blockquote><pre>
-rule    4RB RL4  R3  UB3 UB5 uK5 R9 S10LB
+rule    4RB rL4  r3  uB3 uB5 uB9 uK5 r9 s10LB
 </blockquote></pre>
 
 <p>
