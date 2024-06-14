@@ -5,7 +5,7 @@ public class Control
     private class Cmd   {
         char    type;   // 'T' - turnout, 'S' - signal, '_' - unused
         String  id;     // interface, mqtt topic;
-        char    state;  // T - 'N'/'R', S - 'S'/'C'
+        char    state;  // T - 'n'/'r', S - 's'/'c'
 
         Cmd     next;
         int     delay;
@@ -101,14 +101,14 @@ public class Control
             RuleList rL  = sym.ruleList;
 
             if (null != sym.ruleList)  {
-                if ('O' == cmd.state)  {
+                if ('o' == cmd.state)  {
                     Sym symSig = rL.sym;
 
                     System.out.format (
                         "   processCmd: blk %s occupied, sig %s\n",
                                 sym.name, symSig.name );
 
-                    track.update (symSig.type, 'S', symSig.name);
+                    track.update (symSig.type, 's', symSig.name);
                 }
                 else  {
                     System.out.format (

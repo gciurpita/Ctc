@@ -19,7 +19,7 @@ public class Panel {
             Sym  sym )
         {
             this.sym     = sym;
-            this.sym.pos = 0 == (id % 2) ? 'C' : 'N';
+            this.sym.pos = 0 == (id % 2) ? 'c' : 'n';
         }
     }
 
@@ -188,10 +188,10 @@ public class Panel {
         Sym sym = lvr [num].sym;
 
         if (0 == num % 2)  {    // signal
-            if ('C' == state)   // clear
+            if ('c' == state)   // clear
                 sym.cond = lvr [num].sym.pos;
             else
-                sym.cond = 'C';   // centered
+                sym.cond = 'c';   // centered
         }
         else                    // turnout
             sym.cond = state;
@@ -237,9 +237,9 @@ public class Panel {
             Sym sym = lvr [num].sym;
 
             if ((dX < colWid / 2))
-                sym.pos = 'N';
+                sym.pos = 'n';
             else
-                sym.pos = 'R';
+                sym.pos = 'r';
 
             if (dbg)
                 System.out.format (
@@ -253,11 +253,11 @@ public class Panel {
             Sym sym = lvr [num].sym;
 
             if ((dX < colWid * 0.4))
-                sym.pos = 'L';
+                sym.pos = 'l';
             else if ((colWid * 0.6) < dX)
-                sym.pos = 'R';
+                sym.pos = 'r';
             else
-                sym.pos = 'C';
+                sym.pos = 'c';
 
             sym.pos = sym.pos;
 
@@ -290,10 +290,10 @@ public class Panel {
          //             symTo.name, symTo.cond, symTo.lock);
 
                 if (0 == symTo.lock)  {
-                    if (lvr[num].sym.pos == 'N' && 'R' == symTo.cond)
-                        ctl.send ('T', symTo.name, 'N');
-                    else if (lvr[num].sym.pos == 'R' && 'N' == symTo.cond)
-                        ctl.send ('T', symTo.name, 'R');
+                    if (lvr[num].sym.pos == 'n' && 'r' == symTo.cond)
+                        ctl.send ('T', symTo.name, 'n');
+                    else if (lvr[num].sym.pos == 'r' && 'n' == symTo.cond)
+                        ctl.send ('T', symTo.name, 'r');
                 }
             }
 
@@ -340,7 +340,7 @@ public class Panel {
         g2d.setColor (Color.white);
 
         // plate & lvr
-        int pos = ('R' == lvr [lvrId].sym.pos) ? 1 : 0;
+        int pos = ('r' == lvr [lvrId].sym.pos) ? 1 : 0;
         g2d.drawImage (turnout [lvrId/2].img,   x0, y0, null);
         g2d.drawImage (lever   [pos].img, x0 + 6, y0 + 44, null);
 
@@ -348,7 +348,7 @@ public class Panel {
         int lampIdxLeft  = 6;
         int lampIdxRight = 0;
 
-        if ('R' == lvr [lvrId].sym.cond)  {
+        if ('r' == lvr [lvrId].sym.cond)  {
             lampIdxLeft  = 5;
             lampIdxRight = 1;
         }
@@ -366,7 +366,7 @@ public class Panel {
     {
         // plate & lvr
         char posCh = lvr [lvrId].sym.pos;
-        int  pos   = 'R' == posCh ? 1 : 'C' == posCh ? 2 : 0;
+        int  pos   = 'r' == posCh ? 1 : 'c' == posCh ? 2 : 0;
         g2d.drawImage (signal [lvrId/2].img,   x0, y0, null);
         g2d.drawImage (lever  [pos].img,       x0 + 5, y0 + 57, null);
 
@@ -377,9 +377,9 @@ public class Panel {
 
         if ('L' == lvr [lvrId].sym.cond)
             idxLeft   = 6;
-        else if ('R' == lvr [lvrId].sym.cond)
+        else if ('r' == lvr [lvrId].sym.cond)
             idxRight  = 6;
-        else        // 'C'
+        else        // 'c'
             idxCenter = 10;
 
         g2d.drawImage (lamp [idxLeft].img,   x0 +  5, y0 + 17, null);

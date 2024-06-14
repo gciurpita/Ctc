@@ -43,7 +43,7 @@ public class RuleList  {
         // add sym name associated with rule to ruleList
         sym   = symList.findName (fld [1]);
 
-        if (true)
+        if (false)
             System.out.format (" RuleList: %s - %s\n", fld [1], sym.name);
 
         Rule rule   = null;
@@ -146,7 +146,7 @@ public class RuleList  {
                     System.out.format (
                         "  ruleList.checks: match, %s\n", sym.name);
 
-                sym.pos   = 'C';        // clear
+                sym.pos   = 'c';        // clear
                 if (sym.cond != sym.pos)
                     ctl.send ('S', sym.name, sym.pos);
             }
@@ -157,7 +157,7 @@ public class RuleList  {
                     System.out.format (
                         "  ruleList.checks: no match, %s\n", sym.name);
 
-                sym.pos  = 'S';        // stop
+                sym.pos  = 's';        // stop
                 if (sym.cond != sym.pos)
                     ctl.send ('S', sym.name, sym.pos);
             }
@@ -249,7 +249,7 @@ public class RuleList  {
             }
 
             type = 'S';
-            cond = 'S';
+            cond = 's';
             name = fld;
         }
 
@@ -278,7 +278,7 @@ public class RuleList  {
             int id = atoi (fld.substring (1));
 
             if (1 == id % 2) {
-                if ('N' != c0 && 'R' != c0)  {
+                if ('n' != c0 && 'r' != c0)  {
                     System.out.format (
                         "Error: id - invalid switch cond - %c  %s, %d\n",
                             c0, fld, id);
@@ -292,7 +292,7 @@ public class RuleList  {
                 return true;
             }
             else {
-                if ('S' != c0 && 'C' != c0)  {
+                if ('s' != c0 && 'c' != c0)  {
                     System.out.format (
                         "Error: id invalid signal cond - %s, %d\n", fld, id);
                     return false;
@@ -315,7 +315,7 @@ public class RuleList  {
                 return false;
             }
 
-            if ('L' != c0 && 'C' != c0 && 'R' != c0 && 'N' != c0)  {
+            if ('l' != c0 && 'c' != c0 && 'r' != c0 && 'n' != c0)  {
                 System.out.format (
                     "Error - ruleNew invalid lever cond - %c\n", c0);
                 return false;

@@ -319,6 +319,8 @@ public class Interlock extends JPanel
                     continue;
                 }
 
+                symList.disp ();
+
                 String ip    = fld [1];
                 String port  = fld [2];
                 String name  = fld [3];

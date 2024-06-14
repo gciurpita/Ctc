@@ -28,7 +28,7 @@ public class Sym  {
 
         switch (type)  {
         case 'B':
-            this.cond = 'U';        // Un/Occupied
+            this.cond = 'u';        // Un/Occupied
             break;
 
         case 'K':                   // manual turnout lock
@@ -37,17 +37,17 @@ public class Sym  {
 
         case 'L':                   // lever
             if (0 == (num % 2))
-                this.cond = 'C';    // center signal
+                this.cond = 'c';    // center signal
             else
-                this.cond = 'N';    // set turnout normal
+                this.cond = 'n';    // set turnout normal
             break;
 
         case 'S':                   // signal
-            this.cond = 'S';        // Stop/Clear
+            this.cond = 's';        // Stop/Clear
             break;
 
         case 'T':
-            this.cond = 'N';        // Normal/Reverse
+            this.cond = 'n';        // Normal/Reverse
             break;
 
         }

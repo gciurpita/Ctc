@@ -123,9 +123,6 @@ public class Track {
 
             this.x    = col * tileWid;
             this.y    = row * tileHt;
-
-         // if (null != sym)
-         //     this.sym.cond = 'N';
         }
     };
     ToSig     toSigHd = null;
@@ -496,7 +493,7 @@ public class Track {
             // TO case
             if (1 == (ts.ctcNum % 2))  {
                 byte tile = TrackH;
-                if ('R' == pos)         // right/reversed
+                if ('r' == pos)         // right/reversed
                     tile = ts.tile;
 
                 trk [ts.col][ts.row] = tile;
@@ -511,7 +508,7 @@ public class Track {
             // signal case
             else {
                 byte tile = ts.tile;
-                if ('C' == pos)
+                if ('c' == pos)
                     tile += 30;     // hsignalRG or hsignalLG
 
                 trk [ts.col][ts.row] = tile;
@@ -554,9 +551,9 @@ public class Track {
         // blocks
         for (Blk blk = blks ; null != blk; blk = blk.next)  {
             int idx = 0;
-            if ('O' == blk.sym.cond)
+            if ('o' == blk.sym.cond)
                 idx = 30;               // red
-            else if ('C' == blk.sym.cond)
+            else if ('c' == blk.sym.cond)
                 idx = 60;               // green
 
             trace (g2d, blk.col, blk.row, idx);
